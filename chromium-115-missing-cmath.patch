@@ -1,0 +1,22 @@
+diff -up chromium-115.0.5790.32/skia/ext/skcolorspace_trfn.cc.me chromium-115.0.5790.32/skia/ext/skcolorspace_trfn.cc
+--- chromium-115.0.5790.32/skia/ext/skcolorspace_trfn.cc.me	2023-06-18 12:33:52.387412788 +0200
++++ chromium-115.0.5790.32/skia/ext/skcolorspace_trfn.cc	2023-06-18 12:35:28.229148935 +0200
+@@ -3,6 +3,7 @@
+ // found in the LICENSE file.
+ 
+ #include "skia/ext/skcolorspace_trfn.h"
++#include <cmath>
+ 
+ namespace skia {
+ 
+diff -up chromium-115.0.5790.32/net/cert/pki/verify_name_match.h.me chromium-115.0.5790.32/net/cert/pki/verify_name_match.h
+--- chromium-115.0.5790.32/net/cert/pki/verify_name_match.h.me	2023-06-18 14:23:13.847725775 +0200
++++ chromium-115.0.5790.32/net/cert/pki/verify_name_match.h	2023-06-18 14:23:41.637221117 +0200
+@@ -6,6 +6,7 @@
+ #define NET_CERT_PKI_VERIFY_NAME_MATCH_H_
+ 
+ #include <string>
++#include <vector>
+ 
+ #include "net/base/net_export.h"
+ 

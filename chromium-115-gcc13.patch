@@ -242,17 +242,6 @@ diff -up chromium-109.0.5414.74/components/feature_engagement/internal/never_eve
  #include <string>
  
  #include "components/feature_engagement/internal/event_storage_validator.h"
-diff -up chromium-109.0.5414.74/third_party/swiftshader/third_party/llvm-10.0/llvm/include/llvm/Support/Signals.h.me chromium-109.0.5414.74/third_party/swiftshader/third_party/llvm-10.0/llvm/include/llvm/Support/Signals.h
---- chromium-109.0.5414.74/third_party/swiftshader/third_party/llvm-10.0/llvm/include/llvm/Support/Signals.h.me	2023-01-19 16:06:17.548272878 +0100
-+++ chromium-109.0.5414.74/third_party/swiftshader/third_party/llvm-10.0/llvm/include/llvm/Support/Signals.h	2023-01-19 16:06:25.685410592 +0100
-@@ -14,6 +14,7 @@
- #ifndef LLVM_SUPPORT_SIGNALS_H
- #define LLVM_SUPPORT_SIGNALS_H
- 
-+#include <cstdint>
- #include <string>
- 
- namespace llvm {
 diff -up chromium-109.0.5414.74/third_party/swiftshader/third_party/llvm-10.0/llvm/lib/Support/Unix/Signals.inc.me chromium-109.0.5414.74/third_party/swiftshader/third_party/llvm-10.0/llvm/lib/Support/Unix/Signals.inc
 --- chromium-109.0.5414.74/third_party/swiftshader/third_party/llvm-10.0/llvm/lib/Support/Unix/Signals.inc.me	2023-01-19 16:09:29.216477182 +0100
 +++ chromium-109.0.5414.74/third_party/swiftshader/third_party/llvm-10.0/llvm/lib/Support/Unix/Signals.inc	2023-01-19 16:10:05.657089208 +0100
