@@ -368,6 +368,10 @@ Patch305: chromium-115-add_BoundSessionRefreshCookieFetcher::Result.patch
 # compiler error with c++20
 Patch306: chromium-115-emplace_back_on_vector-c++20.patch
 
+# revert for epel8 on aarch64 due to new feature IFUNC-Resolver not supported
+# in old glibc < 2.30
+Patch307: chromium-115-revert-ifunc.patch
+
 # Load default cursor theme if theme name is empty
 Patch310: chromium-115-wayland-load_default_cursor_theme.patch
 
@@ -977,7 +981,11 @@ udev.
 %patch -P304 -p1 -b .cmath
 %patch -P305 -p1 -b .add_BoundSessionRefreshCookieFetcher::Result
 %patch -P306 -p1 -b .emplace_back_on_vector-c++20
-
+%ifarch aarch64
+%if 0%{?rhel} == 8
+%patch -P307 -p1 -R -b .ifunc
+%endif
+%endif
 %patch -P310 -p1 -b .wayland_load_default_cursor_theme
 
 %patch -P321 -p1 -b .handle_scale_factor_changes
