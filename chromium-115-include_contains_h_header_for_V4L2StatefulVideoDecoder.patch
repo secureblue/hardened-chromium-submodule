@@ -1,0 +1,12 @@
+diff --git a/media/gpu/v4l2/v4l2_stateful_video_decoder.cc b/media/gpu/v4l2/v4l2_stateful_video_decoder.cc
+index c84dedb7d1c1f..ca8cd566d2018 100644
+--- a/media/gpu/v4l2/v4l2_stateful_video_decoder.cc
++++ b/media/gpu/v4l2/v4l2_stateful_video_decoder.cc
+@@ -9,6 +9,7 @@
+ #include <sys/eventfd.h>
+ #include <sys/ioctl.h>
+ 
++#include "base/containers/contains.h"
+ #include "base/files/file_util.h"
+ #include "base/functional/callback_helpers.h"
+ #include "base/memory/ptr_util.h"

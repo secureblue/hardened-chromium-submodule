@@ -370,7 +370,17 @@ Patch306: chromium-115-emplace_back_on_vector-c++20.patch
 
 # revert for epel8 on aarch64 due to new feature IFUNC-Resolver not supported
 # in old glibc < 2.30
+# error: fatal error: 'sys/ifunc.h' file not found
 Patch307: chromium-115-revert-ifunc.patch
+
+# upstream, do not restrict new V4L2 decoders to ARM or ChromeOS 
+# error: use of undeclared identifier 'kV4L2FlatStatefulVideoDecoder'
+# error: use of undeclared identifier 'kV4L2FlatStatelessVideoDecoder'
+Patch308: chromium-115-do_not_restrict_new_V4L2_decoders.v4l2.pach
+
+# upstream, include contains.h header for V4L2StatefulVideoDecoder
+# error: no member named 'Contains' in namespace 'base'
+Patch309: chromium-115-include_contains_h_header_for_V4L2StatefulVideoDecoder.patch
 
 # Load default cursor theme if theme name is empty
 Patch310: chromium-115-wayland-load_default_cursor_theme.patch
@@ -986,6 +996,8 @@ udev.
 %patch -P307 -p1 -R -b .ifunc
 %endif
 %endif
+%patch -P308 -p1 -b .do_not_restrict_new_V4L2_decoders.v4l2
+%patch -P309 -p1 -b .include_contains_h_header_for_V4L2StatefulVideoDecoder
 %patch -P310 -p1 -b .wayland_load_default_cursor_theme
 
 %patch -P321 -p1 -b .handle_scale_factor_changes
