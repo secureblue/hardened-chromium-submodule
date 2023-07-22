@@ -1,0 +1,57 @@
+diff -up chromium-115.0.5790.98/sql/recover_module/cursor.h.me chromium-115.0.5790.98/sql/recover_module/cursor.h
+--- chromium-115.0.5790.98/sql/recover_module/cursor.h.me	2023-07-21 20:13:43.587451992 +0200
++++ chromium-115.0.5790.98/sql/recover_module/cursor.h	2023-07-21 20:16:24.989457148 +0200
+@@ -61,6 +61,10 @@ class VirtualCursor {
+   // The VirtualCursor instance that embeds a given SQLite virtual table cursor.
+   //
+   // |sqlite_cursor| must have been returned by VirtualTable::SqliteCursor().
++#ifdef __GNUC__
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Winvalid-offsetof"
++#endif
+   static inline VirtualCursor* FromSqliteCursor(
+       sqlite3_vtab_cursor* sqlite_cursor) {
+     VirtualCursor* result = reinterpret_cast<VirtualCursor*>(
+@@ -69,6 +73,9 @@ class VirtualCursor {
+     CHECK_EQ(sqlite_cursor, &result->sqlite_cursor_);
+     return result;
+   }
++#ifdef __GNUC__
++#pragma GCC diagnostic pop
++#endif
+ 
+   // Seeks the cursor to the first readable row. Returns a SQLite status code.
+   int First();
+diff -up chromium-115.0.5790.98/third_party/angle/src/libANGLE/BlobCache.cpp.me chromium-115.0.5790.98/third_party/angle/src/libANGLE/BlobCache.cpp
+--- chromium-115.0.5790.98/third_party/angle/src/libANGLE/BlobCache.cpp.me	2023-07-21 20:10:05.119385885 +0200
++++ chromium-115.0.5790.98/third_party/angle/src/libANGLE/BlobCache.cpp	2023-07-21 20:10:14.386558331 +0200
+@@ -14,7 +14,6 @@
+ #include "libANGLE/histogram_macros.h"
+ #include "platform/PlatformMethods.h"
+ 
+-#define USE_SYSTEM_ZLIB
+ #include "compression_utils_portable.h"
+ 
+ namespace egl
+diff -up chromium-115.0.5790.98/third_party/angle/src/libANGLE/MemoryProgramCache.cpp.me chromium-115.0.5790.98/third_party/angle/src/libANGLE/MemoryProgramCache.cpp
+--- chromium-115.0.5790.98/third_party/angle/src/libANGLE/MemoryProgramCache.cpp.me	2023-07-21 20:10:36.864976619 +0200
++++ chromium-115.0.5790.98/third_party/angle/src/libANGLE/MemoryProgramCache.cpp	2023-07-21 20:11:07.629549228 +0200
+@@ -8,7 +8,6 @@
+ //   layer to warm up the cache from disk.
+ 
+ // Include zlib first, otherwise FAR gets defined elsewhere.
+-#define USE_SYSTEM_ZLIB
+ #include "compression_utils_portable.h"
+ 
+ #include "libANGLE/MemoryProgramCache.h"
+diff -up chromium-115.0.5790.98/third_party/angle/src/libANGLE/renderer/vulkan/vk_internal_shaders_autogen.cpp.me chromium-115.0.5790.98/third_party/angle/src/libANGLE/renderer/vulkan/vk_internal_shaders_autogen.cpp
+--- chromium-115.0.5790.98/third_party/angle/src/libANGLE/renderer/vulkan/vk_internal_shaders_autogen.cpp.me	2023-07-21 20:09:44.206996746 +0200
++++ chromium-115.0.5790.98/third_party/angle/src/libANGLE/renderer/vulkan/vk_internal_shaders_autogen.cpp	2023-07-21 20:09:51.834138674 +0200
+@@ -10,7 +10,6 @@
+ 
+ #include "libANGLE/renderer/vulkan/vk_internal_shaders_autogen.h"
+ 
+-#define USE_SYSTEM_ZLIB
+ #include "compression_utils_portable.h"
+ 
+ namespace rx
