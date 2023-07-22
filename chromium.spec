@@ -387,6 +387,8 @@ Patch310: chromium-115-wayland-load_default_cursor_theme.patch
 
 # clang warnings
 Patch311: chromium-115-clang-warnings.patch
+# imp module is removed in python-3.12
+Patch312: chromium-115-python-imp-deprecated.patch
 
 # Qt issue
 Patch321: chromium-114-qt-handle_scale_factor_changes.patch
@@ -1003,6 +1005,7 @@ udev.
 %patch -P309 -p1 -b .include_contains_h_header_for_V4L2StatefulVideoDecoder
 %patch -P310 -p1 -b .wayland_load_default_cursor_theme
 %patch -P311 -p1 -b .clang-warnings
+%patch -P312 -p1 -b .python-imp-deprecated
 
 %patch -P321 -p1 -b .handle_scale_factor_changes
 %patch -P322 -p1 -b .fix_font_double_scaling
