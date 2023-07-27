@@ -1,0 +1,297 @@
+commit 4943182fdfe7adbcc49b10538d7d52b17dd538ff
+Author: Tom Anderson <thomasanderson@chromium.org>
+Date:   Fri Jul 21 22:35:40 2023 +0000
+
+    [Linux Ui] Set toolkit dark preference based on FDO dark preference
+    
+    The toolkit color scheme preference is not affected by the
+    `org.freedesktop.appearance color-scheme` setting.  It's up to
+    apps to manually toggle the toolkit theme based on this setting.
+    This is done by libadwaita, libhandy, firefox, and libreoffice.
+    
+    R=sky
+    
+    Change-Id: If05e61e6d0ec98ee1a74d442ce29b2ceb5337e86
+    Bug: 998903
+    Low-Coverage-Reason: No existing tests for dark_mode_manager_linux
+    Reviewed-on: https://chromium-review.googlesource.com/c/chromium/src/+/4701710
+    Reviewed-by: Scott Violet <sky@chromium.org>
+    Commit-Queue: Thomas Anderson <thomasanderson@chromium.org>
+    Cr-Commit-Position: refs/heads/main@{#1173744}
+
+diff --git a/chrome/browser/ui/views/dark_mode_manager_linux.cc b/chrome/browser/ui/views/dark_mode_manager_linux.cc
+index 4127327433593..6f054ab76b305 100644
+--- a/chrome/browser/ui/views/dark_mode_manager_linux.cc
++++ b/chrome/browser/ui/views/dark_mode_manager_linux.cc
+@@ -67,7 +67,7 @@ DarkModeManagerLinux::DarkModeManagerLinux()
+   if (auto* linux_ui_theme = ui::GetDefaultLinuxUiTheme()) {
+     auto* native_theme = linux_ui_theme->GetNativeTheme();
+     native_theme_observer_.Observe(native_theme);
+-    SetColorScheme(native_theme->ShouldUseDarkColors());
++    SetColorScheme(native_theme->ShouldUseDarkColors(), true);
+   }
+ }
+ 
+@@ -80,7 +80,7 @@ DarkModeManagerLinux::~DarkModeManagerLinux() {
+ 
+ void DarkModeManagerLinux::OnNativeThemeUpdated(
+     ui::NativeTheme* observed_theme) {
+-  SetColorScheme(observed_theme->ShouldUseDarkColors());
++  SetColorScheme(observed_theme->ShouldUseDarkColors(), true);
+ }
+ 
+ void DarkModeManagerLinux::OnSignalConnected(const std::string& interface_name,
+@@ -114,7 +114,7 @@ void DarkModeManagerLinux::OnPortalSettingChanged(dbus::Signal* signal) {
+     return;
+   }
+ 
+-  SetColorScheme(new_color_scheme == kFreedesktopColorSchemeDark);
++  SetColorScheme(new_color_scheme == kFreedesktopColorSchemeDark, false);
+ }
+ 
+ void DarkModeManagerLinux::OnReadColorSchemeResponse(dbus::Response* response) {
+@@ -137,13 +137,23 @@ void DarkModeManagerLinux::OnReadColorSchemeResponse(dbus::Response* response) {
+     return;
+   }
+ 
+-  // Ignore future updates from the toolkit theme.
+-  native_theme_observer_.Reset();
++  // Once we read the org.freedesktop.appearance color-scheme setting successfully,
++  // it should always take precedence over the toolkit color scheme.
++  ignore_toolkit_theme_changes_ = true;
+ 
+-  SetColorScheme(new_color_scheme == kFreedesktopColorSchemeDark);
++  SetColorScheme(new_color_scheme == kFreedesktopColorSchemeDark, false);
+ }
+ 
+-void DarkModeManagerLinux::SetColorScheme(bool prefer_dark_theme) {
++void DarkModeManagerLinux::SetColorScheme(bool prefer_dark_theme,
++                                          bool from_toolkit_theme) {
++  if (from_toolkit_theme && ignore_toolkit_theme_changes_) {
++    return;
++  }
++  if (!from_toolkit_theme) {
++    for (auto* linux_ui_theme : ui::GetLinuxUiThemes()) {
++      linux_ui_theme->SetDarkTheme(prefer_dark_theme);
++    }
++  }
+   if (prefer_dark_theme_ == prefer_dark_theme) {
+     return;
+   }
+diff --git a/chrome/browser/ui/views/dark_mode_manager_linux.h b/chrome/browser/ui/views/dark_mode_manager_linux.h
+index 34b07ffadbbef..e00d8617e0e23 100644
+--- a/chrome/browser/ui/views/dark_mode_manager_linux.h
++++ b/chrome/browser/ui/views/dark_mode_manager_linux.h
+@@ -44,12 +44,13 @@ class DarkModeManagerLinux : public NativeThemeObserver {
+   void OnReadColorSchemeResponse(dbus::Response* response);
+ 
+   // Sets `prefer_dark_theme_` and propagates to the web theme.
+-  void SetColorScheme(bool prefer_dark_theme);
++  void SetColorScheme(bool prefer_dark_theme, bool from_toolkit_theme);
+ 
+   scoped_refptr<dbus::Bus> bus_;
+   raw_ptr<dbus::ObjectProxy> settings_proxy_;
+ 
+   bool prefer_dark_theme_ = false;
++  bool ignore_toolkit_theme_changes_ = false;
+ 
+   base::ScopedObservation<NativeTheme, NativeThemeObserver>
+       native_theme_observer_{this};
+diff --git a/ui/gtk/gtk_ui.cc b/ui/gtk/gtk_ui.cc
+index 2b6bb89e3071e..a463500570c03 100644
+--- a/ui/gtk/gtk_ui.cc
++++ b/ui/gtk/gtk_ui.cc
+@@ -463,6 +463,14 @@ bool GtkUi::PreferDarkTheme() const {
+   return dark;
+ }
+ 
++void GtkUi::SetDarkTheme(bool dark) {
++  auto* settings = gtk_settings_get_default();
++  g_object_set(settings, "gtk-application-prefer-dark-theme", dark, nullptr);
++  // OnThemeChanged() will be called via the
++  // notify::gtk-application-prefer-dark-theme handler to update the native
++  // theme.
++}
++
+ bool GtkUi::AnimationsEnabled() const {
+   gboolean animations_enabled = false;
+   g_object_get(gtk_settings_get_default(), "gtk-enable-animations",
+diff --git a/ui/gtk/gtk_ui.h b/ui/gtk/gtk_ui.h
+index 573ea4066881b..53c02c50dac53 100644
+--- a/ui/gtk/gtk_ui.h
++++ b/ui/gtk/gtk_ui.h
+@@ -106,6 +106,7 @@ class GtkUi : public ui::LinuxUiAndTheme {
+   void GetInactiveSelectionBgColor(SkColor* color) const override;
+   void GetInactiveSelectionFgColor(SkColor* color) const override;
+   bool PreferDarkTheme() const override;
++  void SetDarkTheme(bool dark) override;
+   std::unique_ptr<ui::NavButtonProvider> CreateNavButtonProvider() override;
+   ui::WindowFrameProvider* GetWindowFrameProvider(bool solid_frame) override;
+ 
+diff --git a/ui/linux/fake_linux_ui.cc b/ui/linux/fake_linux_ui.cc
+index d236a0919f66b..8b67f04c25e7d 100644
+--- a/ui/linux/fake_linux_ui.cc
++++ b/ui/linux/fake_linux_ui.cc
+@@ -93,6 +93,8 @@ bool FakeLinuxUi::PreferDarkTheme() const {
+   return false;
+ }
+ 
++void FakeLinuxUi::SetDarkTheme(bool dark) {}
++
+ bool FakeLinuxUi::AnimationsEnabled() const {
+   return true;
+ }
+diff --git a/ui/linux/fake_linux_ui.h b/ui/linux/fake_linux_ui.h
+index 87aa82c930a35..daba20d196a7c 100644
+--- a/ui/linux/fake_linux_ui.h
++++ b/ui/linux/fake_linux_ui.h
+@@ -64,6 +64,7 @@ class FakeLinuxUi : public LinuxUiAndTheme {
+   void GetInactiveSelectionBgColor(SkColor* color) const override;
+   void GetInactiveSelectionFgColor(SkColor* color) const override;
+   bool PreferDarkTheme() const override;
++  void SetDarkTheme(bool dark) override;
+   std::unique_ptr<ui::NavButtonProvider> CreateNavButtonProvider() override;
+   ui::WindowFrameProvider* GetWindowFrameProvider(bool solid_frame) override;
+ };
+diff --git a/ui/linux/fallback_linux_ui.cc b/ui/linux/fallback_linux_ui.cc
+index ab116fda42b22..6d77be047e202 100644
+--- a/ui/linux/fallback_linux_ui.cc
++++ b/ui/linux/fallback_linux_ui.cc
+@@ -112,7 +112,11 @@ LinuxUi::WindowFrameAction FallbackLinuxUi::GetWindowFrameAction(
+ }
+ 
+ bool FallbackLinuxUi::PreferDarkTheme() const {
+-  return false;
++  return theme_is_dark_;
++}
++
++void FallbackLinuxUi::SetDarkTheme(bool dark) {
++  theme_is_dark_ = dark;
+ }
+ 
+ bool FallbackLinuxUi::AnimationsEnabled() const {
+diff --git a/ui/linux/fallback_linux_ui.h b/ui/linux/fallback_linux_ui.h
+index 0d0df25ec2caf..9901d4939400d 100644
+--- a/ui/linux/fallback_linux_ui.h
++++ b/ui/linux/fallback_linux_ui.h
+@@ -65,12 +65,14 @@ class FallbackLinuxUi : public LinuxUiAndTheme {
+   void GetInactiveSelectionBgColor(SkColor* color) const override;
+   void GetInactiveSelectionFgColor(SkColor* color) const override;
+   bool PreferDarkTheme() const override;
++  void SetDarkTheme(bool dark) override;
+   std::unique_ptr<ui::NavButtonProvider> CreateNavButtonProvider() override;
+   ui::WindowFrameProvider* GetWindowFrameProvider(bool solid_frame) override;
+ 
+  private:
+   std::string default_font_family_;
+   gfx::FontRenderParams default_font_render_params_;
++  bool theme_is_dark_ = false;
+ };
+ 
+ }  // namespace ui
+diff --git a/ui/linux/linux_ui.h b/ui/linux/linux_ui.h
+index 45b36fbeeabc4..a47134d7fa672 100644
+--- a/ui/linux/linux_ui.h
++++ b/ui/linux/linux_ui.h
+@@ -300,6 +300,10 @@ class COMPONENT_EXPORT(LINUX_UI) LinuxUiTheme {
+   // preferred.
+   virtual bool PreferDarkTheme() const = 0;
+ 
++  // Override the toolkit's dark mode preference.  Used when the dark mode
++  // setting is provided by org.freedesktop.appearance instead of the toolkit.
++  virtual void SetDarkTheme(bool dark) = 0;
++
+   // Returns a new NavButtonProvider, or nullptr if the underlying
+   // toolkit does not support drawing client-side navigation buttons.
+   virtual std::unique_ptr<NavButtonProvider> CreateNavButtonProvider() = 0;
+diff --git a/ui/linux/linux_ui_factory.cc b/ui/linux/linux_ui_factory.cc
+index 5555ff3bf21f4..21be358d2af8e 100644
+--- a/ui/linux/linux_ui_factory.cc
++++ b/ui/linux/linux_ui_factory.cc
+@@ -10,6 +10,7 @@
+ #include "base/command_line.h"
+ #include "base/environment.h"
+ #include "base/nix/xdg_util.h"
++#include "base/no_destructor.h"
+ #include "base/strings/string_util.h"
+ #include "build/chromecast_buildflags.h"
+ #include "ui/base/buildflags.h"
+@@ -35,10 +36,16 @@ namespace {
+ 
+ const char kUiToolkitFlag[] = "ui-toolkit";
+ 
++std::vector<LinuxUiTheme*>& GetLinuxUiThemesImpl() {
++  static base::NoDestructor<std::vector<LinuxUiTheme*>> themes;
++  return *themes;
++}
++
+ std::unique_ptr<LinuxUiAndTheme> CreateGtkUi() {
+ #if BUILDFLAG(USE_GTK)
+   auto gtk_ui = BuildGtkUi();
+   if (gtk_ui->Initialize()) {
++    GetLinuxUiThemesImpl().push_back(gtk_ui.get());
+     return gtk_ui;
+   }
+ #endif
+@@ -61,6 +68,7 @@ std::unique_ptr<LinuxUiAndTheme> CreateQtUi() {
+ #if BUILDFLAG(USE_QT)
+   auto qt_ui = qt::CreateQtUi(GetGtkUi());
+   if (qt_ui->Initialize()) {
++    GetLinuxUiThemesImpl().push_back(qt_ui.get());
+     return qt_ui;
+   }
+ #endif
+@@ -156,6 +164,10 @@ LinuxUiTheme* GetLinuxUiTheme(SystemTheme system_theme) {
+   }
+ }
+ 
++const std::vector<LinuxUiTheme*>& GetLinuxUiThemes() {
++  return GetLinuxUiThemesImpl();
++}
++
+ SystemTheme GetDefaultSystemTheme() {
+   std::unique_ptr<base::Environment> env = base::Environment::Create();
+ 
+diff --git a/ui/linux/linux_ui_factory.h b/ui/linux/linux_ui_factory.h
+index 5d4f4f4761972..2f4820f2c6240 100644
+--- a/ui/linux/linux_ui_factory.h
++++ b/ui/linux/linux_ui_factory.h
+@@ -32,6 +32,10 @@ LinuxUiTheme* GetDefaultLinuxUiTheme();
+ COMPONENT_EXPORT(LINUX_UI_FACTORY)
+ LinuxUiTheme* GetLinuxUiTheme(SystemTheme system_theme);
+ 
++// Returns all `LinuxUiTheme`s that have been created.
++COMPONENT_EXPORT(LINUX_UI_FACTORY)
++const std::vector<LinuxUiTheme*>& GetLinuxUiThemes();
++
+ COMPONENT_EXPORT(LINUX_UI_FACTORY)
+ SystemTheme GetDefaultSystemTheme();
+ 
+diff --git a/ui/qt/qt_ui.cc b/ui/qt/qt_ui.cc
+index cd12c72a3cad4..37e165d76305e 100644
+--- a/ui/qt/qt_ui.cc
++++ b/ui/qt/qt_ui.cc
+@@ -355,6 +355,11 @@ bool QtUi::PreferDarkTheme() const {
+       shim_->GetColor(ColorType::kWindowBg, ColorState::kNormal));
+ }
+ 
++DISABLE_CFI_VCALL
++void QtUi::SetDarkTheme(bool dark) {
++  // Qt::ColorScheme is only available in QT 6.5 and later.
++}
++
+ DISABLE_CFI_VCALL
+ bool QtUi::AnimationsEnabled() const {
+   return shim_->GetAnimationDurationMs() > 0;
+diff --git a/ui/qt/qt_ui.h b/ui/qt/qt_ui.h
+index 38ce8719ee1d8..787a9556b1264 100644
+--- a/ui/qt/qt_ui.h
++++ b/ui/qt/qt_ui.h
+@@ -82,6 +82,7 @@ class QtUi : public ui::LinuxUiAndTheme, QtInterface::Delegate {
+   void GetInactiveSelectionBgColor(SkColor* color) const override;
+   void GetInactiveSelectionFgColor(SkColor* color) const override;
+   bool PreferDarkTheme() const override;
++  void SetDarkTheme(bool dark) override;
+   std::unique_ptr<ui::NavButtonProvider> CreateNavButtonProvider() override;
+   ui::WindowFrameProvider* GetWindowFrameProvider(bool solid_frame) override;
+ 
