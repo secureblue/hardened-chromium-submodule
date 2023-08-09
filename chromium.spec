@@ -15,7 +15,7 @@
 
 # This flag is so I can build things very fast on a giant system.
 # Enabling this in koji causes aarch64 builds to timeout indefinitely.
-%global use_all_cpus 0
+%global use_all_cpus 1
 
 %if %{use_all_cpus}
 %global numjobs %{_smp_build_ncpus}
@@ -235,7 +235,7 @@
 
 Name:	chromium%{chromium_channel}
 Version: 115.0.5790.170
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
