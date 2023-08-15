@@ -377,6 +377,9 @@ Patch312: chromium-115-python-3.12-deprecated.patch
 Patch350: chromium-115-linux_ui_darkmode.patch
 # Tweak about:gpu, Add dark mode support
 Patch351: chromium-116-tweak_about_gpu.patch
+# Guard the field assignment num_delta_pocs_of_ref_rps_idx as it is not supported
+# in fedora < 39
+Patch352: chromium-116-v4l2-num_delta_pocs_of_ref_rps_idx.patch
 
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
 # http://build.chromium.org/buildbot/official/
@@ -975,6 +978,13 @@ udev.
 
 %patch -P350 -p1 -b .linux_ui_darkmode
 %patch -P351 -p1 -b .tweak_about_gpu
+
+%ifarch aarch64
+%if 0%{?fedora} < 39
+%patch -P352 -p1 -b .num_delta_pocs_of_ref_rps_idx
+%endif 
+%endif
+
 
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
