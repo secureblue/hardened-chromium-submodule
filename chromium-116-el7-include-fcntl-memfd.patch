@@ -34,3 +34,14 @@ diff -up iridium-browser-2022.12.108.1/third_party/wayland/src/cursor/os-compati
  #include <errno.h>
  #include <signal.h>
  #include <string.h>
+diff -up chromium-116.0.5845.96/ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.cc.me chromium-116.0.5845.96/ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.cc
+--- chromium-116.0.5845.96/ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.cc.me	2023-08-17 06:32:32.484538849 +0200
++++ chromium-116.0.5845.96/ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.cc	2023-08-17 07:02:01.965168328 +0200
+@@ -5,6 +5,7 @@
+ #include "ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.h"
+ 
+ #include <sys/mman.h>
++#include <linux/memfd.h>
+ 
+ #include <string>
+ #include <utility>
