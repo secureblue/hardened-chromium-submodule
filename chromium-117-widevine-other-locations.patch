@@ -15,8 +15,9 @@ diff -up chromium-108.0.5359.124/chrome/common/chrome_paths.cc.widevine-other-lo
 +        cur = base::FilePath(FILE_PATH_LITERAL("/opt/google/chrome/WidevineCdm"));
 +        break;
 +      }
-       if (!GetComponentDirectory(&cur))
+       if (!GetComponentDirectory(&cur)) {
          return false;
+       }
        cur = cur.AppendASCII(kWidevineCdmBaseDirectory);
 diff -up chromium-108.0.5359.124/third_party/widevine/cdm/BUILD.gn.widevine-other-locations chromium-108.0.5359.124/third_party/widevine/cdm/BUILD.gn
 --- chromium-108.0.5359.124/third_party/widevine/cdm/BUILD.gn.widevine-other-locations	2023-01-02 11:10:45.953114153 +0100

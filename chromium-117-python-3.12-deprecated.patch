@@ -69,17 +69,6 @@ diff -up chromium-115.0.5790.102/mojo/public/tools/bindings/concatenate_and_repl
      if not match:
        print("Invalid goog.provide line in %s:\n%s" % (filename, line))
        sys.exit(1)
-diff -up chromium-115.0.5790.102/mojo/public/tools/mojom/mojom/parse/lexer.py.me chromium-115.0.5790.102/mojo/public/tools/mojom/mojom/parse/lexer.py
---- chromium-115.0.5790.102/mojo/public/tools/mojom/mojom/parse/lexer.py.me	2023-07-22 14:10:40.372979365 +0200
-+++ chromium-115.0.5790.102/mojo/public/tools/mojom/mojom/parse/lexer.py	2023-07-22 14:13:31.200453442 +0200
-@@ -2,7 +2,6 @@
- # Use of this source code is governed by a BSD-style license that can be
- # found in the LICENSE file.
- 
--import imp
- import os.path
- import sys
- 
 diff -up chromium-115.0.5790.102/third_party/catapult/common/py_vulcanize/py_vulcanize/html_generation_controller.py.me chromium-115.0.5790.102/third_party/catapult/common/py_vulcanize/py_vulcanize/html_generation_controller.py
 --- chromium-115.0.5790.102/third_party/catapult/common/py_vulcanize/py_vulcanize/html_generation_controller.py.me	2023-07-22 15:12:41.850895179 +0200
 +++ chromium-115.0.5790.102/third_party/catapult/common/py_vulcanize/py_vulcanize/html_generation_controller.py	2023-07-22 15:12:55.844871207 +0200
@@ -159,14 +148,3 @@ diff -up chromium-115.0.5790.102/third_party/vulkan-deps/vulkan-validation-layer
      return [s.replace('\\', '/') for s in glob.glob(dirname)]
  
  def main():
-diff -up chromium-115.0.5790.102/mojo/public/tools/mojom/mojom/fileutil.py.python-imp-deprecated chromium-115.0.5790.102/mojo/public/tools/mojom/mojom/fileutil.py
---- chromium-115.0.5790.102/mojo/public/tools/mojom/mojom/fileutil.py.python-imp-deprecated	2023-07-21 05:41:02.000000000 +0200
-+++ chromium-115.0.5790.102/mojo/public/tools/mojom/mojom/fileutil.py	2023-07-22 14:45:20.440127549 +0200
-@@ -3,7 +3,6 @@
- # found in the LICENSE file.
- 
- import errno
--import imp
- import os.path
- import sys
- 
