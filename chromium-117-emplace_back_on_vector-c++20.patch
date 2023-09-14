@@ -44,3 +44,17 @@ diff -up chromium-116.0.5845.96/chrome/browser/content_settings/one_time_permiss
        permissions::PermissionUmaUtil::RecordOneTimePermissionEvent(
            content_setting_type, trigger_event);
      }
+diff -up chromium-117.0.5938.62/base/trace_event/trace_log.cc.me chromium-117.0.5938.62/base/trace_event/trace_log.cc
+--- chromium-117.0.5938.62/base/trace_event/trace_log.cc.me	2023-09-13 20:14:42.441248781 +0200
++++ chromium-117.0.5938.62/base/trace_event/trace_log.cc	2023-09-13 20:16:12.186638601 +0200
+@@ -2187,8 +2187,8 @@ void TraceLog::SetTraceBufferForTesting(
+ #if BUILDFLAG(USE_PERFETTO_CLIENT_LIBRARY)
+ void TraceLog::OnSetup(const perfetto::DataSourceBase::SetupArgs& args) {
+   AutoLock lock(track_event_lock_);
+-  track_event_sessions_.emplace_back(args.internal_instance_index, *args.config,
+-                                     args.backend_type);
++  track_event_sessions_.emplace_back() = {args.internal_instance_index, *args.config,
++                                     args.backend_type};
+ }
+ 
+ void TraceLog::OnStart(const perfetto::DataSourceBase::StartArgs&) {
