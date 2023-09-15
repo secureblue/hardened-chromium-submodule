@@ -416,3 +416,17 @@ diff -up chromium-117.0.5938.62/content/browser/renderer_host/render_frame_host_
          destination,
          /*from_renderer=*/false, info->attribution_reporting_runtime_features,
          GetFrameTreeNodeId(), navigation_request.GetNavigationId());
+diff -up chromium-117.0.5938.62/chrome/browser/enterprise/profile_management/profile_management_navigation_throttle.cc.me chromium-117.0.5938.62/chrome/browser/enterprise/profile_management/profile_management_navigation_throttle.cc
+--- chromium-117.0.5938.62/chrome/browser/enterprise/profile_management/profile_management_navigation_throttle.cc.me	2023-09-15 22:04:09.233356627 +0200
++++ chromium-117.0.5938.62/chrome/browser/enterprise/profile_management/profile_management_navigation_throttle.cc	2023-09-15 22:05:44.126063992 +0200
+@@ -67,8 +67,8 @@ base::flat_map<std::string, SAMLProfileA
+   // TODO(crbug.com/1445072): Add actual domains with attribute names.
+   profile_attributes->insert(std::make_pair(
+       "supported.test",
+-      SAMLProfileAttributes("placeholderName", "placeholderDomain",
+-                            "placeholderToken")));
++      SAMLProfileAttributes{"placeholderName", "placeholderDomain",
++                            "placeholderToken"}));
+ 
+   // Extract domains and attributes from the command line switch.
+   const base::CommandLine& command_line =
