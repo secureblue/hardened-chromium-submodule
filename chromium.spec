@@ -345,7 +345,7 @@ Patch301: chromium-115-compiler-SkColor4f.patch
 Patch302: chromium-117-workaround_clang_bug-structured_binding.patch
 
 # missing typename
-Patch303: chromium-116-typename.patch
+Patch303: chromium-117-typename.patch
 
 # missing include header files
 Patch304: chromium-117-missing-header-files.patch
@@ -357,6 +357,9 @@ Patch306: chromium-117-emplace_back_on_vector-c++20.patch
 # in old glibc < 2.30
 # error: fatal error: 'sys/ifunc.h' file not found
 Patch307: chromium-116-arm64-memory_tagging.patch
+
+# compiler error, invalid operands to binary expression
+Patch308: chromium-117-string-convert.patch
 
 # clang warnings
 Patch311: chromium-115-clang-warnings.patch
@@ -961,6 +964,7 @@ udev.
 %endif
 %endif
 
+%patch -P308 -p1 -b .string-convert
 %patch -P311 -p1 -b .clang-warnings
 %patch -P312 -p1 -b .python-3.12-deprecated
 
