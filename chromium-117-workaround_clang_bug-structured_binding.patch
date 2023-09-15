@@ -67,3 +67,30 @@ diff -up chromium-115.0.5790.32/content/browser/service_worker/service_worker_co
  
    DCHECK(document_url.is_valid());
    TRACE_EVENT1("ServiceWorker",
+diff -up chromium-117.0.5938.62/third_party/blink/renderer/core/layout/ng/grid/ng_grid_layout_algorithm.cc.me chromium-117.0.5938.62/third_party/blink/renderer/core/layout/ng/grid/ng_grid_layout_algorithm.cc
+--- chromium-117.0.5938.62/third_party/blink/renderer/core/layout/ng/grid/ng_grid_layout_algorithm.cc.me	2023-09-15 13:03:00.787257048 +0200
++++ chromium-117.0.5938.62/third_party/blink/renderer/core/layout/ng/grid/ng_grid_layout_algorithm.cc	2023-09-15 13:15:05.502706522 +0200
+@@ -3437,7 +3437,10 @@ void NGGridLayoutAlgorithm::PlaceGridIte
+   DCHECK(out_row_break_between);
+ 
+   const auto& container_space = ConstraintSpace();
+-  const auto& [grid_items, layout_data, tree_size] = sizing_tree.TreeRootData();
++  const auto& [g_i, l_d, t_s] = sizing_tree.TreeRootData();
++  const auto& grid_items = g_i;
++  const auto& layout_data = l_d;
++  const auto& tree_size = t_s;
+ 
+   const auto* cached_layout_subtree = container_space.GridLayoutSubtree();
+   const auto container_writing_direction =
+@@ -3601,7 +3604,10 @@ void NGGridLayoutAlgorithm::PlaceGridIte
+ 
+   // TODO(ikilpatrick): Update |SetHasSeenAllChildren| and early exit if true.
+   const auto& constraint_space = ConstraintSpace();
+-  const auto& [grid_items, layout_data, tree_size] = sizing_tree.TreeRootData();
++  const auto& [g_i, l_d, t_s] = sizing_tree.TreeRootData();
++  const auto& grid_items = g_i;
++  const auto& layout_data = l_d;
++  const auto& tree_size =t_s;
+ 
+   const auto* cached_layout_subtree = constraint_space.GridLayoutSubtree();
+   const auto container_writing_direction =

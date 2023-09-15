@@ -58,3 +58,17 @@ diff -up chromium-117.0.5938.62/base/trace_event/trace_log.cc.me chromium-117.0.
  }
  
  void TraceLog::OnStart(const perfetto::DataSourceBase::StartArgs&) {
+diff -up chromium-117.0.5938.62/content/browser/download/save_package.cc.me chromium-117.0.5938.62/content/browser/download/save_package.cc
+--- chromium-117.0.5938.62/content/browser/download/save_package.cc.me	2023-09-15 12:02:43.866622591 +0200
++++ chromium-117.0.5938.62/content/browser/download/save_package.cc	2023-09-15 12:03:58.715984511 +0200
+@@ -764,8 +764,8 @@ void SavePackage::Finish() {
+   if (download_) {
+     std::vector<download::DownloadSaveItemData::ItemInfo> files;
+     for (auto& item : saved_success_items_) {
+-      files.emplace_back(item.second->full_path(), item.second->url(),
+-                         item.second->referrer().url);
++      files.emplace_back() = {item.second->full_path(), item.second->url(),
++                         item.second->referrer().url};
+     }
+     download::DownloadSaveItemData::AttachItemData(download_, std::move(files));
+   }

@@ -337,8 +337,9 @@ Patch117: chromium-108-ffmpeg-revert-new-channel-layout-api.patch
 # revert AV1 VAAPI video encode due to old libva on el9
 Patch130: chromium-114-revert-av1enc-el9.patch
 
-# compiler build errors
-Patch300: chromium-116-no_matching_constructor.patch
+# fixes for old clang version in fedora < 38 end epel
+# compiler build errors, no matching constructor for initialization
+Patch300: chromium-117-no_matching_constructor.patch
 Patch301: chromium-115-compiler-SkColor4f.patch
 
 # workaround for clang bug, https://github.com/llvm/llvm-project/issues/57826
@@ -358,7 +359,7 @@ Patch306: chromium-117-emplace_back_on_vector-c++20.patch
 # error: fatal error: 'sys/ifunc.h' file not found
 Patch307: chromium-116-arm64-memory_tagging.patch
 
-# compiler error, invalid operands to binary expression
+# error: invalid operands to binary expression
 Patch308: chromium-117-string-convert.patch
 
 # clang warnings
