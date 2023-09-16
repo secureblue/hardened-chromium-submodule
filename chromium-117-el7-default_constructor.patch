@@ -1,0 +1,13 @@
+diff -up chromium-117.0.5938.62/content/browser/interest_group/header_direct_from_seller_signals.cc.me chromium-117.0.5938.62/content/browser/interest_group/header_direct_from_seller_signals.cc
+--- chromium-117.0.5938.62/content/browser/interest_group/header_direct_from_seller_signals.cc.me	2023-09-16 09:43:41.717545215 +0200
++++ chromium-117.0.5938.62/content/browser/interest_group/header_direct_from_seller_signals.cc	2023-09-16 09:48:07.319539585 +0200
+@@ -187,7 +187,8 @@ void OnJsonDecoded(std::unique_ptr<const
+ 
+ }  // namespace
+ 
+-HeaderDirectFromSellerSignals::HeaderDirectFromSellerSignals() = default;
++HeaderDirectFromSellerSignals::HeaderDirectFromSellerSignals() :
++  seller_signals_(absl::nullopt), auction_signals_(absl::nullopt) { }
+ 
+ HeaderDirectFromSellerSignals::~HeaderDirectFromSellerSignals() = default;
+ 
