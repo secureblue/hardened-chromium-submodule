@@ -413,7 +413,7 @@ Source15: https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-%{esbuil
 
 # esbuild binary from fedora
 %if 0%{?fedora}
-BuildRequires: golang-github-evanw-esbuild-%{esbuild_version}
+BuildRequires: golang-github-evanw-esbuild
 %endif
 
 %if %{clang}
