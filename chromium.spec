@@ -1071,6 +1071,14 @@ FLAGS+=' -Wno-unused-but-set-variable -Wno-unused-result -Wno-unused-function -W
 FLAGS+=' -Wno-unused-const-variable -Wno-unneeded-internal-declaration -Wno-unknown-attributes'
 %endif
 
+# Workaround for https://bugzilla.redhat.com/show_bug.cgi?id=2239523
+# Disable BTI until this is fixed upstream.
+%ifarch aarch64
+%if 0%{?fedora}
+FLAGS="${FLAGS/-mbranch-protection=standard/-mbranch-protection=none}"
+%endif
+%endif
+
 %if %{system_build_flags}
 CFLAGS=${CFLAGS/-g }
 CFLAGS=${CFLAGS/-fexceptions}
