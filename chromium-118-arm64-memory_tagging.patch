@@ -1,0 +1,15 @@
+diff -up chromium-118.0.5993.32/base/allocator/partition_allocator/partition_alloc_config.h.me chromium-118.0.5993.32/base/allocator/partition_allocator/partition_alloc_config.h
+--- chromium-118.0.5993.32/base/allocator/partition_allocator/partition_alloc_config.h.me	2023-10-03 20:25:01.282782425 +0200
++++ chromium-118.0.5993.32/base/allocator/partition_allocator/partition_alloc_config.h	2023-10-03 20:25:27.151236664 +0200
+@@ -152,10 +152,7 @@ static_assert(sizeof(void*) != 8, "");
+   (!BUILDFLAG(PUT_REF_COUNT_IN_PREVIOUS_SLOT) && \
+    defined(ARCH_CPU_LITTLE_ENDIAN))
+ 
+-#define PA_CONFIG_HAS_MEMORY_TAGGING()              \
+-  (defined(ARCH_CPU_ARM64) && defined(__clang__) && \
+-   !defined(ADDRESS_SANITIZER) &&                   \
+-   (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)))
++#define PA_CONFIG_HAS_MEMORY_TAGGING() 0
+ 
+ #if PA_CONFIG(HAS_MEMORY_TAGGING)
+ static_assert(sizeof(void*) == 8);
