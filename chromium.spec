@@ -26,6 +26,10 @@
 
 # enable|disble bootstrap
 %global bootstrap 0
+# workaround for broken gn on epel9
+%if 0%{?rhel} == 9
+%global bootstrap 1
+%endif
 
 # Fancy build status, so we at least know, where we are..
 # %1 where
