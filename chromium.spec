@@ -363,7 +363,7 @@ Patch116: chromium-112-ffmpeg-first_dts.patch
 Patch117: chromium-118-sigtrap_system_ffmpeg.patch
 
 # revert AV1 VAAPI video encode due to old libva on el9
-Patch130: chromium-114-revert-av1enc-el9.patch
+Patch130: chromium-119-revert-av1enc-el9.patch
 
 # file conflict with old kernel on el8/el9
 Patch140: chromium-118-dma_buf_export_sync_file-conflict.patch
