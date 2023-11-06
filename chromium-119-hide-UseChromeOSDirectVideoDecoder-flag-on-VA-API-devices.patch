@@ -21,23 +21,10 @@ Date:   Tue Oct 24 19:57:55 2023 +0000
     Commit-Queue: Pilar Molina Lopez <pmolinalopez@chromium.org>
     Cr-Commit-Position: refs/heads/main@{#1214411}
 
-diff --git a/chrome/browser/DEPS b/chrome/browser/DEPS
-index ee9fb206cde36..0fe18013ab044 100644
---- a/chrome/browser/DEPS
-+++ b/chrome/browser/DEPS
-@@ -418,6 +418,7 @@ include_rules = [
-   "+media/base",  # For media switches
-   "+media/capabilities", # For InMemoryVideoDecodeStatsDB
-   "+media/cdm",
-+  "+media/gpu/buildflags.h",
-   "+media/remoting/device_capability_checker.h",
-   "+media/capture",
-   "+media/midi",  # For midi switches
-diff --git a/chrome/browser/about_flags.cc b/chrome/browser/about_flags.cc
-index 84709afaa34d0..777bebeb33d9e 100644
---- a/chrome/browser/about_flags.cc
-+++ b/chrome/browser/about_flags.cc
-@@ -7578,11 +7578,13 @@ const FeatureEntry kFeatureEntries[] = {
+diff -up chromium-119.0.6045.105/chrome/browser/about_flags.cc.hide-UseChromeOSDirectVideoDecoder-flag-on-VA-API-devices chromium-119.0.6045.105/chrome/browser/about_flags.cc
+--- chromium-119.0.6045.105/chrome/browser/about_flags.cc.hide-UseChromeOSDirectVideoDecoder-flag-on-VA-API-devices	2023-11-01 19:10:09.000000000 +0100
++++ chromium-119.0.6045.105/chrome/browser/about_flags.cc	2023-11-06 17:12:08.057984291 +0100
+@@ -7771,11 +7771,13 @@ const FeatureEntry kFeatureEntries[] = {
  #endif  // BUILDFLAG(IS_CHROMEOS_ASH)
  
  #if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CHROMEOS_MEDIA_ACCELERATION)
@@ -51,10 +38,20 @@ index 84709afaa34d0..777bebeb33d9e 100644
  
      {"enable-vbr-encode-acceleration",
       flag_descriptions::kChromeOSHWVBREncodingName,
-diff --git a/chrome/browser/flag_descriptions.cc b/chrome/browser/flag_descriptions.cc
-index 318a8be9ab1a6..d2497d0c403f3 100644
---- a/chrome/browser/flag_descriptions.cc
-+++ b/chrome/browser/flag_descriptions.cc
+diff -up chromium-119.0.6045.105/chrome/browser/DEPS.hide-UseChromeOSDirectVideoDecoder-flag-on-VA-API-devices chromium-119.0.6045.105/chrome/browser/DEPS
+--- chromium-119.0.6045.105/chrome/browser/DEPS.hide-UseChromeOSDirectVideoDecoder-flag-on-VA-API-devices	2023-11-01 19:10:09.000000000 +0100
++++ chromium-119.0.6045.105/chrome/browser/DEPS	2023-11-06 17:12:08.055984248 +0100
+@@ -415,6 +415,7 @@ include_rules = [
+   "+media/base",  # For media switches
+   "+media/capabilities", # For InMemoryVideoDecodeStatsDB
+   "+media/cdm",
++  "+media/gpu/buildflags.h",
+   "+media/remoting/device_capability_checker.h",
+   "+media/capture",
+   "+media/midi",  # For midi switches
+diff -up chromium-119.0.6045.105/chrome/browser/flag_descriptions.cc.hide-UseChromeOSDirectVideoDecoder-flag-on-VA-API-devices chromium-119.0.6045.105/chrome/browser/flag_descriptions.cc
+--- chromium-119.0.6045.105/chrome/browser/flag_descriptions.cc.hide-UseChromeOSDirectVideoDecoder-flag-on-VA-API-devices	2023-11-01 19:10:12.000000000 +0100
++++ chromium-119.0.6045.105/chrome/browser/flag_descriptions.cc	2023-11-06 17:12:08.059984335 +0100
 @@ -7,6 +7,7 @@
  #include "build/build_config.h"
  #include "build/chromeos_buildflags.h"
@@ -63,15 +60,15 @@ index 318a8be9ab1a6..d2497d0c403f3 100644
  #include "pdf/buildflags.h"
  
  // Keep in identical order as the header file, see the comment at the top
-@@ -7338,6 +7339,7 @@ const char kQuickOfficeForceFileDownloadDescription[] =
- #endif  // BUILDFLAG(IS_CHROMEOS)
+@@ -7424,6 +7425,7 @@ const char kVaapiVP9kSVCEncoderDescripti
+ #endif  // defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS)
  
  #if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CHROMEOS_MEDIA_ACCELERATION)
 +#if !BUILDFLAG(USE_VAAPI)
  const char kChromeOSDirectVideoDecoderName[] = "ChromeOS Direct Video Decoder";
  const char kChromeOSDirectVideoDecoderDescription[] =
      "Enables the hardware-accelerated ChromeOS direct media::VideoDecoder "
-@@ -7345,7 +7347,8 @@ const char kChromeOSDirectVideoDecoderDescription[] =
+@@ -7431,7 +7433,8 @@ const char kChromeOSDirectVideoDecoderDe
      "--platform-disallows-chromeos-direct-video-decoder command line switch "
      "which is added for platforms where said direct VideoDecoder does not work "
      "or is not well tested (see the disable_cros_video_decoder USE flag in "
@@ -81,11 +78,10 @@ index 318a8be9ab1a6..d2497d0c403f3 100644
  const char kChromeOSHWVBREncodingName[] =
      "ChromeOS Hardware Variable Bitrate Encoding";
  const char kChromeOSHWVBREncodingDescription[] =
-diff --git a/content/public/browser/gpu_utils.cc b/content/public/browser/gpu_utils.cc
-index dceeca9659a85..3d091359777cc 100644
---- a/content/public/browser/gpu_utils.cc
-+++ b/content/public/browser/gpu_utils.cc
-@@ -133,20 +133,26 @@ const gpu::GpuPreferences GetGpuPreferencesFromCommandLine() {
+diff -up chromium-119.0.6045.105/content/public/browser/gpu_utils.cc.hide-UseChromeOSDirectVideoDecoder-flag-on-VA-API-devices chromium-119.0.6045.105/content/public/browser/gpu_utils.cc
+--- chromium-119.0.6045.105/content/public/browser/gpu_utils.cc.hide-UseChromeOSDirectVideoDecoder-flag-on-VA-API-devices	2023-11-01 19:10:26.000000000 +0100
++++ chromium-119.0.6045.105/content/public/browser/gpu_utils.cc	2023-11-06 17:12:08.059984335 +0100
+@@ -133,20 +133,26 @@ const gpu::GpuPreferences GetGpuPreferen
  #if BUILDFLAG(USE_CHROMEOS_MEDIA_ACCELERATION)
    // The direct VideoDecoder is disallowed on some particular SoC/platforms.
    const bool should_use_direct_video_decoder =
@@ -122,11 +118,10 @@ index dceeca9659a85..3d091359777cc 100644
  #if BUILDFLAG(USE_VAAPI)
    CHECK(gpu_preferences.enable_chromeos_direct_video_decoder);
  #endif  // BUILDFLAG(USE_VAAPI)
-diff --git a/media/base/media_switches.cc b/media/base/media_switches.cc
-index 1af4de46e2a02..3086b1bec2134 100644
---- a/media/base/media_switches.cc
-+++ b/media/base/media_switches.cc
-@@ -1192,6 +1192,7 @@ BASE_FEATURE(kChromeOSHWVBREncoding,
+diff -up chromium-119.0.6045.105/media/base/media_switches.cc.hide-UseChromeOSDirectVideoDecoder-flag-on-VA-API-devices chromium-119.0.6045.105/media/base/media_switches.cc
+--- chromium-119.0.6045.105/media/base/media_switches.cc.hide-UseChromeOSDirectVideoDecoder-flag-on-VA-API-devices	2023-11-01 19:10:31.000000000 +0100
++++ chromium-119.0.6045.105/media/base/media_switches.cc	2023-11-06 17:12:08.060984356 +0100
+@@ -1202,6 +1202,7 @@ BASE_FEATURE(kChromeOSHWVBREncoding,
               "ChromeOSHWVBREncoding",
               base::FEATURE_DISABLED_BY_DEFAULT);
  
@@ -134,7 +129,7 @@ index 1af4de46e2a02..3086b1bec2134 100644
  // Enable the hardware-accelerated direct video decoder instead of the one
  // needing the VdaVideoDecoder adapter. This flag is used mainly as a
  // chrome:flag for developers debugging issues as well as to be able to
-@@ -1200,6 +1201,7 @@ BASE_FEATURE(kChromeOSHWVBREncoding,
+@@ -1210,6 +1211,7 @@ BASE_FEATURE(kChromeOSHWVBREncoding,
  BASE_FEATURE(kUseChromeOSDirectVideoDecoder,
               "UseChromeOSDirectVideoDecoder",
               base::FEATURE_ENABLED_BY_DEFAULT);
@@ -142,7 +137,7 @@ index 1af4de46e2a02..3086b1bec2134 100644
  
  // Limit the number of concurrent hardware decoder instances on ChromeOS.
  BASE_FEATURE(kLimitConcurrentDecoderInstances,
-@@ -1228,7 +1230,7 @@ BASE_FEATURE(kPreferSoftwareMT21,
+@@ -1238,7 +1240,7 @@ BASE_FEATURE(kPreferSoftwareMT21,
               "PreferSoftwareMT21",
               base::FEATURE_DISABLED_BY_DEFAULT);
  #endif  // defined(ARCH_CPU_ARM_FAMILY)
@@ -151,7 +146,7 @@ index 1af4de46e2a02..3086b1bec2134 100644
  // ChromeOS has one of two VideoDecoder implementations active based on
  // SoC/board specific configurations that are sent via command line flags. This
  // switch allows using the non default implementation for testing.
-@@ -1236,7 +1238,7 @@ BASE_FEATURE(kPreferSoftwareMT21,
+@@ -1246,7 +1248,7 @@ BASE_FEATURE(kPreferSoftwareMT21,
  BASE_FEATURE(kUseAlternateVideoDecoderImplementation,
               "UseAlternateVideoDecoderImplementation",
               base::FEATURE_DISABLED_BY_DEFAULT);
@@ -160,10 +155,9 @@ index 1af4de46e2a02..3086b1bec2134 100644
  #endif  // BUILDFLAG(USE_CHROMEOS_MEDIA_ACCELERATION)
  
  #if BUILDFLAG(IS_WIN)
-diff --git a/media/base/media_switches.h b/media/base/media_switches.h
-index 1d9c2c2d9df73..96d9595be110e 100644
---- a/media/base/media_switches.h
-+++ b/media/base/media_switches.h
+diff -up chromium-119.0.6045.105/media/base/media_switches.h.hide-UseChromeOSDirectVideoDecoder-flag-on-VA-API-devices chromium-119.0.6045.105/media/base/media_switches.h
+--- chromium-119.0.6045.105/media/base/media_switches.h.hide-UseChromeOSDirectVideoDecoder-flag-on-VA-API-devices	2023-11-01 19:10:31.000000000 +0100
++++ chromium-119.0.6045.105/media/base/media_switches.h	2023-11-06 17:12:08.060984356 +0100
 @@ -14,6 +14,7 @@
  #include "build/build_config.h"
  #include "build/chromeos_buildflags.h"
@@ -172,7 +166,7 @@ index 1d9c2c2d9df73..96d9595be110e 100644
  #include "media/media_buildflags.h"
  
  namespace base {
-@@ -381,16 +382,18 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(kBuiltInHlsPlayer);
+@@ -382,16 +383,18 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(kBuilt
  #if BUILDFLAG(USE_CHROMEOS_MEDIA_ACCELERATION)
  MEDIA_EXPORT BASE_DECLARE_FEATURE(kChromeOSHWAV1Decoder);
  MEDIA_EXPORT BASE_DECLARE_FEATURE(kChromeOSHWVBREncoding);

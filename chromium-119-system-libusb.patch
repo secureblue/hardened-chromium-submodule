@@ -1,6 +1,6 @@
-diff -up chromium-105.0.5195.52/build/linux/unbundle/libusb.gn.gnsystem chromium-105.0.5195.52/build/linux/unbundle/libusb.gn
---- chromium-105.0.5195.52/build/linux/unbundle/libusb.gn.gnsystem	2022-09-01 12:23:27.557313611 +0000
-+++ chromium-105.0.5195.52/build/linux/unbundle/libusb.gn	2022-09-01 12:23:27.557313611 +0000
+diff -up chromium-119.0.6045.105/build/linux/unbundle/libusb.gn.gnsystem chromium-119.0.6045.105/build/linux/unbundle/libusb.gn
+--- chromium-119.0.6045.105/build/linux/unbundle/libusb.gn.gnsystem	2023-11-06 12:22:08.550625387 +0100
++++ chromium-119.0.6045.105/build/linux/unbundle/libusb.gn	2023-11-06 12:22:08.550625387 +0100
 @@ -0,0 +1,24 @@
 +# Copyright 2016 The Chromium Authors. All rights reserved.
 +# Use of this source code is governed by a BSD-style license that can be
@@ -26,12 +26,12 @@ diff -up chromium-105.0.5195.52/build/linux/unbundle/libusb.gn.gnsystem chromium
 +  ]
 +  public_configs = [ ":system_libusb" ]
 +}
-diff -up chromium-105.0.5195.52/build/linux/unbundle/replace_gn_files.py.gnsystem chromium-105.0.5195.52/build/linux/unbundle/replace_gn_files.py
---- chromium-105.0.5195.52/build/linux/unbundle/replace_gn_files.py.gnsystem	2022-09-01 12:23:27.558313577 +0000
-+++ chromium-105.0.5195.52/build/linux/unbundle/replace_gn_files.py	2022-09-01 12:36:01.870847125 +0000
-@@ -52,6 +52,7 @@ REPLACEMENTS = {
+diff -up chromium-119.0.6045.105/build/linux/unbundle/replace_gn_files.py.gnsystem chromium-119.0.6045.105/build/linux/unbundle/replace_gn_files.py
+--- chromium-119.0.6045.105/build/linux/unbundle/replace_gn_files.py.gnsystem	2023-11-06 12:22:08.550625387 +0100
++++ chromium-119.0.6045.105/build/linux/unbundle/replace_gn_files.py	2023-11-06 12:28:28.295776501 +0100
+@@ -54,6 +54,7 @@ REPLACEMENTS = {
+   'libevent': 'third_party/libevent/BUILD.gn',
    'libjpeg': 'third_party/libjpeg.gni',
-   'libjxl' : 'third_party/libjxl/BUILD.gn',
    'libpng': 'third_party/libpng/BUILD.gn',
 +  'libusb': 'third_party/libusb/BUILD.gn',
    'libvpx': 'third_party/libvpx/BUILD.gn',
