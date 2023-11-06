@@ -270,8 +270,8 @@ Patch0: chromium-70.0.3538.67-sandbox-pie.patch
 # Use /etc/chromium for initial_prefs
 Patch1: chromium-115-initial_prefs-etc-path.patch
 
-# Use gn system files
-Patch2: chromium-107.0.5304.110-gn-system.patch
+# system libusb
+Patch2: chromium-107-system-libusb.patch
 
 # Do not mangle zlib
 Patch5: chromium-77.0.3865.75-no-zlib-mangle.patch
@@ -1078,9 +1078,6 @@ sed -i 's/getenv("CHROME_VERSION_EXTRA")/"Fedora Project"/' chrome/common/channe
 
 # Fix hardcoded path in remoting code
 sed -i 's|/opt/google/chrome-remote-desktop|%{crd_path}|g' remoting/host/setup/daemon_controller_delegate_linux.cc
-
-# reduce debuginfos
-sed -i 's|-g2|-g0|g' build/config/compiler/BUILD.gn
 
 # change moc to moc-qt5 for fedora
 sed -i 's|moc|moc-qt5|g' ui/qt/moc_wrapper.py
