@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# Copyright 2021-2023, Than Ngo <than@redhat.com>
 # Copyright 2010,2015-2019 Tom Callaway <tcallawa@redhat.com>
 # Copyright 2013-2016 Tomas Popela <tpopela@redhat.com>
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -324,7 +325,7 @@ if __name__ == '__main__':
       delete_chromium_dir(directory)
 
   # There has got to be a better, more portable way to do this.
-  os.system("find %s -depth -name reference_build -type d -exec rm -rf {} \;" % latest_dir)
+  os.system("find %s -depth -name reference_build -type d -exec rm -rf {} \\;" % latest_dir)
 
   # I could not find good bindings for xz/lzma support, so we system call here too.
   chromium_clean_xz_file = "chromium-" + chromium_version + "-clean.tar.xz"
@@ -339,6 +340,6 @@ if __name__ == '__main__':
   if (not args.prep):
     print("Compressing cleaned tree, please wait...")
     os.chdir(chromium_root_dir)
-    os.system("tar --exclude=\.svn -cf - chromium-%s | xz -9 -T 0 -f > %s" % (chromium_version, chromium_clean_xz_file))
+    os.system("tar --exclude=\\.svn -cf - chromium-%s | xz -9 -T 0 -f > %s" % (chromium_version, chromium_clean_xz_file))
 
   print("Finished!")
