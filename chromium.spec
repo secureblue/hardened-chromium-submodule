@@ -1708,7 +1708,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 
 %changelog
 * Wed Nov 15 2023 Than Ngo <than@redhat.com> - 119.0.6045.159-1
-- update to 119.0.6045.159
+- update to 119.0.6045.159, upstream security release
+   High CVE-2023-5997, use after free in Garbage Collection
+   High CVE-2023-6112, use after free in Navigation
 - add Requires/Conflicts for ABI break in fmpeg-free 6.0.1
 - drop first_dts patch, reintroduce first_dts patch in ffmpeg-free-6.0.1
 - fixed python3 syntaxWarning: invalid escape sequenc
