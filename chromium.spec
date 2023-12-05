@@ -947,12 +947,9 @@ udev.
 
 %patch -P20 -p1 -b .disable-font-test
 
-%if 0%{?fedora} || 0%{?rhel} >= 8
-%patch -P52 -p1 -b .unbundle-zlib
-%endif
-
 %if ! %{bundleminizip}
 %patch -P61 -p1 -b .system-minizip
+%patch -P52 -p1 -b .unbundle-zlib
 %endif
 
 %patch -P65 -p1 -b .java-only-allowed
@@ -1170,7 +1167,7 @@ CHROMIUM_CORE_GN_DEFINES+=' enable_nacl=false'
 CHROMIUM_CORE_GN_DEFINES+=' system_libdir="%{_lib}"'
 
 %if %{official_build}
-CHROMIUM_CORE_GN_DEFINES+=' is_official_build=true use_thin_lto=true is_cfi=true chrome_pgo_phase=0 use_debug_fission=true'
+CHROMIUM_CORE_GN_DEFINES+=' is_official_build=true use_thin_lto=false is_cfi=false chrome_pgo_phase=0 use_debug_fission=true'
 sed -i 's|OFFICIAL_BUILD|GOOGLE_CHROME_BUILD|g' tools/generate_shim_headers/generate_shim_headers.py
 %endif
 
@@ -1740,7 +1737,6 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 - enable build flag -fstack-protector-strong for improved security
 - fixed bz#2242271, built with bundleminizip in fedora > 39
 - fixed bz#2251884, built with fstack-protector-strong for improved security
-- fixed bz#2252874, enable control flow integrity (cfi)
 
 * Wed Nov 29 2023 Than Ngo <than@redhat.com> - 119.0.6045.199-1
 - update to 119.0.6045.199
