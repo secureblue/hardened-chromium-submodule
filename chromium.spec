@@ -180,9 +180,9 @@
 %global bundlepylibs 0
 
 # RHEL 7.9 dropped minizip.
-# It exists everywhere else though.
+# enable bundleminizip for Fedora > 39 due to switch to minizip-ng
 %global bundleminizip 0
-%if 0%{?rhel} == 7
+%if 0%{?rhel} == 7 || 0%{?fedora} > 39
 %global bundleminizip 1
 %endif
 
@@ -1170,7 +1170,7 @@ CHROMIUM_CORE_GN_DEFINES+=' enable_nacl=false'
 CHROMIUM_CORE_GN_DEFINES+=' system_libdir="%{_lib}"'
 
 %if %{official_build}
-CHROMIUM_CORE_GN_DEFINES+=' is_official_build=true use_thin_lto=false is_cfi=false chrome_pgo_phase=0 use_debug_fission=true'
+CHROMIUM_CORE_GN_DEFINES+=' is_official_build=true use_thin_lto=false is_cfi=true chrome_pgo_phase=0 use_debug_fission=true'
 sed -i 's|OFFICIAL_BUILD|GOOGLE_CHROME_BUILD|g' tools/generate_shim_headers/generate_shim_headers.py
 %endif
 
@@ -1738,6 +1738,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %changelog
 * Sat Dec 02 2023 Than Ngo <than@redhat.com> - 119.0.6045.199-2
 - enable build flag -fstack-protector-strong for improved security
+- fixed bz#2242271, built with bundleminizip in fedora > 39
+- fixed bz#2251884, built with fstack-protector-strong for improved security
+- fixed bz#2252874, enable control flow integrity (cfi)
 
 * Wed Nov 29 2023 Than Ngo <than@redhat.com> - 119.0.6045.199-1
 - update to 119.0.6045.199
