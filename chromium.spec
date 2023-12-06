@@ -132,7 +132,7 @@
 %global debug_package %{nil}
 %global debug_level 0
 %else
-%global debug_level 1
+%global debug_level 0
 # workaround for the error empty file debugsource
 %undefine _debugsource_packages
 %endif
@@ -291,7 +291,7 @@
 
 Name:	chromium%{chromium_channel}
 Version: 120.0.6099.62
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -448,6 +448,8 @@ Patch354: chromium-120-split-threshold-for-reg-with-hint.patch
 Patch355: chromium-120-nullptr_t-without-namespace-std.patch
 # disable FFmpegAllowLists by default to allow external ffmpeg
 patch356: chromium-120-disable-FFmpegAllowLists.patch
+# remove ldflags -Wl,-mllvm,-disable-auto-upgrade-debug-info which is not supported
+Patch357: chromium-120-clang16-disable-auto-upgrade-debug-info.patch
 
 # upstream patches
 
@@ -1063,6 +1065,7 @@ udev.
 %patch -P355 -p1 -b .nullptr_t-without-namespace-std
 %endif
 %patch -P356 -p1 -b .disable-FFmpegAllowLists
+%patch -P357 -p1 -b .clang16-disable-auto-upgrade-debug-info
 
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
@@ -1222,7 +1225,7 @@ CHROMIUM_CORE_GN_DEFINES+=' use_lld=false'
 # disable rust, it's only using for testing
 CHROMIUM_CORE_GN_DEFINES+=' enable_rust=false'
 
-CHROMIUM_CORE_GN_DEFINES+=' use_sysroot=false disable_fieldtrial_testing_config=true rtc_enable_symbol_export=true'
+CHROMIUM_CORE_GN_DEFINES+=' use_sysroot=false disable_fieldtrial_testing_config=true'
 
 %if %{use_gold}
 CHROMIUM_CORE_GN_DEFINES+=' use_gold=true'
@@ -1766,6 +1769,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %{chromium_path}/chromedriver
 
 %changelog
+* Wed Dec 06 2023 Than Ngo <than@redhat.com> - 120.0.6099.62-2
+- drop unsupported ldflag which caused build failure
+
 * Tue Dec 05 2023 Than Ngo <than@redhat.com> - 120.0.6099.62-1
 - update to 120.0.6099.62
 - fixed bz#2252874, built with control flow integrity (CFI) support
