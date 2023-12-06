@@ -377,17 +377,6 @@ diff -up chromium-119.0.6045.105/third_party/vulkan-deps/vulkan-validation-layer
      static inline void VmaUint32ToStr(char* VMA_NOT_NULL outStr, size_t strLen, uint32_t num)
      {
          snprintf(outStr, strLen, "%u", static_cast<unsigned int>(num));
-diff -up chromium-119.0.6045.105/third_party/vulkan_memory_allocator/include/vk_mem_alloc.h.missing-header-files chromium-119.0.6045.105/third_party/vulkan_memory_allocator/include/vk_mem_alloc.h
---- chromium-119.0.6045.105/third_party/vulkan_memory_allocator/include/vk_mem_alloc.h.missing-header-files	2023-11-01 19:12:13.000000000 +0100
-+++ chromium-119.0.6045.105/third_party/vulkan_memory_allocator/include/vk_mem_alloc.h	2023-11-06 14:34:01.812869068 +0100
-@@ -2388,6 +2388,7 @@ VMA_CALL_PRE void VMA_CALL_POST vmaFreeV
- #ifdef VMA_IMPLEMENTATION
- #undef VMA_IMPLEMENTATION
- 
-+#include <cstdio>
- #include <cstdint>
- #include <cstdlib>
- #include <cstring>
 diff -up chromium-119.0.6045.105/third_party/webrtc/audio/utility/channel_mixer.cc.missing-header-files chromium-119.0.6045.105/third_party/webrtc/audio/utility/channel_mixer.cc
 --- chromium-119.0.6045.105/third_party/webrtc/audio/utility/channel_mixer.cc.missing-header-files	2023-11-01 19:14:05.000000000 +0100
 +++ chromium-119.0.6045.105/third_party/webrtc/audio/utility/channel_mixer.cc	2023-11-06 14:34:01.819869217 +0100
