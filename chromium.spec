@@ -132,7 +132,7 @@
 %global debug_package %{nil}
 %global debug_level 0
 %else
-%global debug_level 0
+%global debug_level 1
 # workaround for the error empty file debugsource
 %undefine _debugsource_packages
 %endif
