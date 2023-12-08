@@ -87,9 +87,6 @@ header_files="	libavcodec/x86/inline_asm.h \
 		libavcodec/dv.h \
 		libavcodec/error_resilience.h \
 		libavcodec/fdctdsp.h \
-		libavcodec/fft.h \
-		libavcodec/fft-internal.h \
-		libavcodec/fft_table.h \
 		libavcodec/flac.h \
 		libavcodec/flacdsp.h \
 		libavcodec/flac_parse.h \
@@ -100,6 +97,7 @@ header_files="	libavcodec/x86/inline_asm.h \
 		libavcodec/hevc.h \
 		libavcodec/hpeldsp.h \
 		libavcodec/hwaccels.h \
+		libavcodec/hwaccel_internal.h \
 		libavcodec/hwconfig.h \
 		libavcodec/idctdsp.h \
 		libavcodec/internal.h \
@@ -181,7 +179,7 @@ header_files="	libavcodec/x86/inline_asm.h \
 		libavutil/x86/asm.h \
 		libavutil/x86/bswap.h \
 		libavutil/x86/cpu.h \
-		libavutil/x86/emms.h
+		libavutil/emms.h \
 		libavutil/x86/intreadwrite.h \
 		libavutil/x86/intmath.h
 		libavutil/x86/timer.h \
@@ -223,10 +221,8 @@ header_files="	libavcodec/x86/inline_asm.h \
 		compat/va_copy.h \
 		compat/atomics/gcc/stdatomic.h "
 
-manual_files="	libavcodec/aarch64/fft_neon.S \
-		libavcodec/aarch64/h264pred_neon.S \
+manual_files=" libavcodec/aarch64/h264pred_neon.S \
 		libavcodec/aarch64/hpeldsp_neon.S \
-		libavcodec/aarch64/mdct_neon.S \
 		libavcodec/aarch64/neon.S \
 		libavcodec/aarch64/vorbisdsp_neon.S \
 		libavcodec/aarch64/vorbisdsp_init.c \
@@ -240,7 +236,6 @@ manual_files="	libavcodec/aarch64/fft_neon.S \
 		libavcodec/x86/vp3dsp.asm \
 		libavcodec/x86/vp8dsp.asm \
 		libavcodec/bit_depth_template.c \
-		libavcodec/fft_template.c \
 		libavcodec/flacdec.c \
 		libavcodec/flacdsp.c \
 		libavcodec/flacdsp_template.c \
@@ -248,7 +243,6 @@ manual_files="	libavcodec/aarch64/fft_neon.S \
 		libavcodec/h264pred_template.c \
 		libavcodec/hpel_template.c \
 		libavcodec/hpeldsp.c \
-		libavcodec/mdct_template.c \
 		libavcodec/options.c \
 		libavcodec/pcm.c \
 		libavcodec/pel_template.c \
@@ -301,7 +295,6 @@ mp3_files="	libavcodec/aarch64/aacpsdsp_init_aarch64.c \
 		libavcodec/autorename_libavcodec_mpegaudiodsp.c \
 		libavcodec/autorename_libavcodec_sbrdsp.c \
 		libavcodec/cbrt_data.c \
-		libavcodec/dct.c \
 		libavcodec/dct32_fixed.c \
 		libavcodec/dct32_float.c \
 		libavcodec/dct32_template.c \
@@ -319,7 +312,6 @@ mp3_files="	libavcodec/aarch64/aacpsdsp_init_aarch64.c \
 		libavcodec/sbrdsp.c \
 		libavcodec/sbrdsp_template.c \
 		libavcodec/sinewin.c \
-		libavcodec/x86/dct_init.c \
 		libavcodec/x86/dct32.asm \
 		libavcodec/x86/imdct36.asm \
 		libavcodec/x86/mpegaudiodsp.c \
