@@ -360,6 +360,10 @@ Patch100: chromium-116-el7-include-fcntl-memfd.patch
 # add define HAVE_STRNDUP on epel7
 Patch101: chromium-108-el7-wayland-strndup-error.patch
 
+# Workaround for old clang
+# error: defaulting this default constructor would delete it after its first declaration
+Patch102: chromium-121-el7-default-constructor-involving-anonymous-union.patch
+
 # Work around old and missing headers on EPEL7
 Patch103: chromium-110-epel7-old-headers-workarounds.patch
 
@@ -1026,6 +1030,7 @@ udev.
 %if 0%{?rhel} == 7
 %patch -P100 -p1 -b .el7-memfd-fcntl-include
 %patch -P101 -p1 -b .wayland-strndup-error
+%patch -P102 -p1 -b .default-constructor-involving-anonymous-union
 %patch -P103 -p1 -b .epel7-header-workarounds
 %patch -P104 -p1 -b .el7cups
 %patch -P105 -p1 -b .el7-old-libdrm
