@@ -50,21 +50,6 @@ diff -up chromium-114.0.5735.35/media/gpu/vaapi/vaapi_video_encode_accelerator.c
      default:
        return nullptr;
    }
-diff -up chromium-114.0.5735.35/media/gpu/BUILD.gn.revert-av1enc chromium-114.0.5735.35/media/gpu/BUILD.gn
---- chromium-114.0.5735.35/media/gpu/BUILD.gn.revert-av1enc	2023-05-18 00:37:57.000000000 +0200
-+++ chromium-114.0.5735.35/media/gpu/BUILD.gn	2023-05-20 13:14:10.755183630 +0200
-@@ -373,10 +373,7 @@ source_set("common") {
-       "vp9_svc_layers.h",
-     ]
-     configs += [ "//third_party/libvpx:libvpx_config" ]
--    deps += [
--      "//third_party/libaom:libaomrc",
--      "//third_party/libvpx:libvpxrc",
--    ]
-+    deps += [ "//third_party/libvpx:libvpxrc" ]
-   }
-   if (use_libgav1_parser) {
-     sources += [
 diff -up chromium-114.0.5735.35/media/gpu/vaapi/BUILD.gn.revert-av1enc chromium-114.0.5735.35/media/gpu/vaapi/BUILD.gn
 --- chromium-114.0.5735.35/media/gpu/vaapi/BUILD.gn.revert-av1enc	2023-05-18 00:37:57.000000000 +0200
 +++ chromium-114.0.5735.35/media/gpu/vaapi/BUILD.gn	2023-05-20 13:14:10.756183626 +0200
@@ -119,3 +104,18 @@ diff -up chromium-119.0.6045.105/media/gpu/vaapi/vaapi_wrapper.h.me chromium-119
  
    // Blits a VASurface |va_surface_src| into another VASurface
    // |va_surface_dest| applying pixel format conversion, cropping
+diff -up chromium-121.0.6167.57/media/gpu/BUILD.gn.than chromium-121.0.6167.57/media/gpu/BUILD.gn
+--- chromium-121.0.6167.57/media/gpu/BUILD.gn.than	2024-01-15 22:09:21.010029147 +0100
++++ chromium-121.0.6167.57/media/gpu/BUILD.gn	2024-01-15 22:10:05.192259340 +0100
+@@ -391,10 +391,7 @@ source_set("common") {
+       "vp9_svc_layers_stateful.h",
+     ]
+     configs += [ "//third_party/libvpx:libvpx_config" ]
+-    deps += [
+-      "//third_party/libaom:libaomrc",
+-      "//third_party/libvpx:libvpxrc",
+-    ]
++    deps += [ "//third_party/libvpx:libvpxrc" ]
+   }
+   if (use_libgav1_parser) {
+     sources += [
