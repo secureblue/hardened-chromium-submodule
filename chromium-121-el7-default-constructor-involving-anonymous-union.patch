@@ -10,3 +10,15 @@ diff -up chromium-121.0.6167.57/content/browser/interest_group/header_direct_fro
  
  HeaderDirectFromSellerSignals::Result::Result(
      absl::optional<std::string> seller_signals,
+diff -up chromium-121.0.6167.57/components/variations/service/ui_string_overrider.cc.me chromium-121.0.6167.57/components/variations/service/ui_string_overrider.cc
+--- chromium-121.0.6167.57/components/variations/service/ui_string_overrider.cc.me	2024-01-24 08:07:50.191188397 +0100
++++ chromium-121.0.6167.57/components/variations/service/ui_string_overrider.cc	2024-01-24 08:08:55.905676634 +0100
+@@ -12,7 +12,7 @@
+ 
+ namespace variations {
+ 
+-UIStringOverrider::UIStringOverrider() = default;
++UIStringOverrider::UIStringOverrider() {}
+ 
+ UIStringOverrider::UIStringOverrider(base::span<const uint32_t> resource_hashes,
+                                      base::span<const int> resource_indices)
