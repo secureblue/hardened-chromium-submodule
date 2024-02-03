@@ -943,3 +943,38 @@ diff -up chromium-121.0.6167.57/content/browser/worker_host/dedicated_worker_hos
                creator_);
  
    if (!creator_render_frame_host && !creator_worker) {
+diff -up chromium-121.0.6167.139/chrome/browser/ui/autofill/autofill_context_menu_manager.cc.me chromium-121.0.6167.139/chrome/browser/ui/autofill/autofill_context_menu_manager.cc
+--- chromium-121.0.6167.139/chrome/browser/ui/autofill/autofill_context_menu_manager.cc.me	2024-02-02 21:07:42.852096466 +0100
++++ chromium-121.0.6167.139/chrome/browser/ui/autofill/autofill_context_menu_manager.cc	2024-02-02 21:07:49.336212697 +0100
+@@ -249,8 +249,8 @@ void AutofillContextMenuManager::Execute
+     AutofillManager& manager) {
+   auto& driver = static_cast<ContentAutofillDriver&>(manager.driver());
+   driver.browser_events().RendererShouldTriggerSuggestions(
+-      FieldGlobalId(driver.GetFrameToken(),
+-                    FieldRendererId(params_.field_renderer_id)),
++      FieldGlobalId{driver.GetFrameToken(),
++                    FieldRendererId(params_.field_renderer_id)},
+       AutofillSuggestionTriggerSource::kManualFallbackPayments);
+ }
+ 
+diff -up chromium-121.0.6167.139/chrome/browser/ui/web_applications/sub_apps_service_impl.cc.me chromium-121.0.6167.139/chrome/browser/ui/web_applications/sub_apps_service_impl.cc
+--- chromium-121.0.6167.139/chrome/browser/ui/web_applications/sub_apps_service_impl.cc.me	2024-02-02 22:24:28.167153031 +0100
++++ chromium-121.0.6167.139/chrome/browser/ui/web_applications/sub_apps_service_impl.cc	2024-02-02 22:26:43.994144340 +0100
+@@ -102,7 +102,7 @@ AddOptionsFromMojo(
+                      ConvertPathToUrl(sub_app->manifest_id_path, origin));
+     ASSIGN_OR_RETURN(GURL install_url,
+                      ConvertPathToUrl(sub_app->install_url_path, origin));
+-    sub_apps.emplace_back(std::move(manifest_id), std::move(install_url));
++    sub_apps.emplace_back() = {std::move(manifest_id), std::move(install_url)};
+   }
+   return sub_apps;
+ }
+@@ -389,7 +389,7 @@ void SubAppsServiceImpl::ScheduleSubAppI
+         base::BindOnce(
+             [](webapps::ManifestId manifest_id, const webapps::AppId& app_id,
+                webapps::InstallResultCode result_code) {
+-              return SubAppInstallResult(manifest_id, app_id, result_code);
++              return SubAppInstallResult{manifest_id, app_id, result_code};
+             },
+             manifest_id)
+             .Then(install_results_collector));
