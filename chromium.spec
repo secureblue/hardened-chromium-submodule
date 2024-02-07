@@ -237,7 +237,11 @@
 %global bundlelibxml 1
 %else
 %global bundleharfbuzz 0
+%if 0%{?fedora} > 38 || 0%{?rhel} > 9
 %global bundlebrotli 0
+%else
+%global bundlebrotli 1
+%endif
 %global bundleopus 0
 %global bundlelibusbx 0
 %global bundlelibwebp 0
