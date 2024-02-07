@@ -235,7 +235,6 @@
 %global bundlelibXNVCtrl 1
 %global bundlelibxml 1
 %else
-%global bundleharfbuzz 0
 %if 0%{?fedora} > 38 || 0%{?rhel} > 9
 %global bundlebrotli 0
 %else
@@ -255,8 +254,10 @@
 %global bundlelibtiff 0
 %if 0%{?rhel} == 9
 %global bundlecrc32c 1
+%global bundleharfbuzz 1
 %else
 %global bundlecrc32c 0
+%global bundleharfbuzz 0
 %endif
 %global bundlewoff2 0
 %global bundledoubleconversion 0
