@@ -457,3 +457,59 @@ diff -up chromium-119.0.6045.105/ui/gfx/linux/drm_util_linux.h.missing-header-fi
  namespace ui {
  
  int GetFourCCFormatFromBufferFormat(gfx::BufferFormat format);
+diff -up chromium-121.0.6167.139/crypto/hkdf.h.me chromium-121.0.6167.139/crypto/hkdf.h
+--- chromium-121.0.6167.139/crypto/hkdf.h.me	2024-02-03 17:24:49.957949670 +0100
++++ chromium-121.0.6167.139/crypto/hkdf.h	2024-02-03 17:26:05.753312178 +0100
+@@ -7,6 +7,7 @@
+ 
+ #include <stddef.h>
+ 
++#include <vector>
+ #include <string>
+ #include <string_view>
+ 
+diff -up chromium-121.0.6167.139/ui/display/types/display_color_management.h.me chromium-121.0.6167.139/ui/display/types/display_color_management.h
+--- chromium-121.0.6167.139/ui/display/types/display_color_management.h.me	2024-02-03 18:55:34.889499101 +0100
++++ chromium-121.0.6167.139/ui/display/types/display_color_management.h	2024-02-03 18:55:59.608945624 +0100
+@@ -6,6 +6,7 @@
+ #define UI_DISPLAY_TYPES_DISPLAY_COLOR_MANAGEMENT_H_
+ 
+ #include <vector>
++#include <memory>
+ 
+ #include "third_party/skia/modules/skcms/skcms.h"
+ #include "ui/display/types/display_types_export.h"
+diff -up chromium-121.0.6167.139/ui/gfx/x/visual_manager.cc.me chromium-121.0.6167.139/ui/gfx/x/visual_manager.cc
+--- chromium-121.0.6167.139/ui/gfx/x/visual_manager.cc.me	2024-02-03 21:20:32.126285578 +0100
++++ chromium-121.0.6167.139/ui/gfx/x/visual_manager.cc	2024-02-03 21:20:50.272607248 +0100
+@@ -2,6 +2,8 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
++#include <bitset>
++
+ #include "ui/gfx/x/visual_manager.h"
+ 
+ #include "base/strings/string_number_conversions.h"
+diff -up chromium-121.0.6167.139/third_party/blink/renderer/platform/fonts/simple_font_data.h.me chromium-121.0.6167.139/third_party/blink/renderer/platform/fonts/simple_font_data.h
+--- chromium-121.0.6167.139/third_party/blink/renderer/platform/fonts/simple_font_data.h.me	2024-02-03 22:47:05.632713381 +0100
++++ chromium-121.0.6167.139/third_party/blink/renderer/platform/fonts/simple_font_data.h	2024-02-03 22:47:30.788293027 +0100
+@@ -26,6 +26,7 @@
+ 
+ #include <memory>
+ #include <utility>
++#include <mutex>
+ 
+ #include "build/build_config.h"
+ #include "third_party/blink/renderer/platform/fonts/canvas_rotation_in_vertical.h"
+diff -up chromium-121.0.6167.139/chrome/browser/performance_manager/policies/probability_distribution.h.me chromium-121.0.6167.139/chrome/browser/performance_manager/policies/probability_distribution.h
+--- chromium-121.0.6167.139/chrome/browser/performance_manager/policies/probability_distribution.h.me	2024-02-04 09:26:02.239427860 +0100
++++ chromium-121.0.6167.139/chrome/browser/performance_manager/policies/probability_distribution.h	2024-02-04 09:26:10.051565081 +0100
+@@ -5,6 +5,7 @@
+ #ifndef CHROME_BROWSER_PERFORMANCE_MANAGER_POLICIES_PROBABILITY_DISTRIBUTION_H_
+ #define CHROME_BROWSER_PERFORMANCE_MANAGER_POLICIES_PROBABILITY_DISTRIBUTION_H_
+ 
++#include <cstdint>
+ #include <utility>
+ #include <vector>
+ 
