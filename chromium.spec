@@ -190,9 +190,9 @@
 # This is left here to ease the change if that ever switches.
 %global bundleicu 1
 
-# system libre2.so is not supported with use_custom_libcxx=true
-# because the library's interface relies on libstdc++'s std::string and std::vector.
+# system re2, jsoncpp, build errors with use_custom_libcxx=true
 %global bundlere2 1
+%global bundlejsoncpp 1
 %global bundlelibaom 1
 %global bundlelibavif 1
 %global bundledav1d 1
@@ -229,7 +229,6 @@
 %global bundlelibtiff 1
 %global bundlecrc32c 1
 %global bundlewoff2 1
-%global bundlejsoncpp 1
 %global bundledoubleconversion 1
 %global bundlelibsecret 1
 %global bundlesnappy 1
@@ -260,7 +259,6 @@
 %global bundlecrc32c 0
 %endif
 %global bundlewoff2 0
-%global bundlejsoncpp 0
 %global bundledoubleconversion 0
 %global bundlelibsecret 0
 %global bundlesnappy 0
