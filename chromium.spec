@@ -1065,7 +1065,7 @@ udev.
 %endif
 
 %if ! %{bundlelibxml}
-%if 0%{?fedora} < 40 || 0%{?rhel} < 10
+%if 0%{?fedora} && 0%{?fedora} < 40 || 0%{?rhel} && 0%{?rhel} < 10
 %patch -P90 -p1 -b .system-libxml
 %endif
 %endif
