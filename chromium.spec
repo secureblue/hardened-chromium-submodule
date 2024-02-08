@@ -261,7 +261,7 @@
 %endif
 %global bundledoubleconversion 0
 %global bundlelibsecret 0
-%global bundlesnappy 0
+%global bundlesnappy 1
 %global bundlelibXNVCtrl 0
 %global bundlelibxml 0
 %endif
