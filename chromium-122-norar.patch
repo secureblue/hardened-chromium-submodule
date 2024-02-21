@@ -1,7 +1,7 @@
-diff -up chromium-119.0.6045.105/chrome/browser/safe_browsing/download_protection/file_analyzer.cc.nounrar chromium-119.0.6045.105/chrome/browser/safe_browsing/download_protection/file_analyzer.cc
---- chromium-119.0.6045.105/chrome/browser/safe_browsing/download_protection/file_analyzer.cc.nounrar	2023-11-01 19:10:13.000000000 +0100
-+++ chromium-119.0.6045.105/chrome/browser/safe_browsing/download_protection/file_analyzer.cc	2023-11-06 17:16:55.630255973 +0100
-@@ -77,8 +77,6 @@ void FileAnalyzer::Start(const base::Fil
+diff -up chromium-122.0.6261.29/chrome/browser/safe_browsing/download_protection/file_analyzer.cc.nounrar chromium-122.0.6261.29/chrome/browser/safe_browsing/download_protection/file_analyzer.cc
+--- chromium-122.0.6261.29/chrome/browser/safe_browsing/download_protection/file_analyzer.cc.nounrar	2024-02-07 19:49:25.000000000 +0100
++++ chromium-122.0.6261.29/chrome/browser/safe_browsing/download_protection/file_analyzer.cc	2024-02-11 18:55:29.964450604 +0100
+@@ -79,8 +79,6 @@ void FileAnalyzer::Start(const base::Fil
  
    if (inspection_type == DownloadFileType::ZIP) {
      StartExtractZipFeatures();
@@ -10,9 +10,9 @@ diff -up chromium-119.0.6045.105/chrome/browser/safe_browsing/download_protectio
  #if BUILDFLAG(IS_MAC)
    } else if (inspection_type == DownloadFileType::DMG) {
      StartExtractDmgFeatures();
-diff -up chromium-119.0.6045.105/chrome/common/safe_browsing/BUILD.gn.nounrar chromium-119.0.6045.105/chrome/common/safe_browsing/BUILD.gn
---- chromium-119.0.6045.105/chrome/common/safe_browsing/BUILD.gn.nounrar	2023-11-01 19:10:16.000000000 +0100
-+++ chromium-119.0.6045.105/chrome/common/safe_browsing/BUILD.gn	2023-11-06 17:16:55.630255973 +0100
+diff -up chromium-122.0.6261.29/chrome/common/safe_browsing/BUILD.gn.nounrar chromium-122.0.6261.29/chrome/common/safe_browsing/BUILD.gn
+--- chromium-122.0.6261.29/chrome/common/safe_browsing/BUILD.gn.nounrar	2024-02-07 19:49:27.000000000 +0100
++++ chromium-122.0.6261.29/chrome/common/safe_browsing/BUILD.gn	2024-02-11 18:55:29.965450629 +0100
 @@ -143,7 +143,6 @@ source_set("safe_browsing") {
        "//components/safe_browsing/content/common:file_type_policies",
        "//components/safe_browsing/core/common",
@@ -21,11 +21,11 @@ diff -up chromium-119.0.6045.105/chrome/common/safe_browsing/BUILD.gn.nounrar ch
      ]
  
      public_deps = [
-diff -up chromium-119.0.6045.105/chrome/services/file_util/safe_archive_analyzer.cc.nounrar chromium-119.0.6045.105/chrome/services/file_util/safe_archive_analyzer.cc
---- chromium-119.0.6045.105/chrome/services/file_util/safe_archive_analyzer.cc.nounrar	2023-11-06 18:07:30.549291823 +0100
-+++ chromium-119.0.6045.105/chrome/services/file_util/safe_archive_analyzer.cc	2023-11-06 18:08:00.510076945 +0100
+diff -up chromium-122.0.6261.29/chrome/services/file_util/safe_archive_analyzer.cc.nounrar chromium-122.0.6261.29/chrome/services/file_util/safe_archive_analyzer.cc
+--- chromium-122.0.6261.29/chrome/services/file_util/safe_archive_analyzer.cc.nounrar	2024-02-07 19:49:27.000000000 +0100
++++ chromium-122.0.6261.29/chrome/services/file_util/safe_archive_analyzer.cc	2024-02-11 23:49:25.061324007 +0100
 @@ -74,6 +74,7 @@ void SafeArchiveAnalyzer::AnalyzeRarFile
-     const absl::optional<std::string>& password,
+     const std::optional<std::string>& password,
      mojo::PendingRemote<chrome::mojom::TemporaryFileGetter> temp_file_getter,
      AnalyzeRarFileCallback callback) {
 +#if 0
@@ -42,10 +42,10 @@ diff -up chromium-119.0.6045.105/chrome/services/file_util/safe_archive_analyzer
  }
  
  void SafeArchiveAnalyzer::AnalyzeSevenZipFile(
-diff -up chromium-119.0.6045.105/chrome/services/file_util/safe_archive_analyzer.h.nounrar chromium-119.0.6045.105/chrome/services/file_util/safe_archive_analyzer.h
---- chromium-119.0.6045.105/chrome/services/file_util/safe_archive_analyzer.h.nounrar	2023-11-01 19:10:16.000000000 +0100
-+++ chromium-119.0.6045.105/chrome/services/file_util/safe_archive_analyzer.h	2023-11-06 17:16:55.630255973 +0100
-@@ -7,7 +7,6 @@
+diff -up chromium-122.0.6261.29/chrome/services/file_util/safe_archive_analyzer.h.nounrar chromium-122.0.6261.29/chrome/services/file_util/safe_archive_analyzer.h
+--- chromium-122.0.6261.29/chrome/services/file_util/safe_archive_analyzer.h.nounrar	2024-02-07 19:49:27.000000000 +0100
++++ chromium-122.0.6261.29/chrome/services/file_util/safe_archive_analyzer.h	2024-02-11 18:55:29.966450653 +0100
+@@ -9,7 +9,6 @@
  
  #include "chrome/common/safe_browsing/archive_analyzer_results.h"
  #include "chrome/services/file_util/public/mojom/safe_archive_analyzer.mojom.h"
@@ -53,7 +53,7 @@ diff -up chromium-119.0.6045.105/chrome/services/file_util/safe_archive_analyzer
  #include "chrome/utility/safe_browsing/seven_zip_analyzer.h"
  #include "chrome/utility/safe_browsing/zip_analyzer.h"
  #include "mojo/public/cpp/bindings/remote.h"
-@@ -66,7 +65,6 @@ class SafeArchiveAnalyzer : public chrom
+@@ -67,7 +66,6 @@ class SafeArchiveAnalyzer : public chrom
    void Timeout();
  
    safe_browsing::ZipAnalyzer zip_analyzer_;

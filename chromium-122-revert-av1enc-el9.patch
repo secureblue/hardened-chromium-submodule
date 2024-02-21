@@ -62,14 +62,6 @@ diff -up chromium-114.0.5735.35/media/gpu/vaapi/BUILD.gn.revert-av1enc chromium-
      "h264_vaapi_video_decoder_delegate.cc",
      "h264_vaapi_video_decoder_delegate.h",
      "h264_vaapi_video_encoder_delegate.cc",
-@@ -107,7 +105,6 @@ source_set("vaapi") {
-     "//media/gpu/chromeos:common",
-     "//media/parsers",
-     "//mojo/public/cpp/bindings",
--    "//third_party/libaom:libaomrc",
-     "//third_party/libvpx:libvpxrc",
-     "//third_party/libyuv",
-     "//ui/gfx",
 diff -up chromium-119.0.6045.105/media/gpu/vaapi/vaapi_wrapper.cc.me chromium-119.0.6045.105/media/gpu/vaapi/vaapi_wrapper.cc
 --- chromium-119.0.6045.105/media/gpu/vaapi/vaapi_wrapper.cc.me	2023-11-02 15:08:30.921325747 +0100
 +++ chromium-119.0.6045.105/media/gpu/vaapi/vaapi_wrapper.cc	2023-11-02 15:09:46.123692602 +0100
@@ -104,18 +96,3 @@ diff -up chromium-119.0.6045.105/media/gpu/vaapi/vaapi_wrapper.h.me chromium-119
  
    // Blits a VASurface |va_surface_src| into another VASurface
    // |va_surface_dest| applying pixel format conversion, cropping
-diff -up chromium-121.0.6167.57/media/gpu/BUILD.gn.than chromium-121.0.6167.57/media/gpu/BUILD.gn
---- chromium-121.0.6167.57/media/gpu/BUILD.gn.than	2024-01-15 22:09:21.010029147 +0100
-+++ chromium-121.0.6167.57/media/gpu/BUILD.gn	2024-01-15 22:10:05.192259340 +0100
-@@ -391,10 +391,7 @@ source_set("common") {
-       "vp9_svc_layers_stateful.h",
-     ]
-     configs += [ "//third_party/libvpx:libvpx_config" ]
--    deps += [
--      "//third_party/libaom:libaomrc",
--      "//third_party/libvpx:libvpxrc",
--    ]
-+    deps += [ "//third_party/libvpx:libvpxrc" ]
-   }
-   if (use_libgav1_parser) {
-     sources += [
