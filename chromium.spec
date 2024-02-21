@@ -444,6 +444,9 @@ Patch311: chromium-115-clang-warnings.patch
 # enable fstack-protector-strong
 Patch312: chromium-119-fstack-protector-strong.patch
 
+# fixed static assert error
+Patch313: chromium-122-static-assert.patch
+
 # build error
 Patch351: chromium-121-mnemonic-error.patch
 
@@ -1115,6 +1118,7 @@ udev.
 %patch -P307 -p1 -b .clang16-buildflag
 %patch -P308 -p1 -b .v8-c++20
 %patch -P309 -p1 -b .constexpr
+%patch -P313 -p1 -b .static-assert
 %endif
 
 %patch -P310 -p1 -b .missing-header-files
