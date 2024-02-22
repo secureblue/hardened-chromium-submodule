@@ -427,6 +427,10 @@ Patch303: chromium-121-typename.patch
 # error: invalid operands to binary expression
 Patch304: chromium-117-string-convert.patch
 
+# disable memory tagging in epel7 and epel8 on aarch64 due to new feature IFUNC-Resolver
+# not supported in old glibc < 2.30, error: fatal error: 'sys/ifunc.h' file not found
+Patch305: chromium-122-arm64-memory_tagging.patch
+
 Patch306: chromium-119-assert.patch
 
 # compiler errors on epel
@@ -1113,6 +1117,12 @@ udev.
 
 %if 0%{?rhel} == 9
 %patch -P130 -p1 -b .revert-av1enc
+%endif
+
+%ifarch aarch64
+%if 0%{?rhel} <= 8
+%patch -P305 -p1 -b .memory_tagging
+%endif
 %endif
 
 %if 0%{?rhel} || 0%{?fedora} && 0%{?fedora} < 39
