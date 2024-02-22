@@ -1,5 +1,5 @@
 {
-  "homepage": "https://start.fedoraproject.org",
+  "homepage": "https://fedoraproject.org/start",
   "homepage_is_newtabpage": false,
   "distribution": {
      "alternate_shortcut_text": false,
@@ -11,7 +11,6 @@
      "verbose_logging": false
   },
   "first_run_tabs": [
-     "https://start.fedoraproject.org",
-     "http://tools.google.com/chrome/intl/en/welcome.html"
+     "https://fedoraproject.org/start"
   ]
 }
