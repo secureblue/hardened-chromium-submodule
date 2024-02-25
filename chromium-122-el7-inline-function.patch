@@ -1,7 +1,10 @@
-diff -up chromium-116.0.5845.96/cc/paint/paint_op_writer.h.me chromium-116.0.5845.96/cc/paint/paint_op_writer.h
---- chromium-116.0.5845.96/cc/paint/paint_op_writer.h.me	2023-08-16 19:09:48.998173285 +0200
-+++ chromium-116.0.5845.96/cc/paint/paint_op_writer.h	2023-08-16 21:13:44.442431527 +0200
-@@ -104,7 +104,16 @@ class CC_PAINT_EXPORT PaintOpWriter {
+
+ld.lld: error: undefined symbol: unsigned long cc::PaintOpWriter::SerializedSize<unsigned long>()
+
+diff -up chromium-122.0.6261.69/cc/paint/paint_op_writer.h.me chromium-122.0.6261.69/cc/paint/paint_op_writer.h
+--- chromium-122.0.6261.69/cc/paint/paint_op_writer.h.me	2024-02-25 12:04:07.008177603 +0100
++++ chromium-122.0.6261.69/cc/paint/paint_op_writer.h	2024-02-25 12:14:45.972117522 +0100
+@@ -112,7 +112,17 @@ class CC_PAINT_EXPORT PaintOpWriter {
  
   private:
    template <typename T>
@@ -10,16 +13,17 @@ diff -up chromium-116.0.5845.96/cc/paint/paint_op_writer.h.me chromium-116.0.584
 +    static_assert(!std::is_pointer_v<T>);
 +    return base::bits::AlignUp(sizeof(T), kDefaultAlignment);
 +  }
-+  // size_t is always serialized as uint64_t to make the serialized result
++
++  // size_t is always serialized as two uint32_ts to make the serialized result
 +  // portable between 32bit and 64bit processes.
 +  template <>
-+  constexpr size_t SerializedSizeSimple<size_t>() {
-+    return base::bits::AlignUp(sizeof(uint64_t), kDefaultAlignment);
++    constexpr size_t SerializedSizeSimple<size_t>() {
++    return base::bits::AlignUp(2 * sizeof(uint32_t), kDefaultAlignment);
 +  }
  
   public:
    // SerializedSize() returns the maximum serialized size of the given type or
-@@ -115,7 +124,10 @@ class CC_PAINT_EXPORT PaintOpWriter {
+@@ -123,7 +133,10 @@ class CC_PAINT_EXPORT PaintOpWriter {
    // deserialization, and make it possible to allow dynamic sizing for some
    // data types (see the specialized/overloaded functions).
    template <typename T>
@@ -31,11 +35,10 @@ diff -up chromium-116.0.5845.96/cc/paint/paint_op_writer.h.me chromium-116.0.584
    template <typename T>
    static constexpr size_t SerializedSize(const T& data);
    static size_t SerializedSize(const PaintImage& image);
-@@ -360,19 +372,6 @@ class CC_PAINT_EXPORT PaintOpWriter {
-   const bool enable_security_constraints_;
+@@ -439,24 +452,6 @@ class CC_PAINT_EXPORT PaintOpWriter {
  };
  
--template <typename T>
+ template <typename T>
 -constexpr size_t PaintOpWriter::SerializedSizeSimple() {
 -  static_assert(!std::is_pointer_v<T>);
 -  return base::bits::AlignUp(sizeof(T), kDefaultAlignment);
@@ -48,13 +51,7 @@ diff -up chromium-116.0.5845.96/cc/paint/paint_op_writer.h.me chromium-116.0.584
 -  return base::bits::AlignUp(2 * sizeof(uint32_t), kDefaultAlignment);
 -}
 -
- template <>
- constexpr size_t PaintOpWriter::SerializedSize<SkGainmapInfo>() {
-   return SerializedSizeSimple<SkColor4f>() +  // fGainmapRatioMin
-@@ -386,11 +385,6 @@ constexpr size_t PaintOpWriter::Serializ
- }
- 
- template <typename T>
+-template <typename T>
 -constexpr size_t PaintOpWriter::SerializedSize() {
 -  static_assert(std::is_arithmetic_v<T> || std::is_enum_v<T>);
 -  return SerializedSizeSimple<T>();

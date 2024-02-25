@@ -51,3 +51,29 @@ diff -up chromium-121.0.6167.16/third_party/blink/renderer/core/layout/grid/grid
    const auto* cached_layout_subtree = constraint_space.GetGridLayoutSubtree();
    const auto container_writing_direction =
        constraint_space.GetWritingDirection();
+diff -up chromium-122.0.6261.69/content/common/service_worker/race_network_request_url_loader_client.cc.me chromium-122.0.6261.69/content/common/service_worker/race_network_request_url_loader_client.cc
+--- chromium-122.0.6261.69/content/common/service_worker/race_network_request_url_loader_client.cc.me	2024-02-25 10:07:28.312646853 +0100
++++ chromium-122.0.6261.69/content/common/service_worker/race_network_request_url_loader_client.cc	2024-02-25 10:11:07.018481980 +0100
+@@ -416,7 +416,8 @@ void ServiceWorkerRaceNetworkRequestURLL
+   }
+ 
+   uint32_t num_bytes_to_consume = 0;
+-  auto [result, read_buffer] = BeginReadData();
++  auto [r, read_buffer] = BeginReadData();
++  auto result = r;
+   TRACE_EVENT_WITH_FLOW2(
+       "ServiceWorker",
+       "ServiceWorkerRaceNetworkRequestURLLoaderClient::ReadAndWrite",
+diff -up chromium-122.0.6261.69/chrome/browser/predictors/lcp_critical_path_predictor/prewarm_http_disk_cache_manager.cc.me chromium-122.0.6261.69/chrome/browser/predictors/lcp_critical_path_predictor/prewarm_http_disk_cache_manager.cc
+--- chromium-122.0.6261.69/chrome/browser/predictors/lcp_critical_path_predictor/prewarm_http_disk_cache_manager.cc.me	2024-02-25 18:03:51.654579579 +0100
++++ chromium-122.0.6261.69/chrome/browser/predictors/lcp_critical_path_predictor/prewarm_http_disk_cache_manager.cc	2024-02-25 18:12:45.144287750 +0100
+@@ -136,7 +136,8 @@ void PrewarmHttpDiskCacheManager::MaybeP
+   std::pair<url::Origin, GURL> origin_and_url;
+   std::swap(origin_and_url, queued_jobs_.front());
+   queued_jobs_.pop();
+-  const auto& [origin, url] = origin_and_url;
++  const auto& [origin, u] = origin_and_url;
++  const auto& url = u;
+   TRACE_EVENT_WITH_FLOW1(
+       "loading", "PrewarmHttpDiskCacheManager::MaybeProcessNextQueuedJob",
+       TRACE_ID_LOCAL(this),
