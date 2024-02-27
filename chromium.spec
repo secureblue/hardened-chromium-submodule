@@ -301,7 +301,7 @@
 
 Name:	chromium%{chromium_channel}
 Version: 122.0.6261.69
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -1942,6 +1942,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %{chromium_path}/chromedriver
 
 %changelog
+* Tue Feb 27 2024 Jiri Vanek <jvanek@redhat.com> - 122.0.6261.69-2
+- Rebuilt for java-21-openjdk as system jdk
+
 * Fri Feb 23 2024 Than Ngo <than@redhat.com> - 122.0.6261.69-1
 - update to 122.0.6261.69
 - fix build error on el8
