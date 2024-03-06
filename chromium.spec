@@ -481,7 +481,7 @@ patch356: chromium-122-disable-FFmpegAllowLists.patch
 Patch357: chromium-122-clang16-disable-auto-upgrade-debug-info.patch
 
 # set clang_lib path
-Patch358: chromium-121-rust-clang_lib.patch
+Patch358: chromium-122-rust-clang_lib.patch
 
 # upstream patches
 Patch400: chromium-122-el8-support-64kpage.patch
