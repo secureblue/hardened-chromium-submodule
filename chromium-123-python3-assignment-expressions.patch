@@ -1,0 +1,27 @@
+diff -up chromium-122.0.6261.57/tools/json_to_struct/json_to_struct.py.me chromium-122.0.6261.57/tools/json_to_struct/json_to_struct.py
+--- chromium-122.0.6261.57/tools/json_to_struct/json_to_struct.py.me	2024-02-23 12:04:45.451423995 +0100
++++ chromium-122.0.6261.57/tools/json_to_struct/json_to_struct.py	2024-02-23 12:18:04.099824392 +0100
+@@ -124,7 +124,8 @@ def _GenerateH(basepath, fileroot, head,
+     f.write(u'#include <cstddef>\n')
+     f.write(u'\n')
+ 
+-    if system_headers := schema.get(u'system-headers', []):
++    system_headers = schema.get(u'system-headers', [])
++    if system_headers:
+       for header in system_headers:
+         f.write(u'#include <%s>\n' % header)
+       f.write(u'\n')
+diff -up chromium-123.0.6312.46/tools/metrics/histograms/expand_owners.py.me chromium-123.0.6312.46/tools/metrics/histograms/expand_owners.py
+--- chromium-123.0.6312.46/tools/metrics/histograms/expand_owners.py.me	2024-03-18 14:40:57.871904209 +0100
++++ chromium-123.0.6312.46/tools/metrics/histograms/expand_owners.py	2024-03-18 14:47:12.238907146 +0100
+@@ -209,8 +209,8 @@ def _ComponentFromDirmd(json_data, subpa
+   """
+   dirmd = json_data.get('dirs', {}).get(subpath, {})
+   # If a public Buganizer component is listed, return its component ID.
+-  if buganizer_component := dirmd.get('buganizerPublic',
+-                                      {}).get('componentId', ''):
++  buganizer_component = dirmd.get('buganizerPublic',{}).get('componentId', '')
++  if buganizer_component:
+     return buganizer_component
+   # If no component exists for the directory, or if METADATA migration is
+   # incomplete there will be no component information.

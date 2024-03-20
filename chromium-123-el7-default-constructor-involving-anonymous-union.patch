@@ -22,3 +22,15 @@ diff -up chromium-122.0.6261.69/content/browser/interest_group/header_direct_fro
  
  HeaderDirectFromSellerSignals::Result::Result(
      std::optional<std::string> seller_signals,
+diff -up chromium-123.0.6312.46/third_party/pdfium/core/fpdfdoc/cpdf_defaultappearance.cpp.me chromium-123.0.6312.46/third_party/pdfium/core/fpdfdoc/cpdf_defaultappearance.cpp
+--- chromium-123.0.6312.46/third_party/pdfium/core/fpdfdoc/cpdf_defaultappearance.cpp.me	2024-03-18 16:11:19.550329592 +0100
++++ chromium-123.0.6312.46/third_party/pdfium/core/fpdfdoc/cpdf_defaultappearance.cpp	2024-03-18 16:12:51.124472676 +0100
+@@ -54,7 +54,7 @@ bool FindTagParamFromStart(CPDF_SimplePa
+ 
+ }  // namespace
+ 
+-CPDF_DefaultAppearance::CPDF_DefaultAppearance() = default;
++CPDF_DefaultAppearance::CPDF_DefaultAppearance() {}
+ 
+ CPDF_DefaultAppearance::CPDF_DefaultAppearance(const ByteString& csDA)
+     : m_csDA(csDA) {}

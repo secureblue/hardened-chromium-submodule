@@ -82,37 +82,6 @@ diff -up chromium-122.0.6261.69/chrome/browser/enterprise/profile_management/pro
  
    // Extract domains and attributes from the command line switch.
    const base::CommandLine& command_line =
-diff -up chromium-122.0.6261.69/chrome/browser/ui/autofill/autofill_context_menu_manager.cc.than chromium-122.0.6261.69/chrome/browser/ui/autofill/autofill_context_menu_manager.cc
---- chromium-122.0.6261.69/chrome/browser/ui/autofill/autofill_context_menu_manager.cc.than	2024-02-22 22:42:54.000000000 +0100
-+++ chromium-122.0.6261.69/chrome/browser/ui/autofill/autofill_context_menu_manager.cc	2024-02-24 13:13:44.159712774 +0100
-@@ -283,8 +283,8 @@ void AutofillContextMenuManager::Execute
-     AutofillManager& manager) {
-   auto& driver = static_cast<ContentAutofillDriver&>(manager.driver());
-   driver.browser_events().RendererShouldTriggerSuggestions(
--      FieldGlobalId(driver.GetFrameToken(),
--                    FieldRendererId(params_.field_renderer_id)),
-+      FieldGlobalId{driver.GetFrameToken(),
-+                    FieldRendererId(params_.field_renderer_id)},
-       AutofillSuggestionTriggerSource::kManualFallbackPayments);
- }
- 
-diff -up chromium-122.0.6261.69/chrome/browser/ui/omnibox/chrome_omnibox_client.cc.than chromium-122.0.6261.69/chrome/browser/ui/omnibox/chrome_omnibox_client.cc
---- chromium-122.0.6261.69/chrome/browser/ui/omnibox/chrome_omnibox_client.cc.than	2024-02-22 22:42:55.000000000 +0100
-+++ chromium-122.0.6261.69/chrome/browser/ui/omnibox/chrome_omnibox_client.cc	2024-02-24 13:13:32.485503752 +0100
-@@ -474,10 +474,10 @@ void ChromeOmniboxClient::OnAutocomplete
-               alternative_nav_match);
- 
-   // Store the details necessary to open the omnibox match via browser commands.
--  location_bar_->set_navigation_params(LocationBar::NavigationParams(
-+  location_bar_->set_navigation_params(LocationBar::NavigationParams{
-       destination_url, disposition, transition, match_selection_timestamp,
-       destination_url_entered_without_scheme,
--      destination_url_entered_with_http_scheme));
-+      destination_url_entered_with_http_scheme});
- 
-   if (browser_) {
-     auto navigation = chrome::OpenCurrentURL(browser_);
-diff -up chromium-122.0.6261.69/chrome/browser/ui/safety_hub/menu_notification_service.cc.than chromium-122.0.6261.69/chrome/browser/ui/safety_hub/menu_notification_service.cc
 diff -up chromium-122.0.6261.69/chrome/browser/ui/views/permissions/embedded_permission_prompt_ask_view.cc.than chromium-122.0.6261.69/chrome/browser/ui/views/permissions/embedded_permission_prompt_ask_view.cc
 --- chromium-122.0.6261.69/chrome/browser/ui/views/permissions/embedded_permission_prompt_ask_view.cc.than	2024-02-22 22:42:55.000000000 +0100
 +++ chromium-122.0.6261.69/chrome/browser/ui/views/permissions/embedded_permission_prompt_ask_view.cc	2024-02-24 13:13:32.486503770 +0100
@@ -205,27 +174,6 @@ diff -up chromium-122.0.6261.69/chrome/browser/ui/views/permissions/embedded_per
 +      ButtonType::kStopAllowing, ui::ButtonStyle::kTonal, kStopAllowingId};
    return buttons;
  }
-diff -up chromium-122.0.6261.69/chrome/browser/ui/web_applications/sub_apps_service_impl.cc.than chromium-122.0.6261.69/chrome/browser/ui/web_applications/sub_apps_service_impl.cc
---- chromium-122.0.6261.69/chrome/browser/ui/web_applications/sub_apps_service_impl.cc.than	2024-02-22 22:42:55.000000000 +0100
-+++ chromium-122.0.6261.69/chrome/browser/ui/web_applications/sub_apps_service_impl.cc	2024-02-24 13:13:44.159712774 +0100
-@@ -102,7 +102,7 @@ AddOptionsFromMojo(
-                      ConvertPathToUrl(sub_app->manifest_id_path, origin));
-     ASSIGN_OR_RETURN(GURL install_url,
-                      ConvertPathToUrl(sub_app->install_url_path, origin));
--    sub_apps.emplace_back(std::move(manifest_id), std::move(install_url));
-+    sub_apps.emplace_back() = {std::move(manifest_id), std::move(install_url)};
-   }
-   return sub_apps;
- }
-@@ -391,7 +391,7 @@ void SubAppsServiceImpl::ScheduleSubAppI
-         base::BindOnce(
-             [](webapps::ManifestId manifest_id, const webapps::AppId& app_id,
-                webapps::InstallResultCode result_code) {
--              return SubAppInstallResult(manifest_id, app_id, result_code);
-+              return SubAppInstallResult{manifest_id, app_id, result_code};
-             },
-             manifest_id)
-             .Then(install_results_collector));
 diff -up chromium-122.0.6261.69/chrome/test/chromedriver/capabilities.cc.than chromium-122.0.6261.69/chrome/test/chromedriver/capabilities.cc
 --- chromium-122.0.6261.69/chrome/test/chromedriver/capabilities.cc.than	2024-02-22 22:42:56.000000000 +0100
 +++ chromium-122.0.6261.69/chrome/test/chromedriver/capabilities.cc	2024-02-24 13:13:32.486503770 +0100
@@ -544,27 +492,6 @@ diff -up chromium-122.0.6261.69/net/dns/host_resolver_cache.cc.than chromium-122
        Entry(std::move(result), source, secure, staleness_generation));
  
    if (entries_.size() > max_entries_) {
-diff -up chromium-122.0.6261.69/third_party/blink/renderer/platform/fonts/font_palette.h.than chromium-122.0.6261.69/third_party/blink/renderer/platform/fonts/font_palette.h
---- chromium-122.0.6261.69/third_party/blink/renderer/platform/fonts/font_palette.h.than	2024-02-22 22:43:25.000000000 +0100
-+++ chromium-122.0.6261.69/third_party/blink/renderer/platform/fonts/font_palette.h	2024-02-24 13:13:44.152712649 +0100
-@@ -96,7 +96,7 @@ class PLATFORM_EXPORT FontPalette : publ
-       Color::ColorSpace color_interpolation_space,
-       absl::optional<Color::HueInterpolationMethod> hue_interpolation_method) {
-     return base::AdoptRef(new FontPalette(
--        start, end, NonNormalizedPercentages(start_percentage, end_percentage),
-+        start, end, NonNormalizedPercentages{start_percentage, end_percentage},
-         normalized_percentage, alpha_multiplier, color_interpolation_space,
-         hue_interpolation_method));
-   }
-@@ -170,7 +170,7 @@ class PLATFORM_EXPORT FontPalette : publ
-       double normalized_percentage) {
-     double end_percentage = normalized_percentage * 100.0;
-     double start_percentage = 100.0 - end_percentage;
--    return NonNormalizedPercentages(start_percentage, end_percentage);
-+    return NonNormalizedPercentages{start_percentage, end_percentage};
-   }
- 
-   double GetAlphaMultiplier() const {
 diff -up chromium-122.0.6261.69/third_party/blink/renderer/platform/fonts/palette_interpolation.cc.than chromium-122.0.6261.69/third_party/blink/renderer/platform/fonts/palette_interpolation.cc
 --- chromium-122.0.6261.69/third_party/blink/renderer/platform/fonts/palette_interpolation.cc.than	2024-02-22 22:43:25.000000000 +0100
 +++ chromium-122.0.6261.69/third_party/blink/renderer/platform/fonts/palette_interpolation.cc	2024-02-24 13:13:44.152712649 +0100
@@ -1005,18 +932,6 @@ diff -up chromium-122.0.6261.69/content/browser/interest_group/interest_group_st
  }
  
  void DoGetDebugReportCooldowns(
-diff -up chromium-122.0.6261.69/content/browser/interest_group/interest_group_auction.cc.me chromium-122.0.6261.69/content/browser/interest_group/interest_group_auction.cc
---- chromium-122.0.6261.69/content/browser/interest_group/interest_group_auction.cc.me	2024-02-25 00:20:33.535907981 +0100
-+++ chromium-122.0.6261.69/content/browser/interest_group/interest_group_auction.cc	2024-02-25 00:21:01.082402610 +0100
-@@ -501,7 +501,7 @@ bool SampleDebugReport(
-           ? DebugReportCooldownType::kShortCooldown
-           : DebugReportCooldownType::kRestrictedCooldown;
-   new_debug_report_lockout_and_cooldowns.debug_report_cooldown_map[origin] =
--      DebugReportCooldown(now, cooldown_type);
-+      DebugReportCooldown{now, cooldown_type};
-   base::UmaHistogramEnumeration(
-       "Ads.InterestGroup.Auction.ForDebuggingOnlyCooldownType", cooldown_type);
- 
 diff -up chromium-122.0.6261.69/chrome/browser/ui/safety_hub/menu_notification_service.h.me chromium-122.0.6261.69/chrome/browser/ui/safety_hub/menu_notification_service.h
 --- chromium-122.0.6261.69/chrome/browser/ui/safety_hub/menu_notification_service.h.me	2024-02-25 15:34:16.140768445 +0100
 +++ chromium-122.0.6261.69/chrome/browser/ui/safety_hub/menu_notification_service.h	2024-02-25 15:37:47.789665835 +0100
@@ -1114,3 +1029,336 @@ diff -up chromium-122.0.6261.69/chrome/browser/renderer_context_menu/render_view
          compose::ComposeManagerImpl::UiEntryPoint::kContextMenu);
      new_badge_tracker_.ActionPerformed("compose_menu_item_activated");
    } else {
+--- chromium-123.0.6312.46/chrome/browser/ui/omnibox/chrome_omnibox_client.cc.me	2024-03-15 15:16:46.980123806 +0100
++++ chromium-123.0.6312.46/chrome/browser/ui/omnibox/chrome_omnibox_client.cc	2024-03-15 15:18:39.024042560 +0100
+@@ -474,10 +474,10 @@
+               alternative_nav_match);
+ 
+   // Store the details necessary to open the omnibox match via browser commands.
+-  location_bar_->set_navigation_params(LocationBar::NavigationParams(
++  location_bar_->set_navigation_params(LocationBar::NavigationParams{
+       destination_url, disposition, transition, match_selection_timestamp,
+       destination_url_entered_without_scheme,
+-      destination_url_entered_with_http_scheme, match.extra_headers));
++      destination_url_entered_with_http_scheme, match.extra_headers});
+ 
+   if (browser_) {
+     auto navigation = chrome::OpenCurrentURL(browser_);
+--- chromium-123.0.6312.46/content/browser/interest_group/interest_group_auction.cc.me	2024-03-15 15:16:47.004124431 +0100
++++ chromium-123.0.6312.46/content/browser/interest_group/interest_group_auction.cc	2024-03-15 15:21:57.794229521 +0100
+@@ -565,7 +565,7 @@
+        blink::features::kFledgeDebugReportRestrictedCooldown.Get() !=
+            base::Milliseconds(0))) {
+     new_debug_report_lockout_and_cooldowns.debug_report_cooldown_map[origin] =
+-        DebugReportCooldown(now_nearest_next_hour, cooldown_type);
++        DebugReportCooldown{now_nearest_next_hour, cooldown_type};
+   }
+ 
+   return can_send_debug_report;
+--- chromium-123.0.6312.46/chrome/browser/ui/autofill/autofill_context_menu_manager.cc.no_matching_constructor	2024-03-15 15:55:51.351878829 +0100
++++ chromium-123.0.6312.46/chrome/browser/ui/autofill/autofill_context_menu_manager.cc	2024-03-15 16:19:48.862189463 +0100
+@@ -277,8 +277,8 @@
+     AutofillManager& manager) {
+   auto& driver = static_cast<ContentAutofillDriver&>(manager.driver());
+   driver.browser_events().RendererShouldTriggerSuggestions(
+-      FieldGlobalId(driver.GetFrameToken(),
+-                    FieldRendererId(params_.field_renderer_id)),
++      FieldGlobalId{driver.GetFrameToken(),
++                    FieldRendererId(params_.field_renderer_id)},
+       AutofillSuggestionTriggerSource::kManualFallbackPayments);
+   LogManualFallbackContextMenuEntryAccepted(
+       static_cast<BrowserAutofillManager&>(manager),
+--- chromium-123.0.6312.46/chrome/browser/ui/web_applications/sub_apps_service_impl.cc.no_matching_constructor	2024-03-13 20:35:40.000000000 +0100
++++ chromium-123.0.6312.46/chrome/browser/ui/web_applications/sub_apps_service_impl.cc	2024-03-15 16:20:45.846919820 +0100
+@@ -107,7 +107,7 @@
+                      ConvertPathToUrl(sub_app->manifest_id_path, origin));
+     ASSIGN_OR_RETURN(GURL install_url,
+                      ConvertPathToUrl(sub_app->install_url_path, origin));
+-    sub_apps.emplace_back(std::move(manifest_id), std::move(install_url));
++    sub_apps.emplace_back() = {std::move(manifest_id), std::move(install_url)};
+   }
+   return sub_apps;
+ }
+@@ -439,7 +439,7 @@
+         base::BindOnce(
+             [](webapps::ManifestId manifest_id, const webapps::AppId& app_id,
+                webapps::InstallResultCode result_code) {
+-              return SubAppInstallResult(manifest_id, app_id, result_code);
++              return SubAppInstallResult{manifest_id, app_id, result_code};
+             },
+             manifest_id)
+             .Then(concurrent.CreateCallback()));
+--- chromium-123.0.6312.46/third_party/blink/renderer/platform/fonts/font_palette.h.no_matching_constructor	2024-03-13 20:35:57.000000000 +0100
++++ chromium-123.0.6312.46/third_party/blink/renderer/platform/fonts/font_palette.h	2024-03-15 16:24:57.899540941 +0100
+@@ -96,7 +96,7 @@
+       Color::ColorSpace color_interpolation_space,
+       std::optional<Color::HueInterpolationMethod> hue_interpolation_method) {
+     return base::AdoptRef(new FontPalette(
+-        start, end, NonNormalizedPercentages(start_percentage, end_percentage),
++        start, end, NonNormalizedPercentages{start_percentage, end_percentage},
+         normalized_percentage, alpha_multiplier, color_interpolation_space,
+         hue_interpolation_method));
+   }
+@@ -170,7 +170,7 @@
+       double normalized_percentage) {
+     double end_percentage = normalized_percentage * 100.0;
+     double start_percentage = 100.0 - end_percentage;
+-    return NonNormalizedPercentages(start_percentage, end_percentage);
++    return NonNormalizedPercentages{start_percentage, end_percentage};
+   }
+ 
+   double GetAlphaMultiplier() const {
+diff -up chromium-123.0.6312.46/base/allocator/partition_allocator/src/partition_alloc/lightweight_quarantine.cc.me chromium-123.0.6312.46/base/allocator/partition_allocator/src/partition_alloc/lightweight_quarantine.cc
+--- chromium-123.0.6312.46/base/allocator/partition_allocator/src/partition_alloc/lightweight_quarantine.cc.me	2024-03-15 19:01:07.765832801 +0100
++++ chromium-123.0.6312.46/base/allocator/partition_allocator/src/partition_alloc/lightweight_quarantine.cc	2024-03-15 19:01:52.918687742 +0100
+@@ -62,7 +62,7 @@ bool LightweightQuarantineBranch::Quaran
+     branch_size_in_bytes_ += usable_size;
+     PA_DCHECK(branch_size_in_bytes_ <= capacity_in_bytes);
+ 
+-    slots_.emplace_back(slot_start, usable_size);
++    slots_.emplace_back() = {slot_start, usable_size};
+ 
+     // Swap randomly so that the quarantine list remain shuffled.
+     // This is not uniformly random, but sufficiently random.
+diff -up chromium-123.0.6312.46/gpu/ipc/client/client_shared_image_interface.cc.me chromium-123.0.6312.46/gpu/ipc/client/client_shared_image_interface.cc
+--- chromium-123.0.6312.46/gpu/ipc/client/client_shared_image_interface.cc.me	2024-03-16 18:43:17.863328507 +0100
++++ chromium-123.0.6312.46/gpu/ipc/client/client_shared_image_interface.cc	2024-03-16 18:51:00.449277152 +0100
+@@ -106,8 +106,8 @@ scoped_refptr<ClientSharedImage> ClientS
+       AddMailbox(proxy_->CreateSharedImage(format, size, color_space,
+                                            surface_origin, alpha_type, usage,
+                                            debug_label)),
+-      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                  alpha_type, usage),
++      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                  alpha_type, usage},
+       GenUnverifiedSyncToken(), holder_);
+ }
+ 
+@@ -137,8 +137,8 @@ scoped_refptr<ClientSharedImage> ClientS
+ 
+   return base::MakeRefCounted<ClientSharedImage>(
+       AddMailbox(mailbox),
+-      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                  alpha_type, usage),
++      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                  alpha_type, usage},
+       GenUnverifiedSyncToken(), holder_);
+ }
+ 
+@@ -165,8 +165,8 @@ scoped_refptr<ClientSharedImage> ClientS
+   CHECK(!buffer_handle.is_null());
+   return base::MakeRefCounted<ClientSharedImage>(
+       AddMailbox(mailbox),
+-      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                  alpha_type, usage),
++      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                  alpha_type, usage},
+       GenUnverifiedSyncToken(),
+       GpuMemoryBufferHandleInfo(std::move(buffer_handle), format, size,
+                                 buffer_usage),
+@@ -192,8 +192,8 @@ scoped_refptr<ClientSharedImage> ClientS
+ 
+   return base::MakeRefCounted<ClientSharedImage>(
+       mailbox,
+-      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                  alpha_type, usage),
++      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                  alpha_type, usage},
+       GenUnverifiedSyncToken(),
+       GpuMemoryBufferHandleInfo(std::move(client_buffer_handle), format, size,
+                                 buffer_usage),
+@@ -219,8 +219,8 @@ scoped_refptr<ClientSharedImage> ClientS
+       AddMailbox(proxy_->CreateSharedImage(
+           format, size, color_space, surface_origin, alpha_type, usage,
+           debug_label, std::move(buffer_handle))),
+-      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                  alpha_type, usage),
++      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                  alpha_type, usage},
+       GenUnverifiedSyncToken(), holder_);
+ }
+ 
+@@ -273,8 +273,8 @@ ClientSharedImageInterface::CreateShared
+       AddMailbox(proxy_->CreateSharedImage(format, size, color_space,
+                                            surface_origin, alpha_type, usage,
+                                            debug_label, std::move(handle))),
+-      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                  alpha_type, usage),
++      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                  alpha_type, usage},
+       GenUnverifiedSyncToken(), holder_);
+   return shared_image_mapping;
+ }
+@@ -296,10 +296,10 @@ scoped_refptr<ClientSharedImage> ClientS
+           buffer_format, plane, gpu_memory_buffer->GetSize(), color_space,
+           surface_origin, alpha_type, usage, debug_label,
+           gpu_memory_buffer->CloneHandle())),
+-      ClientSharedImage::Metadata(
++      ClientSharedImage::Metadata{
+           viz::GetSinglePlaneSharedImageFormat(buffer_format),
+           gpu_memory_buffer->GetSize(), color_space, surface_origin, alpha_type,
+-          usage),
++          usage},
+       GenUnverifiedSyncToken(), holder_);
+ }
+ 
+@@ -334,13 +334,13 @@ ClientSharedImageInterface::CreateSwapCh
+   return ClientSharedImageInterface::SwapChainSharedImages(
+       base::MakeRefCounted<ClientSharedImage>(
+           mailboxes.front_buffer,
+-          ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                      alpha_type, usage),
++          ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                      alpha_type, usage},
+           sync_token, holder_),
+       base::MakeRefCounted<ClientSharedImage>(
+           mailboxes.back_buffer,
+-          ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                      alpha_type, usage),
++          ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                      alpha_type, usage},
+           sync_token, holder_));
+ }
+ 
+@@ -380,8 +380,8 @@ ClientSharedImageInterface::AddReference
+ 
+   return base::MakeRefCounted<ClientSharedImage>(
+       mailbox,
+-      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                  alpha_type, usage),
++      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                  alpha_type, usage},
+       sync_token, holder_);
+ }
+ 
+@@ -402,8 +402,8 @@ scoped_refptr<ClientSharedImage> ClientS
+ 
+   return base::MakeRefCounted<ClientSharedImage>(
+       mailbox,
+-      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                  alpha_type, usage),
++      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                  alpha_type, usage},
+       GenUnverifiedSyncToken(), holder_);
+ }
+ 
+diff -up chromium-123.0.6312.46/gpu/command_buffer/client/shared_image_interface.cc.me chromium-123.0.6312.46/gpu/command_buffer/client/shared_image_interface.cc
+--- chromium-123.0.6312.46/gpu/command_buffer/client/shared_image_interface.cc.me	2024-03-16 18:59:20.175882894 +0100
++++ chromium-123.0.6312.46/gpu/command_buffer/client/shared_image_interface.cc	2024-03-16 19:03:05.001754609 +0100
+@@ -41,8 +41,8 @@ scoped_refptr<ClientSharedImage> SharedI
+   NOTREACHED();
+   return base::MakeRefCounted<ClientSharedImage>(
+       Mailbox(),
+-      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                  alpha_type, usage),
++      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                  alpha_type, usage},
+       GenUnverifiedSyncToken(), holder_);
+ }
+ 
+diff -up chromium-123.0.6312.46/gpu/command_buffer/service/shared_image_interface_in_process.cc.me chromium-123.0.6312.46/gpu/command_buffer/service/shared_image_interface_in_process.cc
+--- chromium-123.0.6312.46/gpu/command_buffer/service/shared_image_interface_in_process.cc.me	2024-03-16 19:06:32.102330155 +0100
++++ chromium-123.0.6312.46/gpu/command_buffer/service/shared_image_interface_in_process.cc	2024-03-16 19:11:59.627008063 +0100
+@@ -238,8 +238,8 @@ SharedImageInterfaceInProcess::CreateSha
+   }
+   return base::MakeRefCounted<ClientSharedImage>(
+       mailbox,
+-      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                  alpha_type, usage),
++      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                  alpha_type, usage},
+       GenUnverifiedSyncToken(), holder_);
+ }
+ 
+@@ -301,8 +301,8 @@ SharedImageInterfaceInProcess::CreateSha
+   }
+   return base::MakeRefCounted<ClientSharedImage>(
+       mailbox,
+-      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                  alpha_type, usage),
++      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                  alpha_type, usage},
+       GenUnverifiedSyncToken(), holder_);
+ }
+ 
+@@ -365,8 +365,8 @@ SharedImageInterfaceInProcess::CreateSha
+ 
+   return base::MakeRefCounted<ClientSharedImage>(
+       mailbox,
+-      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                  alpha_type, usage),
++      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                  alpha_type, usage},
+       GenUnverifiedSyncToken(), GetGpuMemoryBufferHandleInfo(mailbox), holder_);
+ }
+ 
+@@ -481,8 +481,8 @@ SharedImageInterfaceInProcess::CreateSha
+ 
+   return base::MakeRefCounted<ClientSharedImage>(
+       mailbox,
+-      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                  alpha_type, usage),
++      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                  alpha_type, usage},
+       GenUnverifiedSyncToken(),
+       GpuMemoryBufferHandleInfo(std::move(client_buffer_handle), format, size,
+                                 buffer_usage),
+@@ -524,8 +524,8 @@ SharedImageInterfaceInProcess::CreateSha
+ 
+   return base::MakeRefCounted<ClientSharedImage>(
+       mailbox,
+-      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                  alpha_type, usage),
++      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                  alpha_type, usage},
+       GenUnverifiedSyncToken(), holder_);
+ }
+ SharedImageInterface::SharedImageMapping
+@@ -589,8 +589,8 @@ SharedImageInterfaceInProcess::CreateSha
+   }
+   shared_image_mapping.shared_image = base::MakeRefCounted<ClientSharedImage>(
+       mailbox,
+-      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
+-                                  alpha_type, usage),
++      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
++                                  alpha_type, usage},
+       GenUnverifiedSyncToken(), holder_);
+ 
+   return shared_image_mapping;
+@@ -664,10 +664,10 @@ SharedImageInterfaceInProcess::CreateSha
+ 
+   return base::MakeRefCounted<ClientSharedImage>(
+       mailbox,
+-      ClientSharedImage::Metadata(
++      ClientSharedImage::Metadata{
+           viz::GetSinglePlaneSharedImageFormat(gpu_memory_buffer->GetFormat()),
+           gpu_memory_buffer->GetSize(), color_space, surface_origin, alpha_type,
+-          usage),
++          usage},
+       GenUnverifiedSyncToken(), holder_);
+ }
+ 
+diff -up chromium-123.0.6312.46/content/browser/attribution_reporting/attribution_manager_impl.cc.me chromium-123.0.6312.46/content/browser/attribution_reporting/attribution_manager_impl.cc
+--- chromium-123.0.6312.46/content/browser/attribution_reporting/attribution_manager_impl.cc.me	2024-03-17 00:42:31.183226211 +0100
++++ chromium-123.0.6312.46/content/browser/attribution_reporting/attribution_manager_impl.cc	2024-03-17 00:55:56.689512430 +0100
+@@ -1507,7 +1507,7 @@ void AttributionManagerImpl::PrepareNext
+                            RenderFrameHost::FromID(event.render_frame_id),
+                            source_origin, destination_origin, &reporting_origin,
+                            &can_bypass_cookie_check)) {
+-      need_to_check_cookie.emplace_back(url::Origin::Create(item.url), i);
++      need_to_check_cookie.emplace_back() = {url::Origin::Create(item.url), i};
+     } else {
+       allowed.at(i) = can_bypass_cookie_check;
+     }
+diff -up chromium-123.0.6312.46/content/browser/interest_group/interest_group_storage.cc.me chromium-123.0.6312.46/content/browser/interest_group/interest_group_storage.cc
+--- chromium-123.0.6312.46/content/browser/interest_group/interest_group_storage.cc.me	2024-03-17 00:24:41.420837884 +0100
++++ chromium-123.0.6312.46/content/browser/interest_group/interest_group_storage.cc	2024-03-17 00:26:40.273364638 +0100
+@@ -3993,7 +3993,7 @@ DoGetBiddingAndAuctionServerKeys(sql::Da
+     std::vector<BiddingAndAuctionServerKey> keys;
+     keys.reserve(key_protos.keys_size());
+     for (auto& key_proto : *key_protos.mutable_keys()) {
+-      keys.emplace_back(std::move(*key_proto.mutable_key()), key_proto.id());
++      keys.emplace_back() = {std::move(*key_proto.mutable_key()), key_proto.id()};
+     }
+     return {expiration, keys};
+   }
