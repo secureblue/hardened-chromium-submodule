@@ -304,7 +304,7 @@
 
 Name:	chromium%{chromium_channel}
 Version: 123.0.6312.58
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -935,7 +935,7 @@ Requires: chromium-common%{_isa} = %{version}-%{release}
 %if 0%{?rhel} == 7
 ExclusiveArch: x86_64
 %else
-%if 0%{?fedora} > 40
+%if 0%{?fedora} >= 40
 ExclusiveArch: x86_64 aarch64 ppc64le
 %else
 ExclusiveArch: x86_64 aarch64
@@ -2106,6 +2106,10 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Sat Mar 23 2024 Than Ngo <than@redhat.com> - 123.0.6312.58-2
+- fixed bz#2269768 - enable build ppc64le package for F40
+- fixed bz#2270321 - VAAPI flags in chromium.conf are out of date
+
 * Wed Mar 20 2024 Than Ngo <than@redhat.com> - 123.0.6312.58-1
 - update to 123.0.6312.58
    * High CVE-2024-2625: Object lifecycle issue in V8
