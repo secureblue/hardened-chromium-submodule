@@ -557,7 +557,10 @@ Patch413: fix-unknown-warning-option-messages.diff
 Patch414: 0002-Highway-disable-128-bit-vsx.patch
 
 # upstream patches
+# 64kpage support on el8
 Patch500: chromium-122-el8-support-64kpage.patch
+# error: static assertion failed due to requirement '::WTF::internal::SizesEqual<72, 64>::value': ShapeResult should stay small 
+Patch501: chromium-123-shape_result-assert.patch
 
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
 # http://build.chromium.org/buildbot/official/
@@ -1313,6 +1316,8 @@ udev.
 %patch -P500 -p1 -b .el8-support-64kpage.patch
 %endif
 %endif
+
+%patch -P501 -p1 -b .shape_result-assert
 
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
