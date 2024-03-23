@@ -1533,6 +1533,8 @@ CHROMIUM_CORE_GN_DEFINES+=' build_dawn_tests=false enable_perfetto_unittests=fal
 CHROMIUM_CORE_GN_DEFINES+=' disable_fieldtrial_testing_config=true'
 CHROMIUM_CORE_GN_DEFINES+=' symbol_level=%{debug_level}'
 CHROMIUM_CORE_GN_DEFINES+=' angle_has_histograms=false'
+# disable screen ai service by default
+CHROMIUM_CORE_GN_DEFINES+=' enable_screen_ai_browsertests=false enable_screen_ai_service=false'
 export CHROMIUM_CORE_GN_DEFINES
 
 # browser gn defines
@@ -2114,6 +2116,7 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 * Sat Mar 23 2024 Than Ngo <than@redhat.com> - 123.0.6312.58-2
 - fixed bz#2269768 - enable build ppc64le package for F40
 - fixed bz#2270321 - VAAPI flags in chromium.conf are out of date
+- fixed bz#2271183 - disable screen ai service
 
 * Wed Mar 20 2024 Than Ngo <than@redhat.com> - 123.0.6312.58-1
 - update to 123.0.6312.58
