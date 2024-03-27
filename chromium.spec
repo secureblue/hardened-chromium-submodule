@@ -35,6 +35,9 @@
 
 # enable|disable headless client build
 %global build_headless 1
+%ifarch ppc64le
+%global build_headless 0
+%endif
 
 # enable|disable chrome-remote-desktop build
 %global build_remoting 0
@@ -303,8 +306,8 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 123.0.6312.58
-Release: 2%{?dist}
+Version: 123.0.6312.86
+Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -558,6 +561,7 @@ Patch413: fix-unknown-warning-option-messages.diff
 # and Highway gets confused when building in POWER8 mode
 # (POWER8 compiler flags) on POWER9 hosts.
 Patch414: 0002-Highway-disable-128-bit-vsx.patch
+Patch415: fix-clang-selection.patch
 
 # upstream patches
 # 64kpage support on el8
@@ -1313,6 +1317,7 @@ udev.
 %patch -P413 -p1 -b .fix-unknown-warning-option-messages
 
 %patch -P414 -p1 -b .0002-Highway-disable-128-bit-vsx
+%patch -P415 -p1 -b .fix-clang-selection
 %endif
 
 %%ifarch aarch64
@@ -2115,6 +2120,13 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Wed Mar 27 2024 Than Ngo <than@redhat.com> - 123.0.6312.86-2
+- update to 123.0.6312.86
+  * Critical CVE-2024-2883: Use after free in ANGLE
+  * High CVE-2024-2885: Use after free in Daw
+  * High CVE-2024-2886: Use after free in WebCodecs
+  * High CVE-2024-2887: Type Confusion in WebAssembly
+
 * Sat Mar 23 2024 Than Ngo <than@redhat.com> - 123.0.6312.58-2
 - fixed bz#2269768 - enable build ppc64le package for F40
 - fixed bz#2270321 - VAAPI flags in chromium.conf are out of date
