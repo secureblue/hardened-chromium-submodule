@@ -73,7 +73,11 @@
 %if 0%{?rhel} == 7
 %global chromium_pybin /usr/bin/python3
 %else
+%if 0%{?rhel} == 8
+%global chromium_pybin /usr/bin/python3.9
+%else
 %global chromium_pybin %{__python3}
+%endif
 %endif
 
 # va-api only supported in rhel >= 9 and fedora
@@ -1321,7 +1325,7 @@ udev.
 
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
-find -type f \( -iname "*.py" \) -exec sed -i '1s=^#! */usr/bin/\(python\|env python\)[23]\?=#!%{__python3}=' {} +
+find -type f \( -iname "*.py" \) -exec sed -i '1s=^#! */usr/bin/\(python\|env python\)[23]\?=#!%{chromium_pybin}=' {} +
 
 # Add correct path for nodejs binary
 %if ! %{system_nodejs}
