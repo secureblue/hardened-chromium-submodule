@@ -1,7 +1,7 @@
-diff -up chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.h.el8-support-64kpage.patch chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.h
---- chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.h.el8-support-64kpage.patch	2024-01-30 21:24:10.000000000 +0100
-+++ chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.h	2024-02-01 17:20:37.178877448 +0100
-@@ -146,7 +146,13 @@ struct PartitionBucket {
+diff -up chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.h.orig chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.h
+--- chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.h.orig	2024-04-12 21:56:54.000000000 +0200
++++ chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.h	2024-04-14 20:53:16.043867871 +0200
+@@ -147,7 +147,13 @@ struct PartitionBucket {
    // Returns a slot number starting from the beginning of the slot span.
    PA_ALWAYS_INLINE size_t GetSlotNumber(size_t offset_in_slot_span) const {
      // See the static assertion for `kReciprocalShift` above.
@@ -12,17 +12,17 @@ diff -up chromium-121.0.6167.139/base/allocator/partition_allocator/src/partitio
 +    // from overlapping. For now this will allow 64k pages
 +    // to function on Aarch64/Linux systems, albeit not
 +    // very efficiently.
-+    // PA_DCHECK(offset_in_slot_span <= kMaxBucketed);
++    PA_DCHECK(internal::SystemPageSize() == (size_t{1} << 16) || offset_in_slot_span <= kMaxBucketed);
      PA_DCHECK(slot_size <= kMaxBucketed);
  
      const size_t offset_in_slot =
-diff -up chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_page_constants.h.el8-support-64kpage.patch chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_page_constants.h
---- chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_page_constants.h.el8-support-64kpage.patch	2024-02-01 17:20:37.178877448 +0100
-+++ chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_page_constants.h	2024-02-01 17:31:08.500268457 +0100
+diff -up chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_page_constants.h.orig chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_page_constants.h
+--- chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_page_constants.h.orig	2024-04-14 20:53:16.043867871 +0200
++++ chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_page_constants.h	2024-04-14 21:39:18.147052845 +0200
 @@ -17,10 +17,8 @@ namespace partition_alloc::internal {
  // PartitionPageSize() is 4 times the OS page size.
  static constexpr size_t kMaxSlotsPerSlotSpan = 4 * (1 << 14) / kSmallestBucket;
- #elif (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)) && defined(ARCH_CPU_ARM64)
+ #elif defined(PARTITION_ALLOCATOR_CONSTANTS_POSIX_NONCONST_PAGE_SIZE)
 -// System page size can be 4, 16, or 64 kiB on Linux on arm64. 64 kiB is
 -// currently (kMaxSlotsPerSlotSpanBits == 13) not supported by the code,
 -// so we use the 16 kiB maximum (64 kiB will crash).
@@ -32,10 +32,30 @@ diff -up chromium-121.0.6167.139/base/allocator/partition_allocator/src/partitio
  #else
  // A slot span can "span" multiple PartitionPages, but then its slot size is
  // larger, so it doesn't have as many slots.
-diff -up chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_page.h.el8-support-64kpage.patch chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_page.h
---- chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_page.h.el8-support-64kpage.patch	2024-01-30 21:24:10.000000000 +0100
-+++ chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_page.h	2024-02-01 17:20:37.178877448 +0100
-@@ -95,26 +95,25 @@ struct SlotSpanMetadata {
+diff -up chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_root.cc.orig chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_root.cc
+--- chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_root.cc.orig	2024-04-14 20:53:16.044867889 +0200
++++ chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_root.cc	2024-04-14 21:50:57.926716718 +0200
+@@ -952,12 +952,11 @@ void PartitionRoot::Init(PartitionOption
+              (internal::SystemPageSize() == (size_t{1} << 14)));
+ #elif BUILDFLAG(IS_LINUX) && defined(ARCH_CPU_ARM64)
+     // Check runtime pagesize. Though the code is currently the same, it is
+-    // not merged with the IS_APPLE case above as a 1 << 16 case needs to be
+-    // added here in the future, to allow 64 kiB pagesize. That is only
+-    // supported on Linux on arm64, not on IS_APPLE, but not yet present here
+-    // as the rest of the PartitionAlloc does not currently support it.
++    // not merged with the IS_APPLE case above as a 1 << 16 case is only
++    // supported on Linux on AArch64.
+     PA_CHECK((internal::SystemPageSize() == (size_t{1} << 12)) ||
+-             (internal::SystemPageSize() == (size_t{1} << 14)));
++             (internal::SystemPageSize() == (size_t{1} << 14)) ||
++             (internal::SystemPageSize() == (size_t{1} << 16)));
+ #endif
+ 
+     ::partition_alloc::internal::ScopedGuard guard{lock_};
+diff -up chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_page.h.me chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_page.h
+--- chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_page.h.me	2024-04-14 22:08:40.655011536 +0200
++++ chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition_alloc/partition_page.h	2024-04-14 22:12:46.665731577 +0200
+@@ -86,27 +86,25 @@ struct SlotSpanMetadata {
  
    // CHECK()ed in AllocNewSlotSpan().
    // The maximum number of bits needed to cover all currently supported OSes.
@@ -66,14 +86,15 @@ diff -up chromium-121.0.6167.139/base/allocator/partition_allocator/src/partitio
    // If |in_empty_cache_|==1, |empty_cache_index| is undefined and mustn't be
    // used.
 -  uint16_t in_empty_cache_ : 1;
--  uint16_t empty_cache_index_ : kEmptyCacheIndexBits;  // < kMaxFreeableSpans.
--  uint16_t unused2_ : (16 - 1 - kEmptyCacheIndexBits);
+-  uint16_t empty_cache_index_
+-      : kMaxEmptyCacheIndexBits;  // < kMaxFreeableSpans.
+-  uint16_t unused2_ : (16 - 1 - kMaxEmptyCacheIndexBits);
 +  bool in_empty_cache_ : 1;
 +  uint8_t empty_cache_index_ : kEmptyCacheIndexBits;  // < kMaxFreeableSpans.
    // Can use only 48 bits (6B) in this bitfield, as this structure is embedded
    // in PartitionPage which has 2B worth of fields and must fit in 32B.
  
-@@ -279,18 +278,13 @@ static_assert(sizeof(SlotSpanMetadata) <
+@@ -246,18 +244,13 @@ static_assert(sizeof(SlotSpanMetadata) <
                "SlotSpanMetadata must fit into a Page Metadata slot.");
  
  inline constexpr SlotSpanMetadata::SlotSpanMetadata() noexcept
@@ -95,7 +116,7 @@ diff -up chromium-121.0.6167.139/base/allocator/partition_allocator/src/partitio
  
  inline SlotSpanMetadata::SlotSpanMetadata(const SlotSpanMetadata&) = default;
  
-@@ -883,7 +877,7 @@ PA_ALWAYS_INLINE void SlotSpanMetadata::
+@@ -752,7 +745,7 @@ PA_ALWAYS_INLINE void SlotSpanMetadata::
  
    size_t num_slots_per_span = bucket->get_slots_per_span();
    PA_DCHECK(num_slots_per_span <= kMaxSlotsPerSlotSpan);
@@ -104,23 +125,3 @@ diff -up chromium-121.0.6167.139/base/allocator/partition_allocator/src/partitio
    PA_DCHECK(num_unprovisioned_slots);
  
    ToSuperPageExtent()->IncrementNumberOfNonemptySlotSpans();
-diff -up chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_root.cc.el8-support-64kpage.patch chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_root.cc
---- chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_root.cc.el8-support-64kpage.patch	2024-01-30 21:24:10.000000000 +0100
-+++ chromium-121.0.6167.139/base/allocator/partition_allocator/src/partition_alloc/partition_root.cc	2024-02-01 17:20:37.178877448 +0100
-@@ -950,12 +950,11 @@ void PartitionRoot::Init(PartitionOption
-              (internal::SystemPageSize() == (size_t{1} << 14)));
- #elif BUILDFLAG(IS_LINUX) && defined(ARCH_CPU_ARM64)
-     // Check runtime pagesize. Though the code is currently the same, it is
--    // not merged with the IS_APPLE case above as a 1 << 16 case needs to be
--    // added here in the future, to allow 64 kiB pagesize. That is only
--    // supported on Linux on arm64, not on IS_APPLE, but not yet present here
--    // as the rest of the partition allocator does not currently support it.
-+    // not merged with the IS_APPLE case above as a 1 << 16 case is only
-+    // supported on Linux on AArch64.
-     PA_CHECK((internal::SystemPageSize() == (size_t{1} << 12)) ||
--             (internal::SystemPageSize() == (size_t{1} << 14)));
-+             (internal::SystemPageSize() == (size_t{1} << 14)) ||
-+             (internal::SystemPageSize() == (size_t{1} << 16)));
- #endif
- 
-     ::partition_alloc::internal::ScopedGuard guard{lock_};

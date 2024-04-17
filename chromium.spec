@@ -179,17 +179,13 @@
 %global toolchain gcc
 %endif
 
-# enable qt backend for el >= 8 and fedora
-%if 0%{?rhel} >= 8 || 0%{?fedora}
-%global use_qt 1
-%else
-%global use_qt 0
-%endif
-
-%if 0%{?rhel} > 9 || 0%{?fedora}
+# enable qt backend
+%if 0%{?fedora} >= 40
 %global use_qt6 1
+%global use_qt 0
 %else
 %global use_qt6 0
+%global use_qt 1
 %endif
 
 # Chromium's fork of ICU is now something we can't unbundle.
@@ -306,7 +302,7 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 123.0.6312.122
+Version: 124.0.6367.60
 Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
@@ -446,19 +442,16 @@ Patch309: chromium-123-constexpr.patch
 # missing include header files
 Patch310: chromium-123-missing-header-files.patch
 
-# clang warnings
-Patch311: chromium-115-clang-warnings.patch
-
 # enable fstack-protector-strong
 Patch312: chromium-123-fstack-protector-strong.patch
 
 # rust is old, function or associated item not found in `OsStr`
 Patch313: chromium-123-rust-clap_lex.patch
 
-Patch314: chromium-122-clang16-buildflags.patch
+Patch314: chromium-124-clang16-buildflags.patch
 
 # assignment-expressions not suport in python < 3.8 on el 7/8
-Patch315: chromium-123-python3-assignment-expressions.patch
+Patch315: chromium-124-python3-assignment-expressions.patch
 
 # add -ftrivial-auto-var-init=zero and -fwrapv
 Patch316: chromium-122-clang-build-flags.patch
@@ -482,6 +475,9 @@ Patch357: chromium-122-clang16-disable-auto-upgrade-debug-info.patch
 
 # set clang_lib path
 Patch358: chromium-122-rust-clang_lib.patch
+
+# ERROR Unresolved dependencies
+Patch359: chromium-124-libavif-deps.patch
 
 # PowerPC64 LE support
 # Patches taken from Debian, Timothy Pearson's patchset
@@ -565,9 +561,7 @@ Patch415: fix-clang-selection.patch
 
 # upstream patches
 # 64kpage support on el8
-Patch500: chromium-122-el8-support-64kpage.patch
-# error: static assertion failed due to requirement '::WTF::internal::SizesEqual<72, 64>::value': ShapeResult should stay small 
-Patch501: chromium-123-shape_result-assert.patch
+Patch500: chromium-124-el8-support-64kpage.patch
 
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
 # http://build.chromium.org/buildbot/official/
@@ -1211,7 +1205,7 @@ udev.
 %patch -P130 -p1 -b .revert-av1enc
 %endif
 
-%if 0%{?rhel} <= 8
+%if 0%{?rhel} && 0%{?rhel} <= 8
 %patch -P315 -p1 -b .assignment-expressions
 %ifarch aarch64
 %patch -P305 -p1 -b .memory_tagging
@@ -1221,12 +1215,10 @@ udev.
 %if 0%{?rhel} || 0%{?fedora} && 0%{?fedora} < 39
 %patch -P307 -p1 -R -b .v8-c++20
 %patch -P308 -p1 -R -b .v8-c++20
-%patch -P309 -p1 -b .constexpr
 %patch -P314 -p1 -b .clang16-buildflag
 %endif
 
 %patch -P310 -p1 -b .missing-header-files
-%patch -P311 -p1 -b .clang-warnings
 %patch -P312 -p1 -b .fstack-protector-strong
 
 %if 0%{?rhel} && 0%{?rhel} < 10
@@ -1248,6 +1240,7 @@ udev.
 %patch -P356 -p1 -b .disable-FFmpegAllowLists
 %patch -P357 -p1 -b .clang16-disable-auto-upgrade-debug-info
 %patch -P358 -p1 -b .rust-clang_lib
+%patch -P359 -p1 -b .libavif-deps
 
 %ifarch ppc64le
 %patch -P360 -p1 -b .0001-linux-seccomp-bpf-ppc64-glibc-workaround-in-SIGSYS-h
@@ -1289,7 +1282,7 @@ udev.
 %patch -P390 -p1 -b .0002-third-party-boringssl-add-generated-files
 %patch -P391 -p1 -b .0003-third_party-libvpx-Add-ppc64-generated-config
 #patch -P392 -p1 -b .0003-third_party-libvpx-Add-ppc64-vsx-files
-%patch -P393 -p1 -b .0003-third_party-ffmpeg-Add-ppc64-generated-config
+#patch -P393 -p1 -b .0003-third_party-ffmpeg-Add-ppc64-generated-config
 %patch -P394 -p1 -b .0004-third_party-libvpx-work-around-ambiguous-vsx
 
 %patch -P395 -p1 -b .skia-vsx-instructions
@@ -1325,8 +1318,6 @@ udev.
 %patch -P500 -p1 -b .el8-support-64kpage.patch
 %endif
 %endif
-
-%patch -P501 -p1 -b .shape_result-assert
 
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
@@ -2120,6 +2111,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Tue Apr 16 2024 Than Ngo <than@redhat.com> - 124.0.6367.60-1
+- update to 124.0.6367.60
+
 * Thu Apr 11 2024 Than Ngo <than@redhat.com> - 123.0.6312.122-1
 - update to 123.0.6312.122
   * High CVE-2024-3157: Out of bounds write in Compositing
