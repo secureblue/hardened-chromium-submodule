@@ -433,7 +433,7 @@ Patch304: chromium-117-string-convert.patch
 
 # disable memory tagging in epel7 and epel8 on aarch64 due to new feature IFUNC-Resolver
 # not supported in old glibc < 2.30, error: fatal error: 'sys/ifunc.h' file not found
-Patch305: chromium-122-arm64-memory_tagging.patch
+Patch305: chromium-124-arm64-memory_tagging.patch
 
 Patch306: chromium-119-assert.patch
 
