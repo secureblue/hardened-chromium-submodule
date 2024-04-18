@@ -460,6 +460,9 @@ Patch315: chromium-124-python3-assignment-expressions.patch
 # add -ftrivial-auto-var-init=zero and -fwrapv
 Patch316: chromium-122-clang-build-flags.patch
 
+# build error: unknown architectural extension on aarch64 (epel and < f39)
+Patch317: chromium-124-libdav1d-aarch64.patch
+
 # Workaround for https://bugzilla.redhat.com/show_bug.cgi?id=2239523
 # https://bugs.chromium.org/p/chromium/issues/detail?id=1145581#c60
 # Disable BTI until this is fixed upstream.
@@ -1220,6 +1223,7 @@ udev.
 %patch -P307 -p1 -R -b .v8-c++20
 %patch -P308 -p1 -R -b .v8-c++20
 %patch -P314 -p1 -b .clang16-buildflag
+%patch -P317 -p1 -b .libdav1d-aarch64
 %endif
 
 %patch -P310 -p1 -b .missing-header-files
