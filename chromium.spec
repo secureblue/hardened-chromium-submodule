@@ -1269,7 +1269,7 @@ udev.
 %patch -P375 -p1 -b .0008-sandbox-fix-ppc64le-glibc234
 
 %patch -P376 -p1 -b .0001-third_party-angle-Include-missing-header-cstddef-in-
-%patch -P377 -p1 -b .0001-Add-PPC64-support-for-boringssl
+#patch -P377 -p1 -b .0001-Add-PPC64-support-for-boringssl
 %patch -P378 -p1 -b .0001-third_party-libvpx-Properly-generate-gni-on-ppc64
 %patch -P379 -p1 -b .0001-third_party-lss-Don-t-look-for-mmap2-on-ppc64
 %patch -P380 -p1 -b .0001-third_party-pffft-Include-altivec.h-on-ppc64-with-SI
@@ -1287,7 +1287,7 @@ udev.
 %patch -P388 -p1 -b .0001-Add-pregenerated-config-for-libaom-on-ppc64
 
 %patch -P389 -p1 -b .0002-third_party-libvpx-Remove-bad-ppc64-config
-%patch -P390 -p1 -b .0002-third-party-boringssl-add-generated-files
+#patch -P390 -p1 -b .0002-third-party-boringssl-add-generated-files
 %patch -P391 -p1 -b .0003-third_party-libvpx-Add-ppc64-generated-config
 #patch -P392 -p1 -b .0003-third_party-libvpx-Add-ppc64-vsx-files
 #patch -P393 -p1 -b .0003-third_party-ffmpeg-Add-ppc64-generated-config
