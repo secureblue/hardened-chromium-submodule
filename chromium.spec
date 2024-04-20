@@ -184,9 +184,9 @@
 %endif
 
 # enable qt backend
-%if 0%{?fedora} >= 40
+%if 0%{?rhel} > 9 || 0%{?fedora}
 %global use_qt6 1
-%global use_qt 0
+%global use_qt 1
 %else
 %global use_qt6 0
 %global use_qt 1
