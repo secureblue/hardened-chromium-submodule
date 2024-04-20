@@ -185,7 +185,7 @@
 
 # enable qt backend
 %if 0%{?rhel} > 9 || 0%{?fedora}
-%global use_qt6 1
+%global use_qt6 0
 %global use_qt 1
 %else
 %global use_qt6 0
@@ -307,7 +307,7 @@
 
 Name:	chromium%{chromium_channel}
 Version: 124.0.6367.60
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -569,6 +569,7 @@ Patch415: fix-clang-selection.patch
 # upstream patches
 # 64kpage support on el8
 Patch500: chromium-124-el8-support-64kpage.patch
+Patch501: chromium-124-wayland-regression.patch
 
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
 # http://build.chromium.org/buildbot/official/
@@ -1269,7 +1270,7 @@ udev.
 %patch -P375 -p1 -b .0008-sandbox-fix-ppc64le-glibc234
 
 %patch -P376 -p1 -b .0001-third_party-angle-Include-missing-header-cstddef-in-
-#patch -P377 -p1 -b .0001-Add-PPC64-support-for-boringssl
+%patch -P377 -p1 -b .0001-Add-PPC64-support-for-boringssl
 %patch -P378 -p1 -b .0001-third_party-libvpx-Properly-generate-gni-on-ppc64
 %patch -P379 -p1 -b .0001-third_party-lss-Don-t-look-for-mmap2-on-ppc64
 %patch -P380 -p1 -b .0001-third_party-pffft-Include-altivec.h-on-ppc64-with-SI
@@ -1287,7 +1288,7 @@ udev.
 %patch -P388 -p1 -b .0001-Add-pregenerated-config-for-libaom-on-ppc64
 
 %patch -P389 -p1 -b .0002-third_party-libvpx-Remove-bad-ppc64-config
-#patch -P390 -p1 -b .0002-third-party-boringssl-add-generated-files
+%patch -P390 -p1 -b .0002-third-party-boringssl-add-generated-files
 %patch -P391 -p1 -b .0003-third_party-libvpx-Add-ppc64-generated-config
 #patch -P392 -p1 -b .0003-third_party-libvpx-Add-ppc64-vsx-files
 #patch -P393 -p1 -b .0003-third_party-ffmpeg-Add-ppc64-generated-config
@@ -1326,6 +1327,7 @@ udev.
 %patch -P500 -p1 -b .el8-support-64kpage.patch
 %endif
 %endif
+%patch -P501 -p1 -b .wayland-regression
 
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
@@ -2119,6 +2121,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Sat Apr 20 2024 Than Ngo <than@redhat.com> - 124.0.6367.60-2
+- fix waylang regression
+
 * Tue Apr 16 2024 Than Ngo <than@redhat.com> - 124.0.6367.60-1
 - update to 124.0.6367.60
 
