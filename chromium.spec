@@ -202,7 +202,6 @@
 %global bundlewoff2 1
 %global bundlelibaom 1
 %global bundlelibavif 1
-%global bundledav1d 1
 %global bundlesnappy 1
 
 # Fedora's Python 2 stack is being removed, we use the bundled Python libraries
@@ -246,6 +245,7 @@
 %else
 %global bundlebrotli 1
 %endif
+%global bundledav1d 0
 %global bundleopus 0
 %global bundlelibusbx 0
 %global bundlelibwebp 0
@@ -306,7 +306,7 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 124.0.6367.78
+Version: 124.0.6367.91
 Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
@@ -528,8 +528,6 @@ Patch389: 0002-third_party-libvpx-Remove-bad-ppc64-config.patch
 Patch390: 0002-third-party-boringssl-add-generated-files.patch
 Patch391: 0003-third_party-libvpx-Add-ppc64-generated-config.patch
 # Enabling VSX causes artifacts to appear in VP9 videos
-Patch392: 0003-third_party-libvpx-Add-ppc64-vsx-files.patch
-Patch393: 0003-third_party-ffmpeg-Add-ppc64-generated-config.patch
 Patch394: 0004-third_party-libvpx-work-around-ambiguous-vsx.patch
 
 # Enable VSX acceleration in Skia.  Requires POWER8 or higher.
@@ -545,10 +543,7 @@ Patch402: fix-partition-alloc-compile.patch
 Patch403: 0002-Add-ppc64-trap-instructions.patch
 Patch404: 0001-Fix-highway-ppc-hwcap.patch
 
-Patch405: 0001-Add-PPC64-support-for-libdav1d.patch
-Patch406: 0001-Fix-libdav1d-compilation-on-clang-ppc.patch
 Patch407: fix-ppc64-linux-syscalls-headers.patch
-Patch408: 0003-thirdparty-fix-dav1d-gn.patch
 Patch409: use-sysconf-page-size-on-ppc64.patch
 
 Patch410: dawn-fix-typos.patch
@@ -1217,6 +1212,7 @@ udev.
 %patch -P315 -p1 -b .assignment-expressions
 %ifarch aarch64
 %patch -P305 -p1 -b .memory_tagging
+%patch -P317 -p1 -b .libdav1d-aarch64
 %endif
 %endif
 
@@ -1224,7 +1220,6 @@ udev.
 %patch -P307 -p1 -R -b .v8-c++20
 %patch -P308 -p1 -R -b .v8-c++20
 %patch -P314 -p1 -b .clang16-buildflag
-%patch -P317 -p1 -b .libdav1d-aarch64
 %endif
 
 %patch -P310 -p1 -b .missing-header-files
@@ -1306,10 +1301,10 @@ udev.
 %patch -P403 -p1 -b .0002-Add-ppc64-trap-instructions
 %patch -P404 -p1 -b .0001-Fix-highway-ppc-hwcap
 
-%patch -P405 -p1 -b .0001-Add-PPC64-support-for-libdav1d
-%patch -P406 -p1 -b .0001-Fix-libdav1d-compilation-on-clang-ppc
+#patch -P405 -p1 -b .0001-Add-PPC64-support-for-libdav1d
+#patch -P406 -p1 -b .0001-Fix-libdav1d-compilation-on-clang-ppc
 %patch -P407 -p1 -b .fix-ppc64-linux-syscalls-headers
-%patch -P408 -p1 -b .0003-thirdparty-fix-dav1d-gn
+#patch -P408 -p1 -b .0003-thirdparty-fix-dav1d-gn
 %patch -P409 -p1 -b .use-sysconf-page-size-on-ppc64
 
 %patch -P410 -p1 -b .dawn-fix-typos
@@ -1389,6 +1384,10 @@ sed -i 's|/opt/google/chrome-remote-desktop|%{crd_path}|g' remoting/host/setup/d
 # bz#2265957, add correct platform
 sed -i "s/Linux x86_64/Linux %{_arch}/" content/common/user_agent.cc
  
+%if ! %{bundledav1d}
+cp -a third_party/dav1d/version/version.h third_party/dav1d/libdav1d/include/dav1d/
+%endif
+
 %build
 # utf8 issue on epel7, Internal parsing error 'ascii' codec can't
 # decode byte 0xe2 in position 474: ordinal not in range(128)
@@ -2121,6 +2120,11 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Sat Apr 27 2024 Than Ngo <than@redhat.com> - 124.0.6367.91-1
+- update to 124.0.6367.91
+- fixed bz#2277228 - chromium wrapper causes library issues (symbol lookup error)
+- use system dav1d
+
 * Wed Apr 24 2024 Than Ngo <than@redhat.com> - 124.0.6367.78-1
 - update to 124.0.6367.78
   * Critical CVE-2024-4058: Type Confusion in ANGLE
