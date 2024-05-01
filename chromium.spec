@@ -1305,7 +1305,6 @@ udev.
 %patch -P412 -p1 -b .fix-swiftshader-compile.patch
 %patch -P413 -p1 -b .fix-unknown-warning-option-messages
 
-%patch -P414 -p1 -b .0002-Highway-disable-128-bit-vsx
 %patch -P415 -p1 -b .fix-clang-selection
 %endif
 
