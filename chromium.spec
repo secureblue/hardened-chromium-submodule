@@ -542,7 +542,6 @@ Patch400: fix-rust-linking.patch
 Patch401: fix-breakpad-compile.patch
 Patch402: fix-partition-alloc-compile.patch
 Patch403: 0002-Add-ppc64-trap-instructions.patch
-Patch404: 0001-Fix-highway-ppc-hwcap.patch
 
 Patch407: fix-ppc64-linux-syscalls-headers.patch
 Patch409: use-sysconf-page-size-on-ppc64.patch
@@ -555,11 +554,6 @@ Patch412: fix-swiftshader-compile.patch
 # Suppress harmless compiler warning messages that appear on ppc64 due to arch-specific warning flags being passed
 Patch413: fix-unknown-warning-option-messages.diff
 
-# Needed on Debian while POWER8 remains the build target
-# POWER9 enables hardware 128 bit vector support (ISA 3.0),
-# and Highway gets confused when building in POWER8 mode
-# (POWER8 compiler flags) on POWER9 hosts.
-Patch414: 0002-Highway-disable-128-bit-vsx.patch
 Patch415: fix-clang-selection.patch
 
 # upstream patches
@@ -1289,8 +1283,6 @@ udev.
 %patch -P389 -p1 -b .0002-third_party-libvpx-Remove-bad-ppc64-config
 %patch -P390 -p1 -b .0002-third-party-boringssl-add-generated-files
 %patch -P391 -p1 -b .0003-third_party-libvpx-Add-ppc64-generated-config
-#patch -P392 -p1 -b .0003-third_party-libvpx-Add-ppc64-vsx-files
-#patch -P393 -p1 -b .0003-third_party-ffmpeg-Add-ppc64-generated-config
 %patch -P394 -p1 -b .0004-third_party-libvpx-work-around-ambiguous-vsx
 
 %patch -P395 -p1 -b .skia-vsx-instructions
@@ -1303,12 +1295,8 @@ udev.
 %patch -P401 -p1 -b .fix-breakpad-compile
 %patch -P402 -p1 -b .fix-partition-alloc-compile
 %patch -P403 -p1 -b .0002-Add-ppc64-trap-instructions
-%patch -P404 -p1 -b .0001-Fix-highway-ppc-hwcap
 
-#patch -P405 -p1 -b .0001-Add-PPC64-support-for-libdav1d
-#patch -P406 -p1 -b .0001-Fix-libdav1d-compilation-on-clang-ppc
 %patch -P407 -p1 -b .fix-ppc64-linux-syscalls-headers
-#patch -P408 -p1 -b .0003-thirdparty-fix-dav1d-gn
 %patch -P409 -p1 -b .use-sysconf-page-size-on-ppc64
 
 %patch -P410 -p1 -b .dawn-fix-typos
