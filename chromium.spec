@@ -245,6 +245,7 @@
 %else
 %global bundlebrotli 1
 %endif
+%global bundlehighway 0
 %global bundledav1d 0
 %global bundleopus 0
 %global bundlelibusbx 0
@@ -306,7 +307,7 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 124.0.6367.91
+Version: 124.0.6367.118
 Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
@@ -564,7 +565,6 @@ Patch415: fix-clang-selection.patch
 # upstream patches
 # 64kpage support on el8
 Patch500: chromium-124-el8-support-64kpage.patch
-Patch501: chromium-124-wayland-regression.patch
 
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
 # http://build.chromium.org/buildbot/official/
@@ -769,6 +769,10 @@ BuildRequires: woff2-devel
 
 %if ! %{bundledav1d}
 BuildRequires: libdav1d-devel
+%endif
+
+%if ! %{bundlehighway}
+BuildRequires: highway-devel
 %endif
 
 %if ! %{bundlelibavif}
@@ -1322,7 +1326,6 @@ udev.
 %patch -P500 -p1 -b .el8-support-64kpage.patch
 %endif
 %endif
-%patch -P501 -p1 -b .wayland-regression
 
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
@@ -1641,6 +1644,9 @@ system_libs=()
 %endif
 %if ! %{bundledav1d}
 	system_libs+=(dav1d)
+%endif
+%if ! %{bundlehighway}
+	system_libs+=(highway)
 %endif
 %if ! %{bundlefontconfig}
 	system_libs+=(fontconfig)
@@ -2120,6 +2126,12 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Wed May 01 2024 Than Ngo <than@redhat.com> - 124.0.6367.118-1
+- update to 124.0.6367.118
+  * High CVE-2024-4331: Use after free in Picture In Picture
+  * High CVE-2024-4368: Use after free in Dawn
+- use system highway
+
 * Sat Apr 27 2024 Than Ngo <than@redhat.com> - 124.0.6367.91-1
 - update to 124.0.6367.91
 - fixed bz#2277228 - chromium wrapper causes library issues (symbol lookup error)
