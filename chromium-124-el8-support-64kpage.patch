@@ -90,7 +90,7 @@ diff -up chromium-124.0.6367.49/base/allocator/partition_allocator/src/partition
 -      : kMaxEmptyCacheIndexBits;  // < kMaxFreeableSpans.
 -  uint16_t unused2_ : (16 - 1 - kMaxEmptyCacheIndexBits);
 +  bool in_empty_cache_ : 1;
-+  uint8_t empty_cache_index_ : kEmptyCacheIndexBits;  // < kMaxFreeableSpans.
++  uint8_t empty_cache_index_ : kMaxEmptyCacheIndexBits;  // < kMaxFreeableSpans.
    // Can use only 48 bits (6B) in this bitfield, as this structure is embedded
    // in PartitionPage which has 2B worth of fields and must fit in 32B.
  
