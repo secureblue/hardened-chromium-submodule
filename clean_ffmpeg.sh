@@ -1,5 +1,6 @@
 #!/bin/bash
 # Copyright 2013-2015 Tomas Popela <tpopela@redhat.com>
+# Copyright 2022-2024 Than Ngo <than@redhat.com>
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -41,6 +42,10 @@ function copy_files() {
 }
 
 where=$(pwd)
+
+pushd $1
+patch -p0 < ../ffmpeg-clean.patch
+popd
 
 if ! generated_files=$(./get_free_ffmpeg_source_files.py "$1" "$2"); then
 	exit 1
@@ -175,6 +180,9 @@ header_files="	libavcodec/x86/inline_asm.h \
 		libavformat/version.h \
 		libavformat/version_major.h \
 		libavformat/w64.h \
+		libavformat/iamf_parse.h \
+		libavformat/iamf_reader.h \
+		libavformat/iamf.h \
 		libavutil/aarch64/cpu.h \
 		libavutil/x86/asm.h \
 		libavutil/x86/bswap.h \
@@ -215,6 +223,7 @@ header_files="	libavcodec/x86/inline_asm.h \
 		libavutil/timestamp.h \
 		libavutil/tx_priv.h \
 		libavutil/version.h \
+		libavutil/sfc64.h \
 		libswresample/swresample.h \
 		libswresample/version.h \
 		libswresample/version_major.h \

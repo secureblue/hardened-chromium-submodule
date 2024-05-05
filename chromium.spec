@@ -239,6 +239,8 @@
 %global bundlelibXNVCtrl 1
 %global bundlelibxml 1
 %global bundlelibevent 1
+%global bundlehighway 1
+%global bundledav1d 1
 %else
 %if 0%{?fedora} > 38 || 0%{?rhel} > 9
 %global bundlebrotli 0
@@ -308,7 +310,7 @@
 
 Name:	chromium%{chromium_channel}
 Version: 124.0.6367.118
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -2113,6 +2115,11 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Sun May 05 2024 Than Ngo <than@redhat.com> - 124.0.6367.118-2
+- fixed build errors on el8
+- refreshed clean_ffmpeg.sh
+- added missing files for bundle ffmpeg
+
 * Wed May 01 2024 Than Ngo <than@redhat.com> - 124.0.6367.118-1
 - update to 124.0.6367.118
   * High CVE-2024-4331: Use after free in Picture In Picture
