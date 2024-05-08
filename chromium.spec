@@ -187,11 +187,12 @@
 %global use_qt6 0
 %global use_qt 0
 
-%if 0%{?rhel} > 9 || 0%{?fedora}
+%if 0%{?rhel} > 9 || 0%{?fedora} > 39
 %global use_qt6 1
 %global use_qt 1
 %else
-%if 0%{?rhel} == 8
+%if 0%{?rhel} == 8 || 0%{?rhel} == 9 || 0%{?fedora}
+%global use_qt6 0
 %global use_qt 1
 %endif
 %endif
@@ -441,6 +442,9 @@ Patch140: chromium-122-revert-av1enc-el9.patch
 
 # file conflict with old kernel on el8/el9
 Patch141: chromium-118-dma_buf_export_sync_file-conflict.patch
+
+# add correct path for Qt6Gui header and libs
+Patch150: chromium-124-qt6.patch
 
 # disable memory tagging in epel7 and epel8 on aarch64 due to new feature IFUNC-Resolver
 # not supported in old glibc < 2.30, error: fatal error: 'sys/ifunc.h' file not found
@@ -1212,6 +1216,10 @@ udev.
 
 %if 0%{?rhel} == 8 || 0%{?rhel} == 9
 %patch -P141 -p1 -b .dma_buf_export_sync_file-conflict
+%endif
+
+%if 0%{?rhel} > 9 || 0%{?fedora} > 39
+%patch -P150 -p1 -b .qt6
 %endif
 
 %if 0%{?rhel} && 0%{?rhel} <= 8
