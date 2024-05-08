@@ -71,7 +71,7 @@
 %endif
 
 %if 0%{?rhel} == 7
-%global chromium_pybin /usr/bin/python3
+%global chromium_pybin /opt/rh/rh-python38/root/usr/bin/python
 %else
 %if 0%{?rhel} == 8
 %global chromium_pybin /usr/bin/python3.9
@@ -184,12 +184,16 @@
 %endif
 
 # enable qt backend
-%if 0%{?rhel} > 9 || 0%{?fedora}
 %global use_qt6 0
+%global use_qt 0
+
+%if 0%{?rhel} > 9 || 0%{?fedora}
+%global use_qt6 1
 %global use_qt 1
 %else
-%global use_qt6 0
+%if 0%{?rhel} == 8
 %global use_qt 1
+%endif
 %endif
 
 # Chromium's fork of ICU is now something we can't unbundle.
@@ -309,8 +313,8 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 124.0.6367.118
-Release: 2%{?dist}
+Version: 124.0.6367.155
+Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -401,50 +405,51 @@ Patch108: chromium-118-el7_v4l2_quantization.patch
 Patch109: chromium-114-wireless-el7.patch
 Patch110: chromium-115-buildflag-el7.patch
 Patch111: chromium-122-el7-inline-function.patch
+Patch112: chromium-124-el7-powf.patch
 Patch113: chromium-121-el7-clang-version-warning.patch
 Patch114: chromium-123-el7-clang-build-failure.patch
+Patch115: chromium-124-el7-size_t.patch
+
+# fixes for old clang version in el7 (clang <= 15)
+# compiler build errors, no matching constructor for initialization
+Patch116: chromium-124-no_matching_constructor.patch
+Patch117: chromium-115-compiler-SkColor4f.patch
+
+# workaround for clang bug, https://github.com/llvm/llvm-project/issues/57826
+Patch118: chromium-124-workaround_clang_bug-structured_binding.patch
+
+# missing typename
+Patch119: chromium-124-typename.patch
+
+# error: invalid operands to binary expression
+Patch120: chromium-117-string-convert.patch
+Patch121: chromium-119-assert.patch
+Patch122: chromium-124-el7-constexpr.patch
 
 # system ffmpeg
 # need for old ffmpeg 5.x on epel9
-Patch115: chromium-107-ffmpeg-5.x-duration.patch
+Patch130: chromium-107-ffmpeg-5.x-duration.patch
 # disable the check
-Patch116: chromium-107-proprietary-codecs.patch
+Patch131: chromium-107-proprietary-codecs.patch
 # fix tab crash with SIGTRAP error when using system ffmpeg
-Patch117: chromium-118-sigtrap_system_ffmpeg.patch
+Patch132: chromium-118-sigtrap_system_ffmpeg.patch
 # need for old ffmpeg 6.0/5.x on epel9 and fedora < 40
-Patch118: chromium-121-system-old-ffmpeg.patch
+Patch133: chromium-121-system-old-ffmpeg.patch
 
-# revert AV1 VAAPI video encode due to old libva on el9
-Patch130: chromium-122-revert-av1enc-el9.patch
+# revert AV1 VAAPI video encode due to old libva on el9 (rhel9.3)
+Patch140: chromium-122-revert-av1enc-el9.patch
 
 # file conflict with old kernel on el8/el9
-Patch140: chromium-118-dma_buf_export_sync_file-conflict.patch
-
-# fixes for old clang version in fedora < 38 end epel < 8 (old clang <= 15)
-# compiler build errors, no matching constructor for initialization
-Patch300: chromium-123-no_matching_constructor.patch
-Patch301: chromium-115-compiler-SkColor4f.patch
-
-# workaround for clang bug, https://github.com/llvm/llvm-project/issues/57826
-Patch302: chromium-123-workaround_clang_bug-structured_binding.patch
-
-# missing typename
-Patch303: chromium-123-typename.patch
-
-# error: invalid operands to binary expression
-Patch304: chromium-117-string-convert.patch
+Patch141: chromium-118-dma_buf_export_sync_file-conflict.patch
 
 # disable memory tagging in epel7 and epel8 on aarch64 due to new feature IFUNC-Resolver
 # not supported in old glibc < 2.30, error: fatal error: 'sys/ifunc.h' file not found
 Patch305: chromium-124-arm64-memory_tagging.patch
 
-Patch306: chromium-119-assert.patch
-
 # compiler errors on epel
 # revert it for old clang on rhel and f38
 Patch307: chromium-121-v8-c++20-p1.patch
 Patch308: chromium-123-v8-c++20.patch
-Patch309: chromium-123-constexpr.patch
 
 # missing include header files
 Patch310: chromium-123-missing-header-files.patch
@@ -456,9 +461,6 @@ Patch312: chromium-123-fstack-protector-strong.patch
 Patch313: chromium-123-rust-clap_lex.patch
 
 Patch314: chromium-124-clang16-buildflags.patch
-
-# assignment-expressions not suport in python < 3.8 on el 7/8
-Patch315: chromium-124-python3-assignment-expressions.patch
 
 # add -ftrivial-auto-var-init=zero and -fwrapv
 Patch316: chromium-122-clang-build-flags.patch
@@ -474,9 +476,6 @@ Patch352: chromium-117-workaround_for_crash_on_BTI_capable_system.patch
 # remove flag split-threshold-for-reg-with-hint, it' not supported in clang <= 17
 Patch354: chromium-120-split-threshold-for-reg-with-hint.patch
 
-# error: unknown type name 'nullptr_t'
-Patch355: chromium-121-nullptr_t-without-namespace-std.patch
-
 # disable FFmpegAllowLists by default to allow external ffmpeg
 patch356: chromium-122-disable-FFmpegAllowLists.patch
 
@@ -484,7 +483,7 @@ patch356: chromium-122-disable-FFmpegAllowLists.patch
 Patch357: chromium-122-clang16-disable-auto-upgrade-debug-info.patch
 
 # set clang_lib path
-Patch358: chromium-122-rust-clang_lib.patch
+Patch358: chromium-124-rust-clang_lib.patch
 
 # ERROR Unresolved dependencies
 Patch359: chromium-124-libavif-deps.patch
@@ -598,6 +597,10 @@ Source15: https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-%{esbuil
 # esbuild binary from fedora
 %if 0%{?fedora}
 BuildRequires: golang-github-evanw-esbuild
+%endif
+
+%if 0%{?rhel} == 7
+BuildRequires: rh-python38
 %endif
 
 %if %{clang}
@@ -1169,11 +1172,11 @@ udev.
 
 %if ! %{bundleffmpegfree}
 %if 0%{?rhel} == 9
-%patch -P115 -p1 -b .ffmpeg-5.x-duration
+%patch -P130 -p1 -b .ffmpeg-5.x-duration
 %endif
-%patch -P116 -p1 -b .prop-codecs
-%patch -P117 -p1 -b .sigtrap_system_ffmpeg
-%patch -P118 -p1 -b .system-old-ffmpeg
+%patch -P131 -p1 -b .prop-codecs
+%patch -P132 -p1 -b .sigtrap_system_ffmpeg
+%patch -P133 -p1 -b .system-old-ffmpeg
 %endif
 
 # EPEL specific patches
@@ -1190,26 +1193,28 @@ udev.
 %patch -P109 -p1 -b .wireless
 %patch -P110 -p1 -b .buildflag-el7
 %patch -P111 -p1 -b .inline-function-el7
+%patch -P112 -p1 -b .el7-powf
 %patch -P113 -p1 -b .el7-clang-version-warning
 %patch -P114 -p1 -b .clang-build-failure
-%patch -P300 -p1 -b .no_matching_constructor
-%patch -P301 -p1 -b .workaround_clang-SkColor4f
-%patch -P302 -p1 -b .workaround_clang_bug-structured_binding
-%patch -P303 -p1 -b .typename
-%patch -P304 -p1 -b .string-convert
-%patch -P306 -p1 -b .assert
-%endif
-
-%if 0%{?rhel} == 8 || 0%{?rhel} == 9
-%patch -P140 -p1 -b .dma_buf_export_sync_file-conflict
+%patch -P115 -p1 -b .el7-size_t
+%patch -P116 -p1 -b .no_matching_constructor
+%patch -P117 -p1 -b .workaround_clang-SkColor4f
+%patch -P118 -p1 -b .workaround_clang_bug-structured_binding
+%patch -P119 -p1 -b .typename
+%patch -P120 -p1 -b .string-convert
+%patch -P121 -p1 -b .assert
+%patch -P122 -p1 -b .constexpr
 %endif
 
 %if 0%{?rhel} == 9
-%patch -P130 -p1 -b .revert-av1enc
+%patch -P140 -p1 -b .revert-av1enc
+%endif
+
+%if 0%{?rhel} == 8 || 0%{?rhel} == 9
+%patch -P141 -p1 -b .dma_buf_export_sync_file-conflict
 %endif
 
 %if 0%{?rhel} && 0%{?rhel} <= 8
-%patch -P315 -p1 -b .assignment-expressions
 %ifarch aarch64
 %patch -P305 -p1 -b .memory_tagging
 %patch -P317 -p1 -b .libdav1d-aarch64
@@ -1238,9 +1243,6 @@ udev.
 %endif
 
 %patch -P354 -p1 -b .revert-split-threshold-for-reg-with-hint
-%if ! %{use_custom_libcxx}
-%patch -P355 -p1 -b .nullptr_t-without-namespace-std
-%endif
 %patch -P356 -p1 -b .disable-FFmpegAllowLists
 %patch -P357 -p1 -b .clang16-disable-auto-upgrade-debug-info
 %patch -P358 -p1 -b .rust-clang_lib
@@ -1381,11 +1383,6 @@ cp -a third_party/dav1d/version/version.h third_party/dav1d/libdav1d/include/dav
 %endif
 
 %build
-# utf8 issue on epel7, Internal parsing error 'ascii' codec can't
-# decode byte 0xe2 in position 474: ordinal not in range(128)
-%if 0%{?rhel} == 7
-export LANG=en_US.UTF-8
-%endif
 
 # reduce warnings
 %if %{clang}
@@ -1438,6 +1435,7 @@ export RUSTFLAGS
 
 # enable toolset on el7
 %if 0%{?rhel} == 7
+. /opt/rh/rh-python38/enable
 %if %{clang}
 . /opt/rh/llvm-toolset-%{llvm_toolset_version}/enable
 %else
@@ -2115,6 +2113,11 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Wed May 08 2024 Than Ngo <than@redhat.com> - 124.0.6367.155-1
+- update to 124.0.6367.155
+  * High CVE-2024-4558: Use after free in ANGLE
+  * High CVE-2024-4559: Heap buffer overflow in WebAudio
+
 * Sun May 05 2024 Than Ngo <than@redhat.com> - 124.0.6367.118-2
 - fixed build errors on el8
 - refreshed clean_ffmpeg.sh

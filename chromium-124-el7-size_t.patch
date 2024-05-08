@@ -1,0 +1,16 @@
+diff -up chromium-124.0.6367.118/third_party/perfetto/src/tracing/core/id_allocator.h.me chromium-124.0.6367.118/third_party/perfetto/src/tracing/core/id_allocator.h
+--- chromium-124.0.6367.118/third_party/perfetto/src/tracing/core/id_allocator.h.me	2024-05-06 08:32:09.637210958 +0200
++++ chromium-124.0.6367.118/third_party/perfetto/src/tracing/core/id_allocator.h	2024-05-06 08:32:26.485518448 +0200
+@@ -63,10 +63,10 @@ class IdAllocator : public IdAllocatorGe
+ 
+   // Tries to allocate `n` IDs. Returns a vector of `n` valid IDs or an empty
+   // vector, if not enough IDs are available.
+-  std::vector<T> AllocateMultiple(size_t n) {
++  std::vector<T> AllocateMultiple(std::size_t n) {
+     std::vector<T> res;
+     res.reserve(n);
+-    for (size_t i = 0; i < n; i++) {
++    for (std::size_t i = 0; i < n; i++) {
+       T id = Allocate();
+       if (id) {
+         res.push_back(id);

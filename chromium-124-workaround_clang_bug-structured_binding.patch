@@ -64,15 +64,15 @@ diff -up chromium-122.0.6261.69/chrome/browser/predictors/lcp_critical_path_pred
    TRACE_EVENT_WITH_FLOW1(
        "loading", "PrewarmHttpDiskCacheManager::MaybeProcessNextQueuedJob",
        TRACE_ID_LOCAL(this),
---- chromium-123.0.6312.46/content/common/service_worker/race_network_request_url_loader_client.cc.orig	2024-03-15 15:37:58.201209354 +0100
-+++ chromium-123.0.6312.46/content/common/service_worker/race_network_request_url_loader_client.cc	2024-03-15 15:40:35.003250723 +0100
-@@ -639,7 +639,8 @@
-     return std::nullopt;
+--- chromium-124.0.6367.118/content/common/service_worker/race_network_request_url_loader_client.cc.workaround_clang_bug-structured_binding	2024-05-05 16:22:47.581070868 +0200
++++ chromium-124.0.6367.118/content/common/service_worker/race_network_request_url_loader_client.cc	2024-05-05 16:27:18.859972481 +0200
+@@ -417,7 +417,8 @@
    }
  
--  auto [result, read_buffer] = BeginReadData();
-+  auto [r, read_buffer] = BeginReadData();
-+  auto result = r;
-   TRACE_EVENT_WITH_FLOW2(
-       "ServiceWorker",
-       "ServiceWorkerRaceNetworkRequestURLLoaderClient::ReadAndWrite",
+   SCOPED_CRASH_KEY_STRING256("SWRace", "request_url", request_.url.spec());
+-  auto [read_result, read_buffer] = read_buffer_manager_->ReadData();
++  auto [r, read_buffer] = read_buffer_manager_->ReadData();
++  auto read_result = r;
+   TRACE_EVENT_WITH_FLOW2("ServiceWorker",
+                          "ServiceWorkerRaceNetworkRequestURLLoaderClient::Read",
+                          TRACE_ID_LOCAL(this),

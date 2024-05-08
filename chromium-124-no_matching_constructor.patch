@@ -988,47 +988,6 @@ diff -up chromium-122.0.6261.69/chrome/browser/file_system_access/chrome_file_sy
    }
  
    base::ThreadPool::PostTaskAndReplyWithResult(
-diff -up chromium-122.0.6261.69/chrome/browser/performance_manager/mechanisms/page_discarder.cc.me chromium-122.0.6261.69/chrome/browser/performance_manager/mechanisms/page_discarder.cc
---- chromium-122.0.6261.69/chrome/browser/performance_manager/mechanisms/page_discarder.cc.me	2024-02-25 19:14:16.227843148 +0100
-+++ chromium-122.0.6261.69/chrome/browser/performance_manager/mechanisms/page_discarder.cc	2024-02-25 19:15:04.589307468 +0100
-@@ -53,7 +53,7 @@ std::vector<PageDiscarder::DiscardEvent>
-     if (lifecycle_unit->DiscardTab(
-             discard_reason,
-             /*memory_footprint_estimate=*/proxy.second)) {
--      discard_events.emplace_back(base::TimeTicks::Now(), proxy.second);
-+      discard_events.emplace_back() = {base::TimeTicks::Now(), proxy.second};
-     }
-   }
-   return discard_events;
-diff -up chromium-122.0.6261.69/extensions/browser/service_worker_task_queue.h.me chromium-122.0.6261.69/extensions/browser/service_worker_task_queue.h
---- chromium-122.0.6261.69/extensions/browser/service_worker_task_queue.h.me	2024-02-25 17:26:25.623572458 +0100
-+++ chromium-122.0.6261.69/extensions/browser/service_worker_task_queue.h	2024-02-25 17:29:52.983345280 +0100
-@@ -204,6 +204,7 @@ class ServiceWorkerTaskQueue : public Ke
-     raw_ptr<content::BrowserContext> browser_context;
-     base::UnguessableToken token;
- 
-+    SequencedContextId(auto e, auto b, auto t) : extension_id(e), browser_context(b), token(t) { }
-     bool operator<(const SequencedContextId& rhs) const {
-       return std::tie(extension_id, browser_context, token) <
-              std::tie(rhs.extension_id, rhs.browser_context, rhs.token);
-diff -up chromium-122.0.6261.69/chrome/browser/renderer_context_menu/render_view_context_menu.cc.me chromium-122.0.6261.69/chrome/browser/renderer_context_menu/render_view_context_menu.cc
---- chromium-122.0.6261.69/chrome/browser/renderer_context_menu/render_view_context_menu.cc.me	2024-02-25 20:05:40.567891077 +0100
-+++ chromium-122.0.6261.69/chrome/browser/renderer_context_menu/render_view_context_menu.cc	2024-02-25 20:05:46.407001997 +0100
-@@ -3993,10 +3993,10 @@ void RenderViewContextMenu::ExecOpenComp
-     autofill::LocalFrameToken frame_token = driver->GetFrameToken();
-     client->GetManager().OpenCompose(
-         *driver,
--        autofill::FormGlobalId(
--            frame_token, autofill::FormRendererId(params_.form_renderer_id)),
--        autofill::FieldGlobalId(
--            frame_token, autofill::FieldRendererId(params_.field_renderer_id)),
-+        autofill::FormGlobalId{
-+            frame_token, autofill::FormRendererId(params_.form_renderer_id)},
-+        autofill::FieldGlobalId{
-+            frame_token, autofill::FieldRendererId(params_.field_renderer_id)},
-         compose::ComposeManagerImpl::UiEntryPoint::kContextMenu);
-     new_badge_tracker_.ActionPerformed("compose_menu_item_activated");
-   } else {
 --- chromium-123.0.6312.46/chrome/browser/ui/omnibox/chrome_omnibox_client.cc.me	2024-03-15 15:16:46.980123806 +0100
 +++ chromium-123.0.6312.46/chrome/browser/ui/omnibox/chrome_omnibox_client.cc	2024-03-15 15:18:39.024042560 +0100
 @@ -474,10 +474,10 @@
@@ -1068,26 +1027,6 @@ diff -up chromium-122.0.6261.69/chrome/browser/renderer_context_menu/render_view
        AutofillSuggestionTriggerSource::kManualFallbackPayments);
    LogManualFallbackContextMenuEntryAccepted(
        static_cast<BrowserAutofillManager&>(manager),
---- chromium-123.0.6312.46/chrome/browser/ui/web_applications/sub_apps_service_impl.cc.no_matching_constructor	2024-03-13 20:35:40.000000000 +0100
-+++ chromium-123.0.6312.46/chrome/browser/ui/web_applications/sub_apps_service_impl.cc	2024-03-15 16:20:45.846919820 +0100
-@@ -107,7 +107,7 @@
-                      ConvertPathToUrl(sub_app->manifest_id_path, origin));
-     ASSIGN_OR_RETURN(GURL install_url,
-                      ConvertPathToUrl(sub_app->install_url_path, origin));
--    sub_apps.emplace_back(std::move(manifest_id), std::move(install_url));
-+    sub_apps.emplace_back() = {std::move(manifest_id), std::move(install_url)};
-   }
-   return sub_apps;
- }
-@@ -439,7 +439,7 @@
-         base::BindOnce(
-             [](webapps::ManifestId manifest_id, const webapps::AppId& app_id,
-                webapps::InstallResultCode result_code) {
--              return SubAppInstallResult(manifest_id, app_id, result_code);
-+              return SubAppInstallResult{manifest_id, app_id, result_code};
-             },
-             manifest_id)
-             .Then(concurrent.CreateCallback()));
 --- chromium-123.0.6312.46/third_party/blink/renderer/platform/fonts/font_palette.h.no_matching_constructor	2024-03-13 20:35:57.000000000 +0100
 +++ chromium-123.0.6312.46/third_party/blink/renderer/platform/fonts/font_palette.h	2024-03-15 16:24:57.899540941 +0100
 @@ -96,7 +96,7 @@
@@ -1108,236 +1047,6 @@ diff -up chromium-122.0.6261.69/chrome/browser/renderer_context_menu/render_view
    }
  
    double GetAlphaMultiplier() const {
-diff -up chromium-123.0.6312.46/base/allocator/partition_allocator/src/partition_alloc/lightweight_quarantine.cc.me chromium-123.0.6312.46/base/allocator/partition_allocator/src/partition_alloc/lightweight_quarantine.cc
---- chromium-123.0.6312.46/base/allocator/partition_allocator/src/partition_alloc/lightweight_quarantine.cc.me	2024-03-15 19:01:07.765832801 +0100
-+++ chromium-123.0.6312.46/base/allocator/partition_allocator/src/partition_alloc/lightweight_quarantine.cc	2024-03-15 19:01:52.918687742 +0100
-@@ -62,7 +62,7 @@ bool LightweightQuarantineBranch::Quaran
-     branch_size_in_bytes_ += usable_size;
-     PA_DCHECK(branch_size_in_bytes_ <= capacity_in_bytes);
- 
--    slots_.emplace_back(slot_start, usable_size);
-+    slots_.emplace_back() = {slot_start, usable_size};
- 
-     // Swap randomly so that the quarantine list remain shuffled.
-     // This is not uniformly random, but sufficiently random.
-diff -up chromium-123.0.6312.46/gpu/ipc/client/client_shared_image_interface.cc.me chromium-123.0.6312.46/gpu/ipc/client/client_shared_image_interface.cc
---- chromium-123.0.6312.46/gpu/ipc/client/client_shared_image_interface.cc.me	2024-03-16 18:43:17.863328507 +0100
-+++ chromium-123.0.6312.46/gpu/ipc/client/client_shared_image_interface.cc	2024-03-16 18:51:00.449277152 +0100
-@@ -106,8 +106,8 @@ scoped_refptr<ClientSharedImage> ClientS
-       AddMailbox(proxy_->CreateSharedImage(format, size, color_space,
-                                            surface_origin, alpha_type, usage,
-                                            debug_label)),
--      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                  alpha_type, usage),
-+      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                  alpha_type, usage},
-       GenUnverifiedSyncToken(), holder_);
- }
- 
-@@ -137,8 +137,8 @@ scoped_refptr<ClientSharedImage> ClientS
- 
-   return base::MakeRefCounted<ClientSharedImage>(
-       AddMailbox(mailbox),
--      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                  alpha_type, usage),
-+      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                  alpha_type, usage},
-       GenUnverifiedSyncToken(), holder_);
- }
- 
-@@ -165,8 +165,8 @@ scoped_refptr<ClientSharedImage> ClientS
-   CHECK(!buffer_handle.is_null());
-   return base::MakeRefCounted<ClientSharedImage>(
-       AddMailbox(mailbox),
--      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                  alpha_type, usage),
-+      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                  alpha_type, usage},
-       GenUnverifiedSyncToken(),
-       GpuMemoryBufferHandleInfo(std::move(buffer_handle), format, size,
-                                 buffer_usage),
-@@ -192,8 +192,8 @@ scoped_refptr<ClientSharedImage> ClientS
- 
-   return base::MakeRefCounted<ClientSharedImage>(
-       mailbox,
--      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                  alpha_type, usage),
-+      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                  alpha_type, usage},
-       GenUnverifiedSyncToken(),
-       GpuMemoryBufferHandleInfo(std::move(client_buffer_handle), format, size,
-                                 buffer_usage),
-@@ -219,8 +219,8 @@ scoped_refptr<ClientSharedImage> ClientS
-       AddMailbox(proxy_->CreateSharedImage(
-           format, size, color_space, surface_origin, alpha_type, usage,
-           debug_label, std::move(buffer_handle))),
--      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                  alpha_type, usage),
-+      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                  alpha_type, usage},
-       GenUnverifiedSyncToken(), holder_);
- }
- 
-@@ -273,8 +273,8 @@ ClientSharedImageInterface::CreateShared
-       AddMailbox(proxy_->CreateSharedImage(format, size, color_space,
-                                            surface_origin, alpha_type, usage,
-                                            debug_label, std::move(handle))),
--      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                  alpha_type, usage),
-+      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                  alpha_type, usage},
-       GenUnverifiedSyncToken(), holder_);
-   return shared_image_mapping;
- }
-@@ -296,10 +296,10 @@ scoped_refptr<ClientSharedImage> ClientS
-           buffer_format, plane, gpu_memory_buffer->GetSize(), color_space,
-           surface_origin, alpha_type, usage, debug_label,
-           gpu_memory_buffer->CloneHandle())),
--      ClientSharedImage::Metadata(
-+      ClientSharedImage::Metadata{
-           viz::GetSinglePlaneSharedImageFormat(buffer_format),
-           gpu_memory_buffer->GetSize(), color_space, surface_origin, alpha_type,
--          usage),
-+          usage},
-       GenUnverifiedSyncToken(), holder_);
- }
- 
-@@ -334,13 +334,13 @@ ClientSharedImageInterface::CreateSwapCh
-   return ClientSharedImageInterface::SwapChainSharedImages(
-       base::MakeRefCounted<ClientSharedImage>(
-           mailboxes.front_buffer,
--          ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                      alpha_type, usage),
-+          ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                      alpha_type, usage},
-           sync_token, holder_),
-       base::MakeRefCounted<ClientSharedImage>(
-           mailboxes.back_buffer,
--          ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                      alpha_type, usage),
-+          ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                      alpha_type, usage},
-           sync_token, holder_));
- }
- 
-@@ -380,8 +380,8 @@ ClientSharedImageInterface::AddReference
- 
-   return base::MakeRefCounted<ClientSharedImage>(
-       mailbox,
--      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                  alpha_type, usage),
-+      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                  alpha_type, usage},
-       sync_token, holder_);
- }
- 
-@@ -402,8 +402,8 @@ scoped_refptr<ClientSharedImage> ClientS
- 
-   return base::MakeRefCounted<ClientSharedImage>(
-       mailbox,
--      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                  alpha_type, usage),
-+      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                  alpha_type, usage},
-       GenUnverifiedSyncToken(), holder_);
- }
- 
-diff -up chromium-123.0.6312.46/gpu/command_buffer/client/shared_image_interface.cc.me chromium-123.0.6312.46/gpu/command_buffer/client/shared_image_interface.cc
---- chromium-123.0.6312.46/gpu/command_buffer/client/shared_image_interface.cc.me	2024-03-16 18:59:20.175882894 +0100
-+++ chromium-123.0.6312.46/gpu/command_buffer/client/shared_image_interface.cc	2024-03-16 19:03:05.001754609 +0100
-@@ -41,8 +41,8 @@ scoped_refptr<ClientSharedImage> SharedI
-   NOTREACHED();
-   return base::MakeRefCounted<ClientSharedImage>(
-       Mailbox(),
--      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                  alpha_type, usage),
-+      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                  alpha_type, usage},
-       GenUnverifiedSyncToken(), holder_);
- }
- 
-diff -up chromium-123.0.6312.46/gpu/command_buffer/service/shared_image_interface_in_process.cc.me chromium-123.0.6312.46/gpu/command_buffer/service/shared_image_interface_in_process.cc
---- chromium-123.0.6312.46/gpu/command_buffer/service/shared_image_interface_in_process.cc.me	2024-03-16 19:06:32.102330155 +0100
-+++ chromium-123.0.6312.46/gpu/command_buffer/service/shared_image_interface_in_process.cc	2024-03-16 19:11:59.627008063 +0100
-@@ -238,8 +238,8 @@ SharedImageInterfaceInProcess::CreateSha
-   }
-   return base::MakeRefCounted<ClientSharedImage>(
-       mailbox,
--      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                  alpha_type, usage),
-+      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                  alpha_type, usage},
-       GenUnverifiedSyncToken(), holder_);
- }
- 
-@@ -301,8 +301,8 @@ SharedImageInterfaceInProcess::CreateSha
-   }
-   return base::MakeRefCounted<ClientSharedImage>(
-       mailbox,
--      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                  alpha_type, usage),
-+      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                  alpha_type, usage},
-       GenUnverifiedSyncToken(), holder_);
- }
- 
-@@ -365,8 +365,8 @@ SharedImageInterfaceInProcess::CreateSha
- 
-   return base::MakeRefCounted<ClientSharedImage>(
-       mailbox,
--      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                  alpha_type, usage),
-+      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                  alpha_type, usage},
-       GenUnverifiedSyncToken(), GetGpuMemoryBufferHandleInfo(mailbox), holder_);
- }
- 
-@@ -481,8 +481,8 @@ SharedImageInterfaceInProcess::CreateSha
- 
-   return base::MakeRefCounted<ClientSharedImage>(
-       mailbox,
--      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                  alpha_type, usage),
-+      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                  alpha_type, usage},
-       GenUnverifiedSyncToken(),
-       GpuMemoryBufferHandleInfo(std::move(client_buffer_handle), format, size,
-                                 buffer_usage),
-@@ -524,8 +524,8 @@ SharedImageInterfaceInProcess::CreateSha
- 
-   return base::MakeRefCounted<ClientSharedImage>(
-       mailbox,
--      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                  alpha_type, usage),
-+      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                  alpha_type, usage},
-       GenUnverifiedSyncToken(), holder_);
- }
- SharedImageInterface::SharedImageMapping
-@@ -589,8 +589,8 @@ SharedImageInterfaceInProcess::CreateSha
-   }
-   shared_image_mapping.shared_image = base::MakeRefCounted<ClientSharedImage>(
-       mailbox,
--      ClientSharedImage::Metadata(format, size, color_space, surface_origin,
--                                  alpha_type, usage),
-+      ClientSharedImage::Metadata{format, size, color_space, surface_origin,
-+                                  alpha_type, usage},
-       GenUnverifiedSyncToken(), holder_);
- 
-   return shared_image_mapping;
-@@ -664,10 +664,10 @@ SharedImageInterfaceInProcess::CreateSha
- 
-   return base::MakeRefCounted<ClientSharedImage>(
-       mailbox,
--      ClientSharedImage::Metadata(
-+      ClientSharedImage::Metadata{
-           viz::GetSinglePlaneSharedImageFormat(gpu_memory_buffer->GetFormat()),
-           gpu_memory_buffer->GetSize(), color_space, surface_origin, alpha_type,
--          usage),
-+          usage},
-       GenUnverifiedSyncToken(), holder_);
- }
- 
 diff -up chromium-123.0.6312.46/content/browser/attribution_reporting/attribution_manager_impl.cc.me chromium-123.0.6312.46/content/browser/attribution_reporting/attribution_manager_impl.cc
 --- chromium-123.0.6312.46/content/browser/attribution_reporting/attribution_manager_impl.cc.me	2024-03-17 00:42:31.183226211 +0100
 +++ chromium-123.0.6312.46/content/browser/attribution_reporting/attribution_manager_impl.cc	2024-03-17 00:55:56.689512430 +0100
@@ -1362,3 +1071,322 @@ diff -up chromium-123.0.6312.46/content/browser/interest_group/interest_group_st
      }
      return {expiration, keys};
    }
+--- chromium-124.0.6367.118/chrome/browser/renderer_context_menu/render_view_context_menu.cc.no_matching_constructor	2024-05-05 11:21:25.869307434 +0200
++++ chromium-124.0.6367.118/chrome/browser/renderer_context_menu/render_view_context_menu.cc	2024-05-05 12:11:07.575690784 +0200
+@@ -4043,10 +4043,10 @@
+     autofill::LocalFrameToken frame_token = driver->GetFrameToken();
+     client->GetManager().OpenCompose(
+         *driver,
+-        autofill::FormGlobalId(
+-            frame_token, autofill::FormRendererId(params_.form_renderer_id)),
+-        autofill::FieldGlobalId(
+-            frame_token, autofill::FieldRendererId(params_.field_renderer_id)),
++        autofill::FormGlobalId{
++            frame_token, autofill::FormRendererId(params_.form_renderer_id)},
++        autofill::FieldGlobalId{
++            frame_token, autofill::FieldRendererId(params_.field_renderer_id)},
+         compose::ComposeManagerImpl::UiEntryPoint::kContextMenu);
+     GetBrowser()->window()->NotifyPromoFeatureUsed(
+         compose::features::kEnableCompose);
+--- chromium-124.0.6367.118/chrome/browser/ui/web_applications/sub_apps_service_impl.cc.no_matching_constructor	2024-05-01 01:46:48.000000000 +0200
++++ chromium-124.0.6367.118/chrome/browser/ui/web_applications/sub_apps_service_impl.cc	2024-05-05 12:13:22.814839779 +0200
+@@ -108,7 +108,7 @@
+                      ConvertPathToUrl(sub_app->manifest_id_path, origin));
+     ASSIGN_OR_RETURN(GURL install_url,
+                      ConvertPathToUrl(sub_app->install_url_path, origin));
+-    sub_apps.emplace_back(std::move(manifest_id), std::move(install_url));
++    sub_apps.emplace_back() = {std::move(manifest_id), std::move(install_url)};
+   }
+   return sub_apps;
+ }
+@@ -440,7 +440,7 @@
+         base::BindOnce(
+             [](webapps::ManifestId manifest_id, const webapps::AppId& app_id,
+                webapps::InstallResultCode result_code) {
+-              return SubAppInstallResult(manifest_id, app_id, result_code);
++              return SubAppInstallResult{manifest_id, app_id, result_code};
+             },
+             manifest_id)
+             .Then(concurrent.CreateCallback()),
+--- chromium-124.0.6367.118/base/allocator/partition_allocator/src/partition_alloc/lightweight_quarantine.cc.no_matching_constructor	2024-05-05 11:21:25.888307743 +0200
++++ chromium-124.0.6367.118/base/allocator/partition_allocator/src/partition_alloc/lightweight_quarantine.cc	2024-05-05 12:17:07.658087100 +0200
+@@ -73,7 +73,7 @@
+     // synchronization between the root and branch, so `branch_size_in_bytes_`
+     // may be larger than `root_.capacity_in_bytes_` at this point.
+ 
+-    slots_.emplace_back(slot_start, usable_size);
++    slots_.emplace_back() = {slot_start, usable_size};
+ 
+     // Swap randomly so that the quarantine list remain shuffled.
+     // This is not uniformly random, but sufficiently random.
+diff -up chromium-124.0.6367.118/components/attribution_reporting/registration_info.cc.me chromium-124.0.6367.118/components/attribution_reporting/registration_info.cc
+--- chromium-124.0.6367.118/components/attribution_reporting/registration_info.cc.me	2024-05-06 12:00:52.947652122 +0200
++++ chromium-124.0.6367.118/components/attribution_reporting/registration_info.cc	2024-05-06 12:01:06.829970137 +0200
+@@ -96,7 +96,7 @@ RegistrationInfo::ParseInfo(const net::s
+ 
+   ASSIGN_OR_RETURN(bool report_header_errors, ParseReportHeaderErrors(dict));
+ 
+-  return RegistrationInfo(preferred_platform, report_header_errors);
++  return RegistrationInfo{preferred_platform, report_header_errors};
+ }
+ 
+ }  // namespace attribution_reporting
+diff -up chromium-124.0.6367.118/gpu/command_buffer/client/shared_image_interface.h.me chromium-124.0.6367.118/gpu/command_buffer/client/shared_image_interface.h
+--- chromium-124.0.6367.118/gpu/command_buffer/client/shared_image_interface.h.me	2024-05-06 09:53:10.755781392 +0200
++++ chromium-124.0.6367.118/gpu/command_buffer/client/shared_image_interface.h	2024-05-06 09:54:42.280586275 +0200
+@@ -64,19 +64,19 @@ struct SharedImageInfo {
+                   SkAlphaType alpha_type,
+                   uint32_t usage,
+                   std::string_view debug_label)
+-      : meta(format, size, color_space, surface_origin, alpha_type, usage),
++      : meta{format, size, color_space, surface_origin, alpha_type, usage},
+         debug_label(debug_label) {}
+   SharedImageInfo(const viz::SharedImageFormat& format,
+                   gfx::Size size,
+                   const gfx::ColorSpace& color_space,
+                   uint32_t usage,
+                   std::string_view debug_label)
+-      : meta(format,
++      : meta{format,
+              size,
+              color_space,
+              kTopLeft_GrSurfaceOrigin,
+              kPremul_SkAlphaType,
+-             usage),
++             usage},
+         debug_label(debug_label) {}
+   // This constructor exists only to support the DEPRECATED CreareSharedImage
+   // call below that accepts a GpuMemoryBuffer. This should be removed when that
+diff -up chromium-124.0.6367.118/gpu/command_buffer/service/shared_image_interface_in_process.cc.me chromium-124.0.6367.118/gpu/command_buffer/service/shared_image_interface_in_process.cc
+--- chromium-124.0.6367.118/gpu/command_buffer/service/shared_image_interface_in_process.cc.me	2024-05-06 11:05:36.974350061 +0200
++++ chromium-124.0.6367.118/gpu/command_buffer/service/shared_image_interface_in_process.cc	2024-05-06 11:06:05.848045697 +0200
+@@ -579,11 +579,11 @@ SharedImageInterfaceInProcess::CreateSha
+ 
+   return base::MakeRefCounted<ClientSharedImage>(
+       mailbox,
+-      SharedImageMetadata(
++      SharedImageMetadata{
+           viz::GetSinglePlaneSharedImageFormat(gpu_memory_buffer->GetFormat()),
+           gpu_memory_buffer->GetSize(), si_info.meta.color_space,
+           si_info.meta.surface_origin, si_info.meta.alpha_type,
+-          si_info.meta.usage),
++          si_info.meta.usage},
+       GenUnverifiedSyncToken(), holder_);
+ }
+ 
+diff -up chromium-124.0.6367.118/gpu/ipc/client/client_shared_image_interface.cc.me chromium-124.0.6367.118/gpu/ipc/client/client_shared_image_interface.cc
+--- chromium-124.0.6367.118/gpu/ipc/client/client_shared_image_interface.cc.me	2024-05-06 10:12:47.067925365 +0200
++++ chromium-124.0.6367.118/gpu/ipc/client/client_shared_image_interface.cc	2024-05-06 10:13:56.568627190 +0200
+@@ -238,11 +238,11 @@ scoped_refptr<ClientSharedImage> ClientS
+       AddMailbox(proxy_->CreateSharedImage(
+           buffer_format, plane, gpu_memory_buffer->GetSize(), si_info,
+           gpu_memory_buffer->CloneHandle())),
+-      SharedImageMetadata(viz::GetSinglePlaneSharedImageFormat(
++      SharedImageMetadata{viz::GetSinglePlaneSharedImageFormat(
+                               GetPlaneBufferFormat(plane, buffer_format)),
+                           gpu_memory_buffer->GetSize(),
+                           si_info.meta.color_space, si_info.meta.surface_origin,
+-                          si_info.meta.alpha_type, si_info.meta.usage),
++                          si_info.meta.alpha_type, si_info.meta.usage},
+       GenUnverifiedSyncToken(), holder_, gpu_memory_buffer->GetType());
+ }
+ 
+@@ -277,13 +277,13 @@ ClientSharedImageInterface::CreateSwapCh
+   return ClientSharedImageInterface::SwapChainSharedImages(
+       base::MakeRefCounted<ClientSharedImage>(
+           mailboxes.front_buffer,
+-          SharedImageMetadata(format, size, color_space, surface_origin,
+-                              alpha_type, usage),
++          SharedImageMetadata{format, size, color_space, surface_origin,
++                              alpha_type, usage},
+           sync_token, holder_),
+       base::MakeRefCounted<ClientSharedImage>(
+           mailboxes.back_buffer,
+-          SharedImageMetadata(format, size, color_space, surface_origin,
+-                              alpha_type, usage),
++          SharedImageMetadata{format, size, color_space, surface_origin,
++                              alpha_type, usage},
+           sync_token, holder_));
+ }
+ 
+@@ -339,8 +339,8 @@ scoped_refptr<ClientSharedImage> ClientS
+ 
+   return base::MakeRefCounted<ClientSharedImage>(
+       mailbox,
+-      SharedImageMetadata(format, size, color_space, surface_origin, alpha_type,
+-                          usage),
++      SharedImageMetadata{format, size, color_space, surface_origin, alpha_type,
++                          usage},
+       GenUnverifiedSyncToken(), holder_);
+ }
+ 
+diff -up chromium-124.0.6367.118/content/browser/gpu/compositor_util.cc.me chromium-124.0.6367.118/content/browser/gpu/compositor_util.cc
+--- chromium-124.0.6367.118/content/browser/gpu/compositor_util.cc.me	2024-05-07 13:34:30.384580905 +0200
++++ chromium-124.0.6367.118/content/browser/gpu/compositor_util.cc	2024-05-07 13:39:24.219132733 +0200
+@@ -108,7 +108,7 @@ std::vector<GpuFeatureData> GetGpuFeatur
+       *base::CommandLine::ForCurrentProcess();
+ 
+   std::vector<GpuFeatureData> features;
+-  features.emplace_back(
++  features.emplace_back() = {
+       "2d_canvas",
+       SafeGetFeatureStatus(
+           gpu_feature_info, gpu::GPU_FEATURE_TYPE_ACCELERATED_2D_CANVAS,
+@@ -116,13 +116,13 @@ std::vector<GpuFeatureData> GetGpuFeatur
+       DisableInfo::Problem(
+           "Accelerated 2D canvas is unavailable: either disabled "
+           "via blocklist or the command line."),
+-      true);
+-  features.emplace_back(
++      true};
++  features.emplace_back() = {
+       "canvas_oop_rasterization",
+       SafeGetFeatureStatus(
+           gpu_feature_info, gpu::GPU_FEATURE_TYPE_CANVAS_OOP_RASTERIZATION,
+-          command_line.HasSwitch(switches::kDisableAccelerated2dCanvas)));
+-  features.emplace_back(
++          command_line.HasSwitch(switches::kDisableAccelerated2dCanvas))};
++  features.emplace_back() = {
+       "gpu_compositing",
+       // TODO(rivr): Replace with a check to see which backend is used for
+       // compositing; do the same for GPU rasterization if it's enabled. For
+@@ -136,16 +136,16 @@ std::vector<GpuFeatureData> GetGpuFeatur
+           "about:flags "
+           "or the command line. The browser will fall back to software "
+           "compositing and hardware acceleration will be unavailable."),
+-      true);
+-  features.emplace_back(
++      true};
++  features.emplace_back() = {
+       "webgl",
+       SafeGetFeatureStatus(gpu_feature_info,
+                            gpu::GPU_FEATURE_TYPE_ACCELERATED_WEBGL,
+                            command_line.HasSwitch(switches::kDisableWebGL)),
+       DisableInfo::Problem(
+           "WebGL has been disabled via blocklist or the command line."),
+-      false);
+-  features.emplace_back(
++      false};
++  features.emplace_back() = {
+       "video_decode",
+       SafeGetFeatureStatus(
+           gpu_feature_info, gpu::GPU_FEATURE_TYPE_ACCELERATED_VIDEO_DECODE,
+@@ -156,8 +156,8 @@ std::vector<GpuFeatureData> GetGpuFeatur
+       DisableInfo::Problem(
+           "Accelerated video decode has been disabled, either via blocklist, "
+           "about:flags or the command line."),
+-      true);
+-  features.emplace_back(
++      true};
++  features.emplace_back() = {
+       "video_encode",
+       SafeGetFeatureStatus(
+           gpu_feature_info, gpu::GPU_FEATURE_TYPE_ACCELERATED_VIDEO_ENCODE,
+@@ -169,33 +169,33 @@ std::vector<GpuFeatureData> GetGpuFeatur
+       DisableInfo::Problem(
+           "Accelerated video encode has been disabled, either via blocklist, "
+           "about:flags or the command line."),
+-      true);
+-  features.emplace_back(
++      true};
++  features.emplace_back() = {
+       "rasterization",
+       SafeGetFeatureStatus(gpu_feature_info,
+                            gpu::GPU_FEATURE_TYPE_GPU_TILE_RASTERIZATION),
+       DisableInfo::Problem(
+           "Accelerated rasterization has been disabled, either via blocklist, "
+           "about:flags or the command line."),
+-      true);
+-  features.emplace_back(
++      true};
++  features.emplace_back() = {
+       "opengl", SafeGetFeatureStatus(gpu_feature_info,
+-                                     gpu::GPU_FEATURE_TYPE_ACCELERATED_GL));
++                                     gpu::GPU_FEATURE_TYPE_ACCELERATED_GL)};
+ #if BUILDFLAG(ENABLE_VULKAN)
+-  features.emplace_back(
++  features.emplace_back() = {
+       "vulkan",
+-      SafeGetFeatureStatus(gpu_feature_info, gpu::GPU_FEATURE_TYPE_VULKAN));
++      SafeGetFeatureStatus(gpu_feature_info, gpu::GPU_FEATURE_TYPE_VULKAN)};
+ #endif
+-  features.emplace_back(
++  features.emplace_back() = {
+       "multiple_raster_threads",
+-      GetFakeFeatureStatus(NumberOfRendererRasterThreads() > 1));
++      GetFakeFeatureStatus(NumberOfRendererRasterThreads() > 1)};
+ #if BUILDFLAG(IS_ANDROID)
+-  features.emplace_back(
++  features.emplace_back() = {
+       "surface_control",
+       SafeGetFeatureStatus(gpu_feature_info,
+-                           gpu::GPU_FEATURE_TYPE_ANDROID_SURFACE_CONTROL));
++                           gpu::GPU_FEATURE_TYPE_ANDROID_SURFACE_CONTROL)};
+ #endif
+-  features.emplace_back(
++  features.emplace_back() = {
+       "webgl2",
+       SafeGetFeatureStatus(
+           gpu_feature_info, gpu::GPU_FEATURE_TYPE_ACCELERATED_WEBGL2,
+@@ -203,12 +203,12 @@ std::vector<GpuFeatureData> GetGpuFeatur
+               command_line.HasSwitch(switches::kDisableWebGL2)),
+       DisableInfo::Problem(
+           "WebGL2 has been disabled via blocklist or the command line."),
+-      false);
+-  features.emplace_back("raw_draw",
+-                        GetFakeFeatureStatus(features::IsUsingRawDraw()));
+-  features.emplace_back("direct_rendering_display_compositor",
+-                        GetFakeFeatureStatus(features::IsDrDcEnabled()));
+-  features.emplace_back(
++      false};
++  features.emplace_back() = {"raw_draw",
++                        GetFakeFeatureStatus(features::IsUsingRawDraw())};
++  features.emplace_back() = {"direct_rendering_display_compositor",
++                        GetFakeFeatureStatus(features::IsDrDcEnabled())};
++  features.emplace_back() = {
+       "webgpu",
+       SafeGetFeatureStatus(
+           gpu_feature_info, gpu::GPU_FEATURE_TYPE_ACCELERATED_WEBGPU,
+@@ -216,14 +216,14 @@ std::vector<GpuFeatureData> GetGpuFeatur
+               !base::FeatureList::IsEnabled(::features::kWebGPUService)),
+       DisableInfo::Problem(
+           "WebGPU has been disabled via blocklist or the command line."),
+-      false);
+-  features.emplace_back(
++      false};
++  features.emplace_back() = {
+       "skia_graphite",
+       SafeGetFeatureStatus(gpu_feature_info,
+-                           gpu::GPU_FEATURE_TYPE_SKIA_GRAPHITE));
+-  features.emplace_back(
++                           gpu::GPU_FEATURE_TYPE_SKIA_GRAPHITE)};
++  features.emplace_back() = {
+       "webnn",
+-      SafeGetFeatureStatus(gpu_feature_info, gpu::GPU_FEATURE_TYPE_WEBNN));
++      SafeGetFeatureStatus(gpu_feature_info, gpu::GPU_FEATURE_TYPE_WEBNN)};
+   return features;
+ }
+ 
+diff -up chromium-124.0.6367.118/third_party/blink/renderer/modules/media/audio/audio_renderer_mixer_manager.cc.me chromium-124.0.6367.118/third_party/blink/renderer/modules/media/audio/audio_renderer_mixer_manager.cc
+--- chromium-124.0.6367.118/third_party/blink/renderer/modules/media/audio/audio_renderer_mixer_manager.cc.me	2024-05-07 17:36:54.884303561 +0200
++++ chromium-124.0.6367.118/third_party/blink/renderer/modules/media/audio/audio_renderer_mixer_manager.cc	2024-05-07 17:38:26.954157928 +0200
+@@ -171,8 +171,8 @@ AudioRendererMixer* AudioRendererMixerMa
+     DVLOG(1) << "Not reusing mixer with errors: " << it->second.mixer;
+ 
+     // Move bad mixers out of the reuse map.
+-    dead_mixers_.emplace_back(std::move(it->second.mixer),
+-                              it->second.ref_count);
++    dead_mixers_.emplace_back() = {std::move(it->second.mixer),
++                              it->second.ref_count};
+     mixers_.erase(it);
+   }
+ 
+@@ -218,7 +218,7 @@ void AudioRendererMixerManager::ReturnMi
+     }
+   } else if (dead_it == dead_mixers_.end() && mixer_ref.mixer->HasSinkError()) {
+     // Move bad mixers out of the reuse map.
+-    dead_mixers_.emplace_back(std::move(mixer_ref.mixer), mixer_ref.ref_count);
++    dead_mixers_.emplace_back() = {std::move(mixer_ref.mixer), mixer_ref.ref_count};
+     mixers_.erase(it);
+   }
+ }
