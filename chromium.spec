@@ -314,7 +314,7 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 124.0.6367.155
+Version: 124.0.6367.201
 Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
@@ -2121,6 +2121,10 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Fri May 10 2024 Than Ngo <than@redhat.com> - 124.0.6367.201-1
+- update to 124.0.6367.201
+  * High CVE-2024-4671: Use after free in Visuals
+
 * Wed May 08 2024 Than Ngo <than@redhat.com> - 124.0.6367.155-1
 - update to 124.0.6367.155
   * High CVE-2024-4558: Use after free in ANGLE
