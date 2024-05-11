@@ -315,7 +315,7 @@
 
 Name:	chromium%{chromium_channel}
 Version: 124.0.6367.201
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -1898,7 +1898,7 @@ popd
 
 %if %{build_headless}
 	pushd %{headlessbuilddir}
-		cp -a headless_lib_data.pak headless_lib_strings.pak headless_shell %{buildroot}%{chromium_path}
+		cp -a *.pak headless_shell %{buildroot}%{chromium_path}
 	popd
 %endif
 
@@ -2090,8 +2090,7 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %if %{build_headless}
 %files headless
 %{chromium_path}/headless_shell
-%{chromium_path}/headless_lib_data.pak
-%{chromium_path}/headless_lib_strings.pak
+%{chromium_path}/headless_*.pak
 %endif
 
 %if %{build_remoting}
@@ -2121,6 +2120,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Sat May 11 2024 Than Ngo <than@redhat.com> - 124.0.6367.201-2
+- include headless_command_resources.pak for head_shell
+
 * Fri May 10 2024 Than Ngo <than@redhat.com> - 124.0.6367.201-1
 - update to 124.0.6367.201
   * High CVE-2024-4671: Use after free in Visuals
