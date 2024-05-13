@@ -314,8 +314,8 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 124.0.6367.201
-Release: 2%{?dist}
+Version: 125.0.6422.41
+Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -364,7 +364,7 @@ Patch69: chromium-103.0.5060.53-update-rjsmin-to-1.2.0.patch
 Patch82: chromium-98.0.4758.102-remoting-no-tests.patch
 
 # patch for using system brotli
-Patch89: chromium-116-system-brotli.patch
+Patch89: chromium-125-system-brotli.patch
 
 # patch for using system libxml
 Patch90: chromium-121-system-libxml.patch
@@ -378,9 +378,9 @@ Patch100: chromium-116-el7-include-fcntl-memfd.patch
 # add define HAVE_STRNDUP on epel7
 Patch101: chromium-108-el7-wayland-strndup-error.patch
 
-# Workaround for old clang
+# Workaround for old clang 14
 # error: defaulting this default constructor would delete it after its first declaration
-Patch102: chromium-123-el7-default-constructor-involving-anonymous-union.patch
+Patch102: chromium-124-el7-default-constructor-involving-anonymous-union.patch
 
 # Work around old and missing headers on EPEL7
 Patch103: chromium-110-epel7-old-headers-workarounds.patch
@@ -406,7 +406,6 @@ Patch108: chromium-118-el7_v4l2_quantization.patch
 Patch109: chromium-114-wireless-el7.patch
 Patch110: chromium-115-buildflag-el7.patch
 Patch111: chromium-122-el7-inline-function.patch
-Patch112: chromium-124-el7-powf.patch
 Patch113: chromium-121-el7-clang-version-warning.patch
 Patch114: chromium-123-el7-clang-build-failure.patch
 Patch115: chromium-124-el7-size_t.patch
@@ -455,9 +454,6 @@ Patch305: chromium-124-arm64-memory_tagging.patch
 Patch307: chromium-121-v8-c++20-p1.patch
 Patch308: chromium-123-v8-c++20.patch
 
-# missing include header files
-Patch310: chromium-123-missing-header-files.patch
-
 # enable fstack-protector-strong
 Patch312: chromium-123-fstack-protector-strong.patch
 
@@ -481,7 +477,7 @@ Patch352: chromium-117-workaround_for_crash_on_BTI_capable_system.patch
 Patch354: chromium-120-split-threshold-for-reg-with-hint.patch
 
 # disable FFmpegAllowLists by default to allow external ffmpeg
-patch356: chromium-122-disable-FFmpegAllowLists.patch
+patch356: chromium-125-disable-FFmpegAllowLists.patch
 
 # remove ldflags -Wl,-mllvm,-disable-auto-upgrade-debug-info which is not supported
 Patch357: chromium-122-clang16-disable-auto-upgrade-debug-info.patch
@@ -1044,7 +1040,9 @@ Provides: bundled(libwebp) = 0.6.0
 Provides: bundled(libxml) = 2.9.4
 %endif
 
+%if %{bundlelibXNVCtrl}
 Provides: bundled(libXNVCtrl) = 302.17
+%endif
 Provides: bundled(libyuv) = 1651
 Provides: bundled(lzma) = 15.14
 Provides: bundled(libudis86) = 1.7.1
@@ -1197,7 +1195,6 @@ udev.
 %patch -P109 -p1 -b .wireless
 %patch -P110 -p1 -b .buildflag-el7
 %patch -P111 -p1 -b .inline-function-el7
-%patch -P112 -p1 -b .el7-powf
 %patch -P113 -p1 -b .el7-clang-version-warning
 %patch -P114 -p1 -b .clang-build-failure
 %patch -P115 -p1 -b .el7-size_t
@@ -1230,12 +1227,11 @@ udev.
 %endif
 
 %if 0%{?rhel} || 0%{?fedora} && 0%{?fedora} < 39
-%patch -P307 -p1 -R -b .v8-c++20
-%patch -P308 -p1 -R -b .v8-c++20
+#patch -P307 -p1 -R -b .v8-c++20
+#patch -P308 -p1 -R -b .v8-c++20
 %patch -P314 -p1 -b .clang16-buildflag
 %endif
 
-%patch -P310 -p1 -b .missing-header-files
 %patch -P312 -p1 -b .fstack-protector-strong
 
 %if 0%{?rhel} && 0%{?rhel} < 10
@@ -2120,6 +2116,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Sun May 12 2024 Than Ngo <than@redhat.com> - 125.0.6422.41-1
+- update to 125.0.6422.41
+
 * Sat May 11 2024 Than Ngo <than@redhat.com> - 124.0.6367.201-2
 - include headless_command_resources.pak for head_shell
 

@@ -34,3 +34,15 @@ diff -up chromium-123.0.6312.46/third_party/pdfium/core/fpdfdoc/cpdf_defaultappe
  
  CPDF_DefaultAppearance::CPDF_DefaultAppearance(const ByteString& csDA)
      : m_csDA(csDA) {}
+diff -up chromium-124.0.6367.201/components/manta/base_provider.cc.me chromium-124.0.6367.201/components/manta/base_provider.cc
+--- chromium-124.0.6367.201/components/manta/base_provider.cc.me	2024-05-11 21:32:47.108964074 +0200
++++ chromium-124.0.6367.201/components/manta/base_provider.cc	2024-05-11 21:34:42.758918367 +0200
+@@ -13,7 +13,7 @@ constexpr base::TimeDelta kTimeout = bas
+ 
+ }  // namespace
+ 
+-BaseProvider::BaseProvider() = default;
++BaseProvider::BaseProvider() {}
+ BaseProvider::BaseProvider(
+     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
+     signin::IdentityManager* identity_manager)
