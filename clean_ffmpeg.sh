@@ -106,6 +106,7 @@ header_files="	libavcodec/x86/inline_asm.h \
 		libavcodec/hwconfig.h \
 		libavcodec/idctdsp.h \
 		libavcodec/internal.h \
+		libavcodec/itut35.h \
 		libavcodec/kbdwin.h \
 		libavcodec/mathops.h \
 		libavcodec/me_cmp.h \
