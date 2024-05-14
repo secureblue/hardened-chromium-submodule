@@ -428,6 +428,7 @@ Patch122: chromium-124-el7-constexpr.patch
 
 # system ffmpeg
 # need for old ffmpeg 5.x on epel9
+Patch129: chromium-125-ffmpeg-5.x-reordered_opaque.patch
 Patch130: chromium-107-ffmpeg-5.x-duration.patch
 # disable the check
 Patch131: chromium-107-proprietary-codecs.patch
@@ -449,10 +450,9 @@ Patch150: chromium-124-qt6.patch
 # not supported in old glibc < 2.30, error: fatal error: 'sys/ifunc.h' file not found
 Patch305: chromium-124-arm64-memory_tagging.patch
 
-# compiler errors on epel
-# revert it for old clang on rhel and f38
-Patch307: chromium-121-v8-c++20-p1.patch
-Patch308: chromium-123-v8-c++20.patch
+# compiler errors on el7/el8 and f38 (clang <17)
+Patch307: chromium-125-el-NativeValueTraits-p1.patch
+Patch308: chromium-125-el-NativeValueTraits-p2.patch
 
 # enable fstack-protector-strong
 Patch312: chromium-123-fstack-protector-strong.patch
@@ -461,6 +461,9 @@ Patch312: chromium-123-fstack-protector-strong.patch
 Patch313: chromium-123-rust-clap_lex.patch
 
 Patch314: chromium-124-clang16-buildflags.patch
+
+# remove ldflags -Wl,-mllvm,-disable-auto-upgrade-debug-info which is not supported
+Patch315: chromium-122-clang16-disable-auto-upgrade-debug-info.patch
 
 # add -ftrivial-auto-var-init=zero and -fwrapv
 Patch316: chromium-122-clang-build-flags.patch
@@ -478,9 +481,6 @@ Patch354: chromium-120-split-threshold-for-reg-with-hint.patch
 
 # disable FFmpegAllowLists by default to allow external ffmpeg
 patch356: chromium-125-disable-FFmpegAllowLists.patch
-
-# remove ldflags -Wl,-mllvm,-disable-auto-upgrade-debug-info which is not supported
-Patch357: chromium-122-clang16-disable-auto-upgrade-debug-info.patch
 
 # set clang_lib path
 Patch358: chromium-124-rust-clang_lib.patch
@@ -521,7 +521,6 @@ Patch383: 0002-Include-cstddef-to-fix-build.patch
 Patch384: 0004-third_party-crashpad-port-curl-transport-ppc64.patch
 
 Patch385: HACK-third_party-libvpx-use-generic-gnu.patch
-Patch386: HACK-debian-clang-disable-skia-musttail.patch
 
 Patch387: 0001-Add-ppc64-target-to-libaom.patch
 Patch388: 0001-Add-pregenerated-config-for-libaom-on-ppc64.patch
@@ -1174,6 +1173,7 @@ udev.
 
 %if ! %{bundleffmpegfree}
 %if 0%{?rhel} == 9
+%patch -P129 -p1 -R -b .ffmpeg-5.x-reordered_opaque
 %patch -P130 -p1 -b .ffmpeg-5.x-duration
 %endif
 %patch -P131 -p1 -b .prop-codecs
@@ -1226,10 +1226,11 @@ udev.
 %endif
 %endif
 
-%if 0%{?rhel} || 0%{?fedora} && 0%{?fedora} < 39
-#patch -P307 -p1 -R -b .v8-c++20
-#patch -P308 -p1 -R -b .v8-c++20
+%if 0%{?rhel} && 0%{?rhel} < 9 || 0%{?fedora} && 0%{?fedora} < 39
+%patch -P307 -p1 -b .el-NativeValueTraits-p1
+%patch -P308 -p1 -b .el-NativeValueTraits
 %patch -P314 -p1 -b .clang16-buildflag
+%patch -P315 -p1 -b .clang16-disable-auto-upgrade-debug-info
 %endif
 
 %patch -P312 -p1 -b .fstack-protector-strong
@@ -1248,7 +1249,6 @@ udev.
 
 %patch -P354 -p1 -b .revert-split-threshold-for-reg-with-hint
 %patch -P356 -p1 -b .disable-FFmpegAllowLists
-%patch -P357 -p1 -b .clang16-disable-auto-upgrade-debug-info
 %patch -P358 -p1 -b .rust-clang_lib
 %patch -P359 -p1 -b .libavif-deps
 
@@ -1283,7 +1283,6 @@ udev.
 %patch -P384 -p1 -b .0004-third_party-crashpad-port-curl-transport-ppc64
 
 %patch -P385 -p1 -b .HACK-third_party-libvpx-use-generic-gnu
-%patch -P386 -p1 -b .HACK-debian-clang-disable-skia-musttail
 
 %patch -P387 -p1 -b .0001-Add-ppc64-target-to-libaom
 %patch -P388 -p1 -b .0001-Add-pregenerated-config-for-libaom-on-ppc64
@@ -2120,7 +2119,7 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 - update to 125.0.6422.41
 
 * Sat May 11 2024 Than Ngo <than@redhat.com> - 124.0.6367.201-2
-- include headless_command_resources.pak for head_shell
+- include headless_command_resources.pak for headless_shell
 
 * Fri May 10 2024 Than Ngo <than@redhat.com> - 124.0.6367.201-1
 - update to 124.0.6367.201
