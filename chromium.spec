@@ -513,20 +513,21 @@ Patch377: 0001-Add-PPC64-support-for-boringssl.patch
 Patch378: 0001-third_party-libvpx-Properly-generate-gni-on-ppc64.patch
 Patch379: 0001-third_party-lss-Don-t-look-for-mmap2-on-ppc64.patch
 Patch380: 0001-third_party-pffft-Include-altivec.h-on-ppc64-with-SI.patch
-Patch381: 0002-third_party-lss-kernel-structs.patch
+Patch381: 0002-Add-PPC64-generated-files-for-boringssl.patch
+Patch382: 0002-third_party-lss-kernel-structs.patch
 
-Patch382: Rtc_base-system-arch.h-PPC.patch
+Patch383: Rtc_base-system-arch.h-PPC.patch
 
-Patch383: 0002-Include-cstddef-to-fix-build.patch
-Patch384: 0004-third_party-crashpad-port-curl-transport-ppc64.patch
+Patch384: 0002-Include-cstddef-to-fix-build.patch
+Patch385: 0004-third_party-crashpad-port-curl-transport-ppc64.patch
 
-Patch385: HACK-third_party-libvpx-use-generic-gnu.patch
+Patch386: HACK-third_party-libvpx-use-generic-gnu.patch
+Patch387: HACK-debian-clang-disable-skia-musttail.patch
 
-Patch387: 0001-Add-ppc64-target-to-libaom.patch
-Patch388: 0001-Add-pregenerated-config-for-libaom-on-ppc64.patch
+Patch388: 0001-Add-ppc64-target-to-libaom.patch
+Patch389: 0001-Add-pregenerated-config-for-libaom-on-ppc64.patch
 
-Patch389: 0002-third_party-libvpx-Remove-bad-ppc64-config.patch
-Patch390: 0002-third-party-boringssl-add-generated-files.patch
+Patch390: 0002-third_party-libvpx-Remove-bad-ppc64-config.patch
 Patch391: 0003-third_party-libvpx-Add-ppc64-generated-config.patch
 # Enabling VSX causes artifacts to appear in VP9 videos
 Patch394: 0004-third_party-libvpx-work-around-ambiguous-vsx.patch
@@ -537,11 +538,12 @@ Patch395: skia-vsx-instructions.patch
 Patch396: 0001-Implement-support-for-ppc64-on-Linux.patch
 Patch397: 0001-Implement-support-for-PPC64-on-Linux.patch
 Patch398: 0001-Force-baseline-POWER8-AltiVec-VSX-CPU-features-when-.patch
-Patch399: fix-rustc.patch
-Patch400: fix-rust-linking.patch
-Patch401: fix-breakpad-compile.patch
-Patch402: fix-partition-alloc-compile.patch
-Patch403: 0002-Add-ppc64-trap-instructions.patch
+Patch399: fix-clang-selection.patch
+Patch400: fix-rustc.patch
+Patch401: fix-rust-linking.patch
+Patch402: fix-breakpad-compile.patch
+Patch403: fix-partition-alloc-compile.patch
+Patch404: 0002-Add-ppc64-trap-instructions.patch
 
 Patch407: fix-ppc64-linux-syscalls-headers.patch
 Patch409: use-sysconf-page-size-on-ppc64.patch
@@ -553,8 +555,6 @@ Patch412: fix-swiftshader-compile.patch
 
 # Suppress harmless compiler warning messages that appear on ppc64 due to arch-specific warning flags being passed
 Patch413: fix-unknown-warning-option-messages.diff
-
-Patch415: fix-clang-selection.patch
 
 # upstream patches
 # 64kpage support on el8
@@ -1275,20 +1275,21 @@ udev.
 %patch -P378 -p1 -b .0001-third_party-libvpx-Properly-generate-gni-on-ppc64
 %patch -P379 -p1 -b .0001-third_party-lss-Don-t-look-for-mmap2-on-ppc64
 %patch -P380 -p1 -b .0001-third_party-pffft-Include-altivec.h-on-ppc64-with-SI
-%patch -P381 -p1 -b .0002-third_party-lss-kernel-structs
+%patch -P381 -p1 -b .002-Add-PPC64-generated-files-for-boringssl
+%patch -P382 -p1 -b .0002-third_party-lss-kernel-structs
 
-%patch -P382 -p1 -b .Rtc_base-system-arch.h-PPC
+%patch -P383 -p1 -b .Rtc_base-system-arch.h-PPC
 
-%patch -P383 -p1 -b .0002-Include-cstddef-to-fix-build
-%patch -P384 -p1 -b .0004-third_party-crashpad-port-curl-transport-ppc64
+%patch -P384 -p1 -b .0002-Include-cstddef-to-fix-build
+%patch -P385 -p1 -b .0004-third_party-crashpad-port-curl-transport-ppc64
 
-%patch -P385 -p1 -b .HACK-third_party-libvpx-use-generic-gnu
+%patch -P386 -p1 -b .HACK-third_party-libvpx-use-generic-gnu
+%patch -P387 -p1 -b .HACK-debian-clang-disable-skia-musttail
 
-%patch -P387 -p1 -b .0001-Add-ppc64-target-to-libaom
-%patch -P388 -p1 -b .0001-Add-pregenerated-config-for-libaom-on-ppc64
+%patch -P388 -p1 -b .0001-Add-ppc64-target-to-libaom
+%patch -P389 -p1 -b .0001-Add-pregenerated-config-for-libaom-on-ppc64
 
-%patch -P389 -p1 -b .0002-third_party-libvpx-Remove-bad-ppc64-config
-%patch -P390 -p1 -b .0002-third-party-boringssl-add-generated-files
+%patch -P390 -p1 -b .0002-third_party-libvpx-Remove-bad-ppc64-config
 %patch -P391 -p1 -b .0003-third_party-libvpx-Add-ppc64-generated-config
 %patch -P394 -p1 -b .0004-third_party-libvpx-work-around-ambiguous-vsx
 
@@ -1297,11 +1298,12 @@ udev.
 %patch -P396 -p1 -b .0001-Implement-support-for-ppc64-on-Linux
 %patch -P397 -p1 -b .0001-Implement-support-for-PPC64-on-Linux
 %patch -P398 -p1 -b .0001-Force-baseline-POWER8-AltiVec-VSX-CPU-features-when-
-%patch -P399 -p1 -b .fix-rustc
-%patch -P400 -p1 -b .fix-rust-linking
-%patch -P401 -p1 -b .fix-breakpad-compile
-%patch -P402 -p1 -b .fix-partition-alloc-compile
-%patch -P403 -p1 -b .0002-Add-ppc64-trap-instructions
+%patch -P399 -p1 -b .fix-clang-selection
+%patch -P400 -p1 -b .fix-rustc
+%patch -P401 -p1 -b .fix-rust-linking
+%patch -P402 -p1 -b .fix-breakpad-compile
+%patch -P403 -p1 -b .fix-partition-alloc-compile
+%patch -P404 -p1 -b .0002-Add-ppc64-trap-instructions
 
 %patch -P407 -p1 -b .fix-ppc64-linux-syscalls-headers
 %patch -P409 -p1 -b .use-sysconf-page-size-on-ppc64
@@ -1311,8 +1313,6 @@ udev.
 
 %patch -P412 -p1 -b .fix-swiftshader-compile.patch
 %patch -P413 -p1 -b .fix-unknown-warning-option-messages
-
-%patch -P415 -p1 -b .fix-clang-selection
 %endif
 
 %%ifarch aarch64
