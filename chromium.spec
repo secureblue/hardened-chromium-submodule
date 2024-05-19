@@ -164,7 +164,7 @@
 
 # enable|disable use_custom_libcxx
 %global use_custom_libcxx 1
-%if %{rhel} == 7
+%if 0%{?rhel} == 7
 %global use_custom_libcxx 0
 %endif
 
