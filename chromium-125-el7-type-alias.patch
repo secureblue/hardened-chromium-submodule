@@ -1,0 +1,30 @@
+diff -up chromium-125.0.6422.60/components/plus_addresses/plus_address_service.cc.el7 chromium-125.0.6422.60/components/plus_addresses/plus_address_service.cc
+--- chromium-125.0.6422.60/components/plus_addresses/plus_address_service.cc.el7	2024-05-18 14:12:06.510863456 +0200
++++ chromium-125.0.6422.60/components/plus_addresses/plus_address_service.cc	2024-05-18 14:13:39.670666352 +0200
+@@ -165,7 +165,7 @@ std::vector<Suggestion> PlusAddressServi
+     bool is_off_the_record,
+     std::u16string_view focused_field_value,
+     autofill::AutofillSuggestionTriggerSource trigger_source) {
+-  using enum autofill::AutofillSuggestionTriggerSource;
++  using autofill::AutofillSuggestionTriggerSource;
+   if (!SupportsPlusAddresses(last_committed_primary_main_frame_origin,
+                              is_off_the_record)) {
+     return {};
+@@ -176,7 +176,7 @@ std::vector<Suggestion> PlusAddressServi
+   std::optional<std::string> maybe_address =
+       GetPlusAddress(last_committed_primary_main_frame_origin);
+   if (maybe_address == std::nullopt) {
+-    if (trigger_source != kManualFallbackPlusAddresses &&
++    if (trigger_source != AutofillSuggestionTriggerSource::kManualFallbackPlusAddresses &&
+         !normalized_field_value.empty()) {
+       return {};
+     }
+@@ -191,7 +191,7 @@ std::vector<Suggestion> PlusAddressServi
+ 
+   // Only suggest filling a plus address whose prefix matches the field's value.
+   std::u16string address = base::UTF8ToUTF16(*maybe_address);
+-  if (trigger_source != kManualFallbackPlusAddresses &&
++  if (trigger_source != AutofillSuggestionTriggerSource::kManualFallbackPlusAddresses &&
+       !address.starts_with(normalized_field_value)) {
+     return {};
+   }

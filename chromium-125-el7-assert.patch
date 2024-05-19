@@ -1,0 +1,24 @@
+diff -up chromium-125.0.6422.60/chrome/browser/ui/webui/top_chrome/webui_contents_wrapper.h.assert chromium-125.0.6422.60/chrome/browser/ui/webui/top_chrome/webui_contents_wrapper.h
+--- chromium-125.0.6422.60/chrome/browser/ui/webui/top_chrome/webui_contents_wrapper.h.assert	2024-05-18 19:33:37.165243577 +0200
++++ chromium-125.0.6422.60/chrome/browser/ui/webui/top_chrome/webui_contents_wrapper.h	2024-05-18 19:45:51.224995489 +0200
+@@ -185,7 +185,7 @@ class WebUIContentsWrapperT : public Web
+                              supports_draggable_regions,
+                              T::GetWebUIName()),
+         webui_url_(webui_url) {
+-    static_assert(
++    assert(
+         views_metrics::IsValidWebUINameVariant("." + T::GetWebUIName()));
+     if (is_ready_to_show()) {
+       CHECK(GetWebUIController());
+diff -up chromium-125.0.6422.60/v8/src/base/small-vector.h.assert chromium-125.0.6422.60/v8/src/base/small-vector.h
+--- chromium-125.0.6422.60/v8/src/base/small-vector.h.assert	2024-05-15 23:48:18.000000000 +0200
++++ chromium-125.0.6422.60/v8/src/base/small-vector.h	2024-05-17 12:33:58.745651173 +0200
+@@ -22,7 +22,7 @@ template <typename T, size_t kSize, type
+ class SmallVector {
+   // Currently only support trivially copyable and trivially destructible data
+   // types, as it uses memcpy to copy elements and never calls destructors.
+-  ASSERT_TRIVIALLY_COPYABLE(T);
++  //ASSERT_TRIVIALLY_COPYABLE(T);
+   static_assert(std::is_trivially_destructible<T>::value);
+ 
+  public:

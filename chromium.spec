@@ -164,6 +164,9 @@
 
 # enable|disable use_custom_libcxx
 %global use_custom_libcxx 1
+%if %{rhel} == 7
+%global use_custom_libcxx 0
+%endif
 
 # enable clang by default
 %global clang 1
@@ -315,7 +318,7 @@
 
 Name:	chromium%{chromium_channel}
 Version: 125.0.6422.60
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -380,7 +383,7 @@ Patch101: chromium-108-el7-wayland-strndup-error.patch
 
 # Workaround for old clang 14
 # error: defaulting this default constructor would delete it after its first declaration
-Patch102: chromium-124-el7-default-constructor-involving-anonymous-union.patch
+Patch102: chromium-125-el7-default-constructor-involving-anonymous-union.patch
 
 # Work around old and missing headers on EPEL7
 Patch103: chromium-110-epel7-old-headers-workarounds.patch
@@ -391,7 +394,7 @@ Patch104: chromium-99.0.4844.51-epel7-old-cups.patch
 
 # libdrm on EL7 is rather old and chromium assumes newer
 # This gets us by for now
-Patch105: chromium-120-el7-old-libdrm.patch
+Patch105: chromium-125-el7-old-libdrm.patch
 
 # error: no matching function for call to 'std::basic_string<char>::erase(std::basic_string<char>::const_iterator, __gnu_cxx::__normal_iterator<const char*, std::basic_string<char> >&)'
 #   33 |   property_name.erase(property_name.cbegin(), cur);
@@ -406,25 +409,27 @@ Patch108: chromium-118-el7_v4l2_quantization.patch
 Patch109: chromium-114-wireless-el7.patch
 Patch110: chromium-115-buildflag-el7.patch
 Patch111: chromium-122-el7-inline-function.patch
+Patch112: chromium-125-el7-rust-proc-macro2.patch
 Patch113: chromium-121-el7-clang-version-warning.patch
 Patch114: chromium-123-el7-clang-build-failure.patch
 Patch115: chromium-124-el7-size_t.patch
 
 # fixes for old clang version in el7 (clang <= 15)
 # compiler build errors, no matching constructor for initialization
-Patch116: chromium-124-no_matching_constructor.patch
-Patch117: chromium-115-compiler-SkColor4f.patch
+Patch116: chromium-125-el7-no_matching_constructor.patch
+Patch117: chromium-115-el7-compiler-SkColor4f.patch
 
 # workaround for clang bug, https://github.com/llvm/llvm-project/issues/57826
-Patch118: chromium-124-workaround_clang_bug-structured_binding.patch
+Patch118: chromium-124-el7-workaround_clang_bug-structured_binding.patch
 
 # missing typename
-Patch119: chromium-124-typename.patch
+Patch119: chromium-125-el7-typename.patch
 
 # error: invalid operands to binary expression
-Patch120: chromium-117-string-convert.patch
-Patch121: chromium-119-assert.patch
-Patch122: chromium-124-el7-constexpr.patch
+Patch120: chromium-117-el7-string-convert.patch
+Patch121: chromium-125-el7-assert.patch
+Patch122: chromium-125-el7-constexpr.patch
+Patch123: chromium-125-el7-type-alias.patch
 
 # system ffmpeg
 # need for old ffmpeg 5.x on epel9
@@ -478,6 +483,9 @@ Patch352: chromium-117-workaround_for_crash_on_BTI_capable_system.patch
 
 # remove flag split-threshold-for-reg-with-hint, it' not supported in clang <= 17
 Patch354: chromium-120-split-threshold-for-reg-with-hint.patch
+
+# use system libstdc++
+Patch355: chromium-125-system-libstdc++.patch
 
 # disable FFmpegAllowLists by default to allow external ffmpeg
 patch356: chromium-125-disable-FFmpegAllowLists.patch
@@ -559,6 +567,7 @@ Patch413: fix-unknown-warning-option-messages.diff
 # upstream patches
 # 64kpage support on el8
 Patch500: chromium-124-el8-support-64kpage.patch
+Patch501: chromium-125-missing-include-FieldDataManager.patch
 
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
 # http://build.chromium.org/buildbot/official/
@@ -1195,6 +1204,7 @@ udev.
 %patch -P109 -p1 -b .wireless
 %patch -P110 -p1 -b .buildflag-el7
 %patch -P111 -p1 -b .inline-function-el7
+%patch -P112 -p1 -R -b  .rust-proc-macro2
 %patch -P113 -p1 -b .el7-clang-version-warning
 %patch -P114 -p1 -b .clang-build-failure
 %patch -P115 -p1 -b .el7-size_t
@@ -1205,6 +1215,7 @@ udev.
 %patch -P120 -p1 -b .string-convert
 %patch -P121 -p1 -b .assert
 %patch -P122 -p1 -b .constexpr
+%patch -P123 -p1 -b .el7-type-alias
 %endif
 
 %if 0%{?rhel} == 9
@@ -1248,6 +1259,9 @@ udev.
 %endif
 
 %patch -P354 -p1 -b .revert-split-threshold-for-reg-with-hint
+%if ! %{use_custom_libcxx}
+%patch -P355 -p1 -b .system-libstdc++
+%endif
 %patch -P356 -p1 -b .disable-FFmpegAllowLists
 %patch -P358 -p1 -b .rust-clang_lib
 %patch -P359 -p1 -b .libavif-deps
@@ -1320,6 +1334,7 @@ udev.
 %patch -P500 -p1 -b .el8-support-64kpage.patch
 %endif
 %endif
+%patch -P501 -p1 -b .missing-include-FieldDataManage
 
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
@@ -1391,8 +1406,7 @@ cp -a third_party/dav1d/version/version.h third_party/dav1d/libdav1d/include/dav
 %if %{clang}
 FLAGS=' -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-command-line-argument'
 FLAGS+=' -Wno-unused-but-set-variable -Wno-unused-result -Wno-unused-function -Wno-unused-variable'
-FLAGS+=' -Wno-unused-const-variable -Wno-unneeded-internal-declaration -Wno-unknown-attributes'
-FLAGS+=' -Wno-unknown-pragmas'
+FLAGS+=' -Wno-unused-const-variable -Wno-unneeded-internal-declaration -Wno-unknown-attributes -Wno-unknown-pragmas'
 %endif
 
 %if %{system_build_flags}
@@ -2115,6 +2129,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Sun May 19 2024 Than Ngo <than@redhat.com> - 125.0.6422.60-2
+- fix build errors on el7
+
 * Thu May 16 2024 Than Ngo <than@redhat.com> - 125.0.6422.60-1
 - update to 125.0.6422.60
   * High CVE-2024-4947: Type Confusion in V8
