@@ -1,6 +1,6 @@
 diff -up chromium-125.0.6422.60/base/allocator/partition_allocator/src/partition_alloc/starscan/stats_collector.h.system-libstdc++ chromium-125.0.6422.60/base/allocator/partition_allocator/src/partition_alloc/starscan/stats_collector.h
 --- chromium-125.0.6422.60/base/allocator/partition_allocator/src/partition_alloc/starscan/stats_collector.h.system-libstdc++	2024-05-15 23:45:49.000000000 +0200
-+++ chromium-125.0.6422.60/base/allocator/partition_allocator/src/partition_alloc/starscan/stats_collector.h	2024-05-17 12:33:58.761651505 +0200
++++ chromium-125.0.6422.60/base/allocator/partition_allocator/src/partition_alloc/starscan/stats_collector.h	2024-05-19 09:07:38.199437617 +0200
 @@ -14,7 +14,7 @@
  #include <unordered_map>
  #include <utility>
@@ -11,8 +11,8 @@ diff -up chromium-125.0.6422.60/base/allocator/partition_allocator/src/partition
  #include "partition_alloc/partition_alloc_base/time/time.h"
  #include "partition_alloc/partition_alloc_check.h"
 diff -up chromium-125.0.6422.60/chrome/browser/lens/lens_overlay/lens_overlay_url_builder.h.system-libstdc++ chromium-125.0.6422.60/chrome/browser/lens/lens_overlay/lens_overlay_url_builder.h
---- chromium-125.0.6422.60/chrome/browser/lens/lens_overlay/lens_overlay_url_builder.h.system-libstdc++	2024-05-18 19:22:04.534942469 +0200
-+++ chromium-125.0.6422.60/chrome/browser/lens/lens_overlay/lens_overlay_url_builder.h	2024-05-18 19:22:18.371296934 +0200
+--- chromium-125.0.6422.60/chrome/browser/lens/lens_overlay/lens_overlay_url_builder.h.system-libstdc++	2024-05-15 23:46:01.000000000 +0200
++++ chromium-125.0.6422.60/chrome/browser/lens/lens_overlay/lens_overlay_url_builder.h	2024-05-19 09:07:38.200437638 +0200
 @@ -5,6 +5,7 @@
  #ifndef CHROME_BROWSER_LENS_LENS_OVERLAY_LENS_OVERLAY_URL_BUILDER_H_
  #define CHROME_BROWSER_LENS_LENS_OVERLAY_LENS_OVERLAY_URL_BUILDER_H_
@@ -21,9 +21,238 @@ diff -up chromium-125.0.6422.60/chrome/browser/lens/lens_overlay/lens_overlay_ur
  #include <string>
  
  #include "third_party/lens_server_proto/lens_overlay_cluster_info.pb.h"
+diff -up chromium-125.0.6422.60/chrome/browser/sync/test/integration/product_specifications_helper.cc.system-libstdc++ chromium-125.0.6422.60/chrome/browser/sync/test/integration/product_specifications_helper.cc
+--- chromium-125.0.6422.60/chrome/browser/sync/test/integration/product_specifications_helper.cc.system-libstdc++	2024-05-19 13:16:01.140442423 +0200
++++ chromium-125.0.6422.60/chrome/browser/sync/test/integration/product_specifications_helper.cc	2024-05-19 13:16:38.029246015 +0200
+@@ -41,9 +41,9 @@ bool ProductSpecificationsChecker::IsExi
+ bool ProductSpecificationsChecker::IsSpecificsAvailableAndEqual() {
+   for (const ProductSpecificationsSet& product_specifications_set :
+        service_->GetAllProductSpecifications()) {
+-    std::vector<const GURL> specifics_urls;
++    std::vector<GURL> specifics_urls;
+     for (sync_pb::ComparisonData data : compare_specifics_->data()) {
+-      specifics_urls.push_back(GURL(data.url()));
++      specifics_urls.emplace_back(data.url());
+     }
+     if (product_specifications_set.uuid().AsLowercaseString() ==
+             compare_specifics_->uuid() &&
+diff -up chromium-125.0.6422.60/chrome/browser/ui/tabs/tab_strip_model.h.system-libstdc++ chromium-125.0.6422.60/chrome/browser/ui/tabs/tab_strip_model.h
+--- chromium-125.0.6422.60/chrome/browser/ui/tabs/tab_strip_model.h.system-libstdc++	2024-05-15 23:46:05.000000000 +0200
++++ chromium-125.0.6422.60/chrome/browser/ui/tabs/tab_strip_model.h	2024-05-19 09:07:38.200437638 +0200
+@@ -12,6 +12,7 @@
+ #include <memory>
+ #include <optional>
+ #include <string>
++#include <variant>
+ #include <vector>
+ 
+ #include "base/containers/span.h"
+diff -up chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service.cc.system-libstdc++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service.cc
+--- chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service.cc.system-libstdc++	2024-05-19 13:08:44.920571765 +0200
++++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service.cc	2024-05-19 13:11:08.451775188 +0200
+@@ -24,11 +24,11 @@ ProductSpecificationsService::GetSyncCon
+   return bridge_->change_processor()->GetControllerDelegate();
+ }
+ 
+-const std::vector<const ProductSpecificationsSet>
++const std::vector<ProductSpecificationsSet>
+ ProductSpecificationsService::GetAllProductSpecifications() {
+-  std::vector<const ProductSpecificationsSet> product_specifications;
++  std::vector<ProductSpecificationsSet> product_specifications;
+   for (auto& entry : bridge_->entries()) {
+-    std::vector<const GURL> urls;
++    std::vector<GURL> urls;
+     for (auto& data : entry.second.data()) {
+       urls.emplace_back(data.url());
+     }
+@@ -43,7 +43,7 @@ ProductSpecificationsService::GetAllProd
+ const std::optional<const ProductSpecificationsSet>
+ ProductSpecificationsService::AddProductSpecificationsSet(
+     const std::string& name,
+-    const std::vector<const GURL>& urls) {
++    const std::vector<GURL>& urls) {
+   // TODO(crbug.com/332545064) add for a product specification set being added.
+   std::optional<sync_pb::CompareSpecifics> specifics =
+       bridge_->AddProductSpecifications(name, urls);
+diff -up chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service.h.system-libstdc++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service.h
+--- chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service.h.system-libstdc++	2024-05-15 23:46:11.000000000 +0200
++++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service.h	2024-05-19 09:07:38.201437659 +0200
+@@ -26,14 +26,13 @@ class ProductSpecificationsService : pub
+   base::WeakPtr<syncer::ModelTypeControllerDelegate>
+   GetSyncControllerDelegate();
+ 
+-  const std::vector<const ProductSpecificationsSet>
+-  GetAllProductSpecifications();
++  const std::vector<ProductSpecificationsSet> GetAllProductSpecifications();
+ 
+   // Add new product specifications set called |name| with product pages
+   // corresponding to |urls|.
+   const std::optional<const ProductSpecificationsSet>
+   AddProductSpecificationsSet(const std::string& name,
+-                              const std::vector<const GURL>& urls);
++                              const std::vector<GURL>& urls);
+ 
+   // Deletes product specification set corresponding to identifier |uuid|.
+   void DeleteProductSpecificationsSet(const std::string& uuid);
+diff -up chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service_unittest.cc.system-libstdc++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service_unittest.cc
+--- chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service_unittest.cc.system-libstdc++	2024-05-19 13:12:01.840028873 +0200
++++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service_unittest.cc	2024-05-19 13:13:44.363473948 +0200
+@@ -82,9 +82,9 @@ void AddTestSpecifics(commerce::ProductS
+ }
+ 
+ MATCHER_P(HasAllProductSpecs, compare_specifics, "") {
+-  std::vector<const GURL> specifics_urls;
++  std::vector<GURL> specifics_urls;
+   for (const sync_pb::ComparisonData& data : compare_specifics.data()) {
+-    specifics_urls.push_back(GURL(data.url()));
++    specifics_urls.emplace_back(data.url());
+   }
+   return arg.uuid().AsLowercaseString() == compare_specifics.uuid() &&
+          arg.creation_time() ==
+@@ -217,7 +217,7 @@ class ProductSpecificationsServiceTest :
+                   specifics.update_time_unix_epoch_micros()),
+               specifications.update_time());
+     EXPECT_EQ(specifics.name(), specifications.name());
+-    std::vector<const GURL> urls;
++    std::vector<GURL> urls;
+     for (const sync_pb::ComparisonData& data : specifics.data()) {
+       urls.emplace_back(data.url());
+     }
+@@ -243,7 +243,7 @@ TEST_F(ProductSpecificationsServiceTest,
+   for (const sync_pb::CompareSpecifics& specifics : kCompareSpecifics) {
+     bridge()->AddCompareSpecifics(specifics);
+   }
+-  const std::vector<const ProductSpecificationsSet> specifications =
++  const std::vector<ProductSpecificationsSet> specifications =
+       service()->GetAllProductSpecifications();
+   EXPECT_EQ(2u, specifications.size());
+   for (uint64_t i = 0; i < specifications.size(); i++) {
+@@ -252,7 +252,7 @@ TEST_F(ProductSpecificationsServiceTest,
+ }
+ 
+ TEST_F(ProductSpecificationsServiceTest, TestAddProductSpecificationsSuccess) {
+-  std::vector<const GURL> expected_product_urls{GURL(kProductOneUrl),
++  std::vector<GURL> expected_product_urls{GURL(kProductOneUrl),
+                                                 GURL(kProductTwoUrl)};
+   EXPECT_CALL(*observer(),
+               OnProductSpecificationsSetAdded(HasProductSpecsNameUrl(
+diff -up chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_set.cc.system-libstdc++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_set.cc
+--- chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_set.cc.system-libstdc++	2024-05-19 13:06:20.870445163 +0200
++++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_set.cc	2024-05-19 13:07:44.385278233 +0200
+@@ -12,7 +12,7 @@ ProductSpecificationsSet::ProductSpecifi
+     const std::string& uuid,
+     const int64_t creation_time_usec_since_epoch,
+     const int64_t update_time_usec_since_epoch,
+-    const std::vector<const GURL>& urls,
++    const std::vector<GURL>& urls,
+     const std::string& name)
+     : uuid_(base::Uuid::ParseLowercase(uuid)),
+       creation_time_(base::Time::FromMillisecondsSinceUnixEpoch(
+@@ -34,9 +34,9 @@ ProductSpecificationsSet::~ProductSpecif
+ 
+ ProductSpecificationsSet ProductSpecificationsSet::FromProto(
+     const sync_pb::CompareSpecifics& specifics) {
+-  std::vector<const GURL> urls;
++  std::vector<GURL> urls;
+   for (const sync_pb::ComparisonData& data : specifics.data()) {
+-    urls.push_back(GURL(data.url()));
++    urls.emplace_back(data.url());
+   }
+   return ProductSpecificationsSet(
+       specifics.uuid(), specifics.creation_time_unix_epoch_micros(),
+diff -up chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_set.h.system-libstdc++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_set.h
+--- chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_set.h.system-libstdc++	2024-05-15 23:46:11.000000000 +0200
++++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_set.h	2024-05-19 09:07:38.201437659 +0200
+@@ -43,7 +43,7 @@ class ProductSpecificationsSet {
+   ProductSpecificationsSet(const std::string& uuid,
+                            const int64_t creation_time_usec_since_epoch,
+                            const int64_t update_time_usec_since_epoch,
+-                           const std::vector<const GURL>& urls,
++                           const std::vector<GURL>& urls,
+                            const std::string& name);
+ 
+   ProductSpecificationsSet(const ProductSpecificationsSet&);
+@@ -61,7 +61,7 @@ class ProductSpecificationsSet {
+   const base::Time& update_time() const { return update_time_; }
+ 
+   // Product urls for each item in the set
+-  const std::vector<const GURL>& urls() const { return urls_; }
++  const std::vector<GURL>& urls() const { return urls_; }
+ 
+   // Name of the set
+   const std::string& name() const { return name_; }
+@@ -76,7 +76,7 @@ class ProductSpecificationsSet {
+   const base::Uuid uuid_;
+   const base::Time creation_time_;
+   const base::Time update_time_;
+-  const std::vector<const GURL> urls_;
++  const std::vector<GURL> urls_;
+   const std::string name_;
+ };
+ 
+diff -up chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.cc.system-libstdc++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.cc
+--- chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.cc.system-libstdc++	2024-05-15 23:46:11.000000000 +0200
++++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.cc	2024-05-19 09:07:38.201437659 +0200
+@@ -131,7 +131,7 @@ void ProductSpecificationsSyncBridge::Ge
+ const std::optional<sync_pb::CompareSpecifics>
+ ProductSpecificationsSyncBridge::AddProductSpecifications(
+     const std::string& name,
+-    const std::vector<const GURL>& urls) {
++    const std::vector<GURL>& urls) {
+   if (!change_processor()->IsTrackingMetadata()) {
+     return std::nullopt;
+   }
+diff -up chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.h.system-libstdc++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.h
+--- chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.h.system-libstdc++	2024-05-15 23:46:11.000000000 +0200
++++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.h	2024-05-19 09:07:38.201437659 +0200
+@@ -64,7 +64,7 @@ class ProductSpecificationsSyncBridge :
+ 
+   virtual const std::optional<sync_pb::CompareSpecifics>
+   AddProductSpecifications(const std::string& name,
+-                           const std::vector<const GURL>& urls);
++                           const std::vector<GURL>& urls);
+ 
+   void DeleteProductSpecificationsSet(const std::string& uuid);
+ 
+diff -up chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge_unittest.cc.system-libstdc++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge_unittest.cc
+--- chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge_unittest.cc.system-libstdc++	2024-05-15 23:46:11.000000000 +0200
++++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge_unittest.cc	2024-05-19 09:07:38.201437659 +0200
+@@ -178,7 +178,7 @@ class ProductSpecificationsSyncBridgeTes
+ 
+   std::optional<sync_pb::CompareSpecifics> AddProductSpecifications(
+       const std::string& name,
+-      const std::vector<const GURL> urls) {
++      const std::vector<GURL> urls) {
+     return bridge().AddProductSpecifications(name, urls);
+   }
+ 
+diff -up chromium-125.0.6422.60/components/commerce/core/shopping_service.cc.system-libstdc++ chromium-125.0.6422.60/components/commerce/core/shopping_service.cc
+--- chromium-125.0.6422.60/components/commerce/core/shopping_service.cc.system-libstdc++	2024-05-15 23:46:11.000000000 +0200
++++ chromium-125.0.6422.60/components/commerce/core/shopping_service.cc	2024-05-19 09:07:38.201437659 +0200
+@@ -1734,7 +1734,7 @@ void ShoppingService::GetProductIdentifi
+           std::move(callback)));
+ }
+ 
+-const std::vector<const ProductSpecificationsSet>
++const std::vector<ProductSpecificationsSet>
+ ShoppingService::GetAllProductSpecificationSets() {
+   return product_specifications_service_->GetAllProductSpecifications();
+ }
+diff -up chromium-125.0.6422.60/components/commerce/core/shopping_service.h.system-libstdc++ chromium-125.0.6422.60/components/commerce/core/shopping_service.h
+--- chromium-125.0.6422.60/components/commerce/core/shopping_service.h.system-libstdc++	2024-05-15 23:46:11.000000000 +0200
++++ chromium-125.0.6422.60/components/commerce/core/shopping_service.h	2024-05-19 09:07:38.201437659 +0200
+@@ -624,7 +624,7 @@ class ShoppingService : public KeyedServ
+                                   UrlProductIdentifierTupleCallback callback);
+ 
+   // Return all ProductSpecificationsSets from ProductSpecificationsService.
+-  virtual const std::vector<const ProductSpecificationsSet>
++  virtual const std::vector<ProductSpecificationsSet>
+   GetAllProductSpecificationSets();
+ 
+   // Updates the bookmark model used for sync (and shopping) if needed. Invoked
 diff -up chromium-125.0.6422.60/components/services/app_service/public/cpp/app_types.h.system-libstdc++ chromium-125.0.6422.60/components/services/app_service/public/cpp/app_types.h
---- chromium-125.0.6422.60/components/services/app_service/public/cpp/app_types.h.system-libstdc++	2024-05-18 13:31:00.381517294 +0200
-+++ chromium-125.0.6422.60/components/services/app_service/public/cpp/app_types.h	2024-05-18 13:31:19.740946964 +0200
+--- chromium-125.0.6422.60/components/services/app_service/public/cpp/app_types.h.system-libstdc++	2024-05-15 23:46:14.000000000 +0200
++++ chromium-125.0.6422.60/components/services/app_service/public/cpp/app_types.h	2024-05-19 09:07:38.202437679 +0200
 @@ -5,6 +5,7 @@
  #ifndef COMPONENTS_SERVICES_APP_SERVICE_PUBLIC_CPP_APP_TYPES_H_
  #define COMPONENTS_SERVICES_APP_SERVICE_PUBLIC_CPP_APP_TYPES_H_
@@ -34,7 +263,7 @@ diff -up chromium-125.0.6422.60/components/services/app_service/public/cpp/app_t
  #include "components/services/app_service/public/protos/app_types.pb.h"
 diff -up chromium-125.0.6422.60/components/viz/service/display/surface_aggregator.cc.system-libstdc++ chromium-125.0.6422.60/components/viz/service/display/surface_aggregator.cc
 --- chromium-125.0.6422.60/components/viz/service/display/surface_aggregator.cc.system-libstdc++	2024-05-15 23:46:17.000000000 +0200
-+++ chromium-125.0.6422.60/components/viz/service/display/surface_aggregator.cc	2024-05-17 12:33:58.761651505 +0200
++++ chromium-125.0.6422.60/components/viz/service/display/surface_aggregator.cc	2024-05-19 09:07:38.202437679 +0200
 @@ -2275,7 +2275,7 @@ AggregatedFrame SurfaceAggregator::Aggre
    root_surface_id_ = surface_id;
  
@@ -46,7 +275,7 @@ diff -up chromium-125.0.6422.60/components/viz/service/display/surface_aggregato
    ResolvedFrameData* resolved_frame = GetResolvedFrame(surface_id);
 diff -up chromium-125.0.6422.60/content/browser/first_party_sets/first_party_sets_handler_database_helper.cc.system-libstdc++ chromium-125.0.6422.60/content/browser/first_party_sets/first_party_sets_handler_database_helper.cc
 --- chromium-125.0.6422.60/content/browser/first_party_sets/first_party_sets_handler_database_helper.cc.system-libstdc++	2024-05-15 23:46:17.000000000 +0200
-+++ chromium-125.0.6422.60/content/browser/first_party_sets/first_party_sets_handler_database_helper.cc	2024-05-17 12:33:58.762651526 +0200
++++ chromium-125.0.6422.60/content/browser/first_party_sets/first_party_sets_handler_database_helper.cc	2024-05-19 09:07:38.202437679 +0200
 @@ -2,6 +2,7 @@
  // Use of this source code is governed by a BSD-style license that can be
  // found in the LICENSE file.
@@ -57,7 +286,7 @@ diff -up chromium-125.0.6422.60/content/browser/first_party_sets/first_party_set
  #include "base/containers/contains.h"
 diff -up chromium-125.0.6422.60/gpu/command_buffer/service/shared_image/shared_image_backing.h.system-libstdc++ chromium-125.0.6422.60/gpu/command_buffer/service/shared_image/shared_image_backing.h
 --- chromium-125.0.6422.60/gpu/command_buffer/service/shared_image/shared_image_backing.h.system-libstdc++	2024-05-15 23:46:22.000000000 +0200
-+++ chromium-125.0.6422.60/gpu/command_buffer/service/shared_image/shared_image_backing.h	2024-05-17 12:33:58.762651526 +0200
++++ chromium-125.0.6422.60/gpu/command_buffer/service/shared_image/shared_image_backing.h	2024-05-19 09:07:38.202437679 +0200
 @@ -111,6 +111,25 @@ using VideoDecodeDevice = Microsoft::WRL
  using VideoDecodeDevice = void*;
  #endif  // BUILDFLAG(IS_WIN)
@@ -110,9 +339,32 @@ diff -up chromium-125.0.6422.60/gpu/command_buffer/service/shared_image/shared_i
    const Mailbox mailbox_;
    const viz::SharedImageFormat format_;
    const gfx::Size size_;
+diff -up chromium-125.0.6422.60/mojo/public/cpp/base/proto_wrapper.cc.system-libstdc++ chromium-125.0.6422.60/mojo/public/cpp/base/proto_wrapper.cc
+--- chromium-125.0.6422.60/mojo/public/cpp/base/proto_wrapper.cc.system-libstdc++	2024-05-15 23:46:29.000000000 +0200
++++ chromium-125.0.6422.60/mojo/public/cpp/base/proto_wrapper.cc	2024-05-19 09:07:38.203437700 +0200
+@@ -57,7 +57,7 @@ bool ProtoWrapper::DeserializeToMessage(
+     // Make an in-process copy here as protobuf is not designed to
+     // safely parse data that might be changing underneath it.
+     auto as_span = base::make_span(bytes_->data(), bytes_->size());
+-    const std::vector<const uint8_t> copy(as_span.begin(), as_span.end());
++    const std::vector<uint8_t> copy(as_span.begin(), as_span.end());
+     return message.ParseFromArray(copy.data(), copy.size());
+   }
+ }
+diff -up chromium-125.0.6422.60/mojo/public/cpp/bindings/lib/bindings_internal.h.system-libstdc++ chromium-125.0.6422.60/mojo/public/cpp/bindings/lib/bindings_internal.h
+--- chromium-125.0.6422.60/mojo/public/cpp/bindings/lib/bindings_internal.h.system-libstdc++	2024-05-15 23:46:29.000000000 +0200
++++ chromium-125.0.6422.60/mojo/public/cpp/bindings/lib/bindings_internal.h	2024-05-19 09:07:38.203437700 +0200
+@@ -8,6 +8,7 @@
+ #include <stdint.h>
+ 
+ #include <functional>
++#include <optional>
+ #include <type_traits>
+ #include <utility>
+ 
 diff -up chromium-125.0.6422.60/mojo/public/cpp/bindings/lib/multiplex_router.cc.system-libstdc++ chromium-125.0.6422.60/mojo/public/cpp/bindings/lib/multiplex_router.cc
 --- chromium-125.0.6422.60/mojo/public/cpp/bindings/lib/multiplex_router.cc.system-libstdc++	2024-05-15 23:46:29.000000000 +0200
-+++ chromium-125.0.6422.60/mojo/public/cpp/bindings/lib/multiplex_router.cc	2024-05-17 12:33:58.762651526 +0200
++++ chromium-125.0.6422.60/mojo/public/cpp/bindings/lib/multiplex_router.cc	2024-05-19 09:07:38.203437700 +0200
 @@ -892,7 +892,7 @@ bool MultiplexRouter::ExclusiveSyncWaitF
    DCHECK(!exclusive_sync_wait_);
  
@@ -124,7 +376,7 @@ diff -up chromium-125.0.6422.60/mojo/public/cpp/bindings/lib/multiplex_router.cc
    while (!exclusive_sync_wait_->finished) {
 diff -up chromium-125.0.6422.60/third_party/blink/common/interest_group/auction_config_mojom_traits.cc.system-libstdc++ chromium-125.0.6422.60/third_party/blink/common/interest_group/auction_config_mojom_traits.cc
 --- chromium-125.0.6422.60/third_party/blink/common/interest_group/auction_config_mojom_traits.cc.system-libstdc++	2024-05-15 23:46:38.000000000 +0200
-+++ chromium-125.0.6422.60/third_party/blink/common/interest_group/auction_config_mojom_traits.cc	2024-05-17 12:33:58.763651547 +0200
++++ chromium-125.0.6422.60/third_party/blink/common/interest_group/auction_config_mojom_traits.cc	2024-05-19 09:07:38.206437763 +0200
 @@ -218,8 +218,6 @@ bool StructTraits<blink::mojom::AuctionA
        !data.ReadAllBuyersPrioritySignals(&out->all_buyers_priority_signals) ||
        !data.ReadAuctionReportBuyerKeys(&out->auction_report_buyer_keys) ||
@@ -136,7 +388,7 @@ diff -up chromium-125.0.6422.60/third_party/blink/common/interest_group/auction_
        !data.ReadRequestedSize(&out->requested_size) ||
 diff -up chromium-125.0.6422.60/third_party/blink/renderer/core/loader/history_item.cc.system-libstdc++ chromium-125.0.6422.60/third_party/blink/renderer/core/loader/history_item.cc
 --- chromium-125.0.6422.60/third_party/blink/renderer/core/loader/history_item.cc.system-libstdc++	2024-05-15 23:46:41.000000000 +0200
-+++ chromium-125.0.6422.60/third_party/blink/renderer/core/loader/history_item.cc	2024-05-17 12:33:58.763651547 +0200
++++ chromium-125.0.6422.60/third_party/blink/renderer/core/loader/history_item.cc	2024-05-19 09:07:38.209437825 +0200
 @@ -182,26 +182,26 @@ void HistoryItem::SetReferrerPolicy(netw
  
  void HistoryItem::SetVisualViewportScrollOffset(const ScrollOffset& offset) {
@@ -170,7 +422,7 @@ diff -up chromium-125.0.6422.60/third_party/blink/renderer/core/loader/history_i
  
 diff -up chromium-125.0.6422.60/third_party/blink/renderer/core/paint/fragment_data_iterator.h.system-libstdc++ chromium-125.0.6422.60/third_party/blink/renderer/core/paint/fragment_data_iterator.h
 --- chromium-125.0.6422.60/third_party/blink/renderer/core/paint/fragment_data_iterator.h.system-libstdc++	2024-05-15 23:46:41.000000000 +0200
-+++ chromium-125.0.6422.60/third_party/blink/renderer/core/paint/fragment_data_iterator.h	2024-05-17 12:33:58.763651547 +0200
++++ chromium-125.0.6422.60/third_party/blink/renderer/core/paint/fragment_data_iterator.h	2024-05-19 09:07:38.209437825 +0200
 @@ -22,7 +22,7 @@ class FragmentDataIteratorBase {
  
   public:
@@ -182,7 +434,7 @@ diff -up chromium-125.0.6422.60/third_party/blink/renderer/core/paint/fragment_d
      return !IsDone() ? &fragment_head_.at(idx_) : nullptr;
 diff -up chromium-125.0.6422.60/third_party/blink/renderer/modules/media_controls/elements/media_control_timeline_element.cc.system-libstdc++ chromium-125.0.6422.60/third_party/blink/renderer/modules/media_controls/elements/media_control_timeline_element.cc
 --- chromium-125.0.6422.60/third_party/blink/renderer/modules/media_controls/elements/media_control_timeline_element.cc.system-libstdc++	2024-05-15 23:46:42.000000000 +0200
-+++ chromium-125.0.6422.60/third_party/blink/renderer/modules/media_controls/elements/media_control_timeline_element.cc	2024-05-17 12:33:58.764651567 +0200
++++ chromium-125.0.6422.60/third_party/blink/renderer/modules/media_controls/elements/media_control_timeline_element.cc	2024-05-19 09:07:38.210437846 +0200
 @@ -101,7 +101,7 @@ void MediaControlTimelineElement::Update
  void MediaControlTimelineElement::SetPosition(double current_time,
                                                bool suppress_aria) {
@@ -194,7 +446,7 @@ diff -up chromium-125.0.6422.60/third_party/blink/renderer/modules/media_control
    }
 diff -up chromium-125.0.6422.60/third_party/blink/renderer/platform/graphics/paint/geometry_mapper_transform_cache.cc.system-libstdc++ chromium-125.0.6422.60/third_party/blink/renderer/platform/graphics/paint/geometry_mapper_transform_cache.cc
 --- chromium-125.0.6422.60/third_party/blink/renderer/platform/graphics/paint/geometry_mapper_transform_cache.cc.system-libstdc++	2024-05-15 23:46:42.000000000 +0200
-+++ chromium-125.0.6422.60/third_party/blink/renderer/platform/graphics/paint/geometry_mapper_transform_cache.cc	2024-05-17 12:33:58.764651567 +0200
++++ chromium-125.0.6422.60/third_party/blink/renderer/platform/graphics/paint/geometry_mapper_transform_cache.cc	2024-05-19 09:07:38.210437846 +0200
 @@ -70,7 +70,7 @@ void GeometryMapperTransformCache::Updat
      to_2d_translation_root_ += translation;
  
@@ -222,9 +474,31 @@ diff -up chromium-125.0.6422.60/third_party/blink/renderer/platform/graphics/pai
    parent.ApplyToScreen(screen_transform_->to_screen);
    if (node.FlattensInheritedTransform())
      screen_transform_->to_screen.Flatten();
+diff -up chromium-125.0.6422.60/third_party/ruy/src/ruy/profiler/instrumentation.h.system-libstdc++ chromium-125.0.6422.60/third_party/ruy/src/ruy/profiler/instrumentation.h
+--- chromium-125.0.6422.60/third_party/ruy/src/ruy/profiler/instrumentation.h.system-libstdc++	2024-05-15 23:47:49.000000000 +0200
++++ chromium-125.0.6422.60/third_party/ruy/src/ruy/profiler/instrumentation.h	2024-05-19 09:07:38.211437867 +0200
+@@ -19,6 +19,7 @@ limitations under the License.
+ #ifdef RUY_PROFILER
+ #include <cstdio>
+ #include <mutex>
++#include <string>
+ #include <vector>
+ #endif
+ 
+diff -up chromium-125.0.6422.60/third_party/vulkan-deps/vulkan-utility-libraries/src/include/vulkan/utility/vk_small_containers.hpp.system-libstdc++ chromium-125.0.6422.60/third_party/vulkan-deps/vulkan-utility-libraries/src/include/vulkan/utility/vk_small_containers.hpp
+--- chromium-125.0.6422.60/third_party/vulkan-deps/vulkan-utility-libraries/src/include/vulkan/utility/vk_small_containers.hpp.system-libstdc++	2024-05-15 23:48:05.000000000 +0200
++++ chromium-125.0.6422.60/third_party/vulkan-deps/vulkan-utility-libraries/src/include/vulkan/utility/vk_small_containers.hpp	2024-05-19 09:07:38.211437867 +0200
+@@ -8,6 +8,7 @@
+ 
+ #pragma once
+ 
++#include <memory>
+ #include <cassert>
+ #include <unordered_map>
+ #include <unordered_set>
 diff -up chromium-125.0.6422.60/third_party/webrtc/modules/congestion_controller/goog_cc/loss_based_bwe_v2.cc.system-libstdc++ chromium-125.0.6422.60/third_party/webrtc/modules/congestion_controller/goog_cc/loss_based_bwe_v2.cc
 --- chromium-125.0.6422.60/third_party/webrtc/modules/congestion_controller/goog_cc/loss_based_bwe_v2.cc.system-libstdc++	2024-05-15 23:48:09.000000000 +0200
-+++ chromium-125.0.6422.60/third_party/webrtc/modules/congestion_controller/goog_cc/loss_based_bwe_v2.cc	2024-05-17 12:33:58.765651588 +0200
++++ chromium-125.0.6422.60/third_party/webrtc/modules/congestion_controller/goog_cc/loss_based_bwe_v2.cc	2024-05-19 09:07:38.212437888 +0200
 @@ -549,7 +549,7 @@ absl::optional<LossBasedBweV2::Config> L
    if (!enabled.Get()) {
      return config;
@@ -236,7 +510,7 @@ diff -up chromium-125.0.6422.60/third_party/webrtc/modules/congestion_controller
    config->bandwidth_rampup_upper_bound_factor_in_hold =
 diff -up chromium-125.0.6422.60/ui/gfx/x/generated_protos/randr.cc.system-libstdc++ chromium-125.0.6422.60/ui/gfx/x/generated_protos/randr.cc
 --- chromium-125.0.6422.60/ui/gfx/x/generated_protos/randr.cc.system-libstdc++	2024-05-15 23:47:33.000000000 +0200
-+++ chromium-125.0.6422.60/ui/gfx/x/generated_protos/randr.cc	2024-05-17 12:33:58.765651588 +0200
++++ chromium-125.0.6422.60/ui/gfx/x/generated_protos/randr.cc	2024-05-19 09:07:38.212437888 +0200
 @@ -305,7 +305,7 @@ void ReadEvent<RandR::NotifyEvent>(RandR
    // data
    auto data_expr = subCode;
@@ -302,7 +576,7 @@ diff -up chromium-125.0.6422.60/ui/gfx/x/generated_protos/randr.cc.system-libstd
      auto& lease = (*data.lc).lease;
 diff -up chromium-125.0.6422.60/ui/gfx/x/generated_protos/xinput.cc.system-libstdc++ chromium-125.0.6422.60/ui/gfx/x/generated_protos/xinput.cc
 --- chromium-125.0.6422.60/ui/gfx/x/generated_protos/xinput.cc.system-libstdc++	2024-05-15 23:47:33.000000000 +0200
-+++ chromium-125.0.6422.60/ui/gfx/x/generated_protos/xinput.cc	2024-05-17 12:33:58.767651629 +0200
++++ chromium-125.0.6422.60/ui/gfx/x/generated_protos/xinput.cc	2024-05-19 09:07:38.216437971 +0200
 @@ -567,7 +567,7 @@ void ReadEvent<Input::DeviceChangedEvent
        // data
        auto data_expr = type;
@@ -565,7 +839,7 @@ diff -up chromium-125.0.6422.60/ui/gfx/x/generated_protos/xinput.cc.system-libst
              // num_touches
 diff -up chromium-125.0.6422.60/ui/gfx/x/generated_protos/xkb.cc.system-libstdc++ chromium-125.0.6422.60/ui/gfx/x/generated_protos/xkb.cc
 --- chromium-125.0.6422.60/ui/gfx/x/generated_protos/xkb.cc.system-libstdc++	2024-05-15 23:47:33.000000000 +0200
-+++ chromium-125.0.6422.60/ui/gfx/x/generated_protos/xkb.cc	2024-05-17 12:33:58.768651650 +0200
++++ chromium-125.0.6422.60/ui/gfx/x/generated_protos/xkb.cc	2024-05-19 09:07:38.220438054 +0200
 @@ -2346,7 +2346,7 @@ std::unique_ptr<Xkb::GetMapReply> detail
    // map
    auto map_expr = present;
@@ -620,158 +894,3 @@ diff -up chromium-125.0.6422.60/ui/gfx/x/generated_protos/xkb.cc.system-libstdc+
      auto& geometry_type = (*replies.geometry).geometry_type;
      auto& geometryDeviceID = (*replies.geometry).geometryDeviceID;
      auto& geometry_sequence = (*replies.geometry).geometry_sequence;
-diff -up chromium-125.0.6422.60/chrome/browser/ui/tabs/tab_strip_model.h.me chromium-125.0.6422.60/chrome/browser/ui/tabs/tab_strip_model.h
---- chromium-125.0.6422.60/chrome/browser/ui/tabs/tab_strip_model.h.me	2024-05-17 13:03:47.120796989 +0200
-+++ chromium-125.0.6422.60/chrome/browser/ui/tabs/tab_strip_model.h	2024-05-17 13:04:07.392217367 +0200
-@@ -12,6 +12,7 @@
- #include <memory>
- #include <optional>
- #include <string>
-+#include <variant>
- #include <vector>
- 
- #include "base/containers/span.h"
-diff -up chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service.h.me chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service.h
---- chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service.h.me	2024-05-15 23:46:11.000000000 +0200
-+++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_service.h	2024-05-17 13:09:38.495376514 +0200
-@@ -26,14 +26,13 @@ class ProductSpecificationsService : pub
-   base::WeakPtr<syncer::ModelTypeControllerDelegate>
-   GetSyncControllerDelegate();
- 
--  const std::vector<const ProductSpecificationsSet>
--  GetAllProductSpecifications();
-+  const std::vector<ProductSpecificationsSet> GetAllProductSpecifications();
- 
-   // Add new product specifications set called |name| with product pages
-   // corresponding to |urls|.
-   const std::optional<const ProductSpecificationsSet>
-   AddProductSpecificationsSet(const std::string& name,
--                              const std::vector<const GURL>& urls);
-+                              const std::vector<GURL>& urls);
- 
-   // Deletes product specification set corresponding to identifier |uuid|.
-   void DeleteProductSpecificationsSet(const std::string& uuid);
-diff -up chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_set.h.me chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_set.h
---- chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_set.h.me	2024-05-15 23:46:11.000000000 +0200
-+++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_set.h	2024-05-17 13:09:38.496376540 +0200
-@@ -43,7 +43,7 @@ class ProductSpecificationsSet {
-   ProductSpecificationsSet(const std::string& uuid,
-                            const int64_t creation_time_usec_since_epoch,
-                            const int64_t update_time_usec_since_epoch,
--                           const std::vector<const GURL>& urls,
-+                           const std::vector<GURL>& urls,
-                            const std::string& name);
- 
-   ProductSpecificationsSet(const ProductSpecificationsSet&);
-@@ -61,7 +61,7 @@ class ProductSpecificationsSet {
-   const base::Time& update_time() const { return update_time_; }
- 
-   // Product urls for each item in the set
--  const std::vector<const GURL>& urls() const { return urls_; }
-+  const std::vector<GURL>& urls() const { return urls_; }
- 
-   // Name of the set
-   const std::string& name() const { return name_; }
-@@ -76,7 +76,7 @@ class ProductSpecificationsSet {
-   const base::Uuid uuid_;
-   const base::Time creation_time_;
-   const base::Time update_time_;
--  const std::vector<const GURL> urls_;
-+  const std::vector<GURL> urls_;
-   const std::string name_;
- };
- 
-diff -up chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.cc.me chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.cc
---- chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.cc.me	2024-05-15 23:46:11.000000000 +0200
-+++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.cc	2024-05-17 13:09:38.497376567 +0200
-@@ -131,7 +131,7 @@ void ProductSpecificationsSyncBridge::Ge
- const std::optional<sync_pb::CompareSpecifics>
- ProductSpecificationsSyncBridge::AddProductSpecifications(
-     const std::string& name,
--    const std::vector<const GURL>& urls) {
-+    const std::vector<GURL>& urls) {
-   if (!change_processor()->IsTrackingMetadata()) {
-     return std::nullopt;
-   }
-diff -up chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.h.me chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.h
---- chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.h.me	2024-05-15 23:46:11.000000000 +0200
-+++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge.h	2024-05-17 13:09:38.497376567 +0200
-@@ -64,7 +64,7 @@ class ProductSpecificationsSyncBridge :
- 
-   virtual const std::optional<sync_pb::CompareSpecifics>
-   AddProductSpecifications(const std::string& name,
--                           const std::vector<const GURL>& urls);
-+                           const std::vector<GURL>& urls);
- 
-   void DeleteProductSpecificationsSet(const std::string& uuid);
- 
-diff -up chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge_unittest.cc.me chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge_unittest.cc
---- chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge_unittest.cc.me	2024-05-15 23:46:11.000000000 +0200
-+++ chromium-125.0.6422.60/components/commerce/core/product_specifications/product_specifications_sync_bridge_unittest.cc	2024-05-17 13:09:38.497376567 +0200
-@@ -178,7 +178,7 @@ class ProductSpecificationsSyncBridgeTes
- 
-   std::optional<sync_pb::CompareSpecifics> AddProductSpecifications(
-       const std::string& name,
--      const std::vector<const GURL> urls) {
-+      const std::vector<GURL> urls) {
-     return bridge().AddProductSpecifications(name, urls);
-   }
- 
-diff -up chromium-125.0.6422.60/components/commerce/core/shopping_service.cc.me chromium-125.0.6422.60/components/commerce/core/shopping_service.cc
---- chromium-125.0.6422.60/components/commerce/core/shopping_service.cc.me	2024-05-15 23:46:11.000000000 +0200
-+++ chromium-125.0.6422.60/components/commerce/core/shopping_service.cc	2024-05-17 13:09:38.498376593 +0200
-@@ -1734,7 +1734,7 @@ void ShoppingService::GetProductIdentifi
-           std::move(callback)));
- }
- 
--const std::vector<const ProductSpecificationsSet>
-+const std::vector<ProductSpecificationsSet>
- ShoppingService::GetAllProductSpecificationSets() {
-   return product_specifications_service_->GetAllProductSpecifications();
- }
-diff -up chromium-125.0.6422.60/components/commerce/core/shopping_service.h.me chromium-125.0.6422.60/components/commerce/core/shopping_service.h
---- chromium-125.0.6422.60/components/commerce/core/shopping_service.h.me	2024-05-15 23:46:11.000000000 +0200
-+++ chromium-125.0.6422.60/components/commerce/core/shopping_service.h	2024-05-17 13:09:38.499376619 +0200
-@@ -624,7 +624,7 @@ class ShoppingService : public KeyedServ
-                                   UrlProductIdentifierTupleCallback callback);
- 
-   // Return all ProductSpecificationsSets from ProductSpecificationsService.
--  virtual const std::vector<const ProductSpecificationsSet>
-+  virtual const std::vector<ProductSpecificationsSet>
-   GetAllProductSpecificationSets();
- 
-   // Updates the bookmark model used for sync (and shopping) if needed. Invoked
-diff -up chromium-125.0.6422.60/mojo/public/cpp/base/proto_wrapper.cc.me chromium-125.0.6422.60/mojo/public/cpp/base/proto_wrapper.cc
---- chromium-125.0.6422.60/mojo/public/cpp/base/proto_wrapper.cc.me	2024-05-15 23:46:29.000000000 +0200
-+++ chromium-125.0.6422.60/mojo/public/cpp/base/proto_wrapper.cc	2024-05-17 13:09:38.499376619 +0200
-@@ -57,7 +57,7 @@ bool ProtoWrapper::DeserializeToMessage(
-     // Make an in-process copy here as protobuf is not designed to
-     // safely parse data that might be changing underneath it.
-     auto as_span = base::make_span(bytes_->data(), bytes_->size());
--    const std::vector<const uint8_t> copy(as_span.begin(), as_span.end());
-+    const std::vector<uint8_t> copy(as_span.begin(), as_span.end());
-     return message.ParseFromArray(copy.data(), copy.size());
-   }
- }
-diff -up chromium-125.0.6422.60/mojo/public/cpp/bindings/lib/bindings_internal.h.me chromium-125.0.6422.60/mojo/public/cpp/bindings/lib/bindings_internal.h
---- chromium-125.0.6422.60/mojo/public/cpp/bindings/lib/bindings_internal.h.me	2024-05-17 14:54:11.158723735 +0200
-+++ chromium-125.0.6422.60/mojo/public/cpp/bindings/lib/bindings_internal.h	2024-05-17 14:55:20.214285825 +0200
-@@ -8,6 +8,7 @@
- #include <stdint.h>
- 
- #include <functional>
-+#include <optional>
- #include <type_traits>
- #include <utility>
- 
-diff -up chromium-125.0.6422.60/third_party/vulkan-deps/vulkan-utility-libraries/src/include/vulkan/utility/vk_small_containers.hpp.me chromium-125.0.6422.60/third_party/vulkan-deps/vulkan-utility-libraries/src/include/vulkan/utility/vk_small_containers.hpp
---- chromium-125.0.6422.60/third_party/vulkan-deps/vulkan-utility-libraries/src/include/vulkan/utility/vk_small_containers.hpp.me	2024-05-17 12:59:26.714809822 +0200
-+++ chromium-125.0.6422.60/third_party/vulkan-deps/vulkan-utility-libraries/src/include/vulkan/utility/vk_small_containers.hpp	2024-05-17 12:59:49.236235446 +0200
-@@ -8,6 +8,7 @@
- 
- #pragma once
- 
-+#include <memory>
- #include <cassert>
- #include <unordered_map>
- #include <unordered_set>

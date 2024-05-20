@@ -217,6 +217,7 @@
 %global bundlepylibs 0
 %global bundlelibxslt 0
 %global bundleflac 0
+%global bundledoubleconversion 0
 
 # RHEL 7.9 dropped minizip.
 # enable bundleminizip for Fedora > 39 due to switch to minizip-ng
@@ -242,7 +243,6 @@
 %global bundlelcms2 1
 %global bundlelibtiff 1
 %global bundlecrc32c 1
-%global bundledoubleconversion 1
 %global bundlelibsecret 1
 %global bundlelibXNVCtrl 1
 %global bundlelibxml 1
@@ -276,7 +276,6 @@
 %global bundlecrc32c 0
 %global bundleharfbuzz 0
 %endif
-%global bundledoubleconversion 0
 %global bundlelibsecret 0
 %global bundlelibXNVCtrl 0
 %global bundlelibxml 0
@@ -318,7 +317,7 @@
 
 Name:	chromium%{chromium_channel}
 Version: 125.0.6422.60
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -430,6 +429,7 @@ Patch120: chromium-117-el7-string-convert.patch
 Patch121: chromium-125-el7-assert.patch
 Patch122: chromium-125-el7-constexpr.patch
 Patch123: chromium-125-el7-type-alias.patch
+Patch124: chromium-125-el7-optional-workaround-assert.patch
 
 # system ffmpeg
 # need for old ffmpeg 5.x on epel9
@@ -567,7 +567,10 @@ Patch413: fix-unknown-warning-option-messages.diff
 # upstream patches
 # 64kpage support on el8
 Patch500: chromium-124-el8-support-64kpage.patch
+# add missing include for usage of FieldDataManager in autofill_agent.h
 Patch501: chromium-125-missing-include-FieldDataManager.patch
+# [devtools] fix a missing build dependency to a generated file
+Patch502: chromium-125-devtools-build-dependency.patch
 
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
 # http://build.chromium.org/buildbot/official/
@@ -878,30 +881,13 @@ BuildRequires:	mesa-libGL-devel
 BuildRequires:	opus-devel
 %endif
 
-BuildRequires:	perl(Switch)
 BuildRequires: %{chromium_pybin}
 BuildRequires:	pkgconfig(gtk+-3.0)
-BuildRequires:	python3-devel
-BuildRequires: python3-zipp
-BuildRequires: python3-simplejson
-BuildRequires: python3-importlib-metadata
-
-%if 0%{?rhel} == 7 || 0%{?rhel} == 8  
-BuildRequires: python3-dataclasses
-%endif
 
 %if ! %{bundlepylibs}
 %if 0%{?fedora} || 0%{?rhel} >= 8
-BuildRequires: python3-beautifulsoup4
-BuildRequires: python3-html5lib
-BuildRequires: python3-markupsafe
-BuildRequires: python3-ply
 BuildRequires: python3-jinja2
 %else
-BuildRequires: python-beautifulsoup4
-BuildRequires: python-html5lib
-BuildRequires: python-markupsafe
-BuildRequires: python-ply
 BuildRequires: python-jinja2
 %endif
 %endif
@@ -1192,6 +1178,7 @@ udev.
 
 # EPEL specific patches
 %if 0%{?rhel} == 7
+cp /opt/rh/%{toolset}-%{dts_version}/root/usr/include/c++/%{dts_version}/optional .
 %patch -P100 -p1 -b .el7-memfd-fcntl-include
 %patch -P101 -p1 -b .wayland-strndup-error
 %patch -P102 -p1 -b .default-constructor-involving-anonymous-union
@@ -1216,6 +1203,7 @@ udev.
 %patch -P121 -p1 -b .assert
 %patch -P122 -p1 -b .constexpr
 %patch -P123 -p1 -b .el7-type-alias
+%patch -P124 -p1 -b .el7-workaround-assert
 %endif
 
 %if 0%{?rhel} == 9
@@ -1335,6 +1323,7 @@ udev.
 %endif
 %endif
 %patch -P501 -p1 -b .missing-include-FieldDataManage
+%patch -P502 -p1 -b .devtools-build-dependency
 
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
@@ -1547,7 +1536,7 @@ CHROMIUM_CORE_GN_DEFINES+=' enable_iterator_debugging=false'
 CHROMIUM_CORE_GN_DEFINES+=' enable_vr=false'
 CHROMIUM_CORE_GN_DEFINES+=' build_dawn_tests=false enable_perfetto_unittests=false'
 CHROMIUM_CORE_GN_DEFINES+=' disable_fieldtrial_testing_config=true'
-CHROMIUM_CORE_GN_DEFINES+=' symbol_level=%{debug_level}'
+CHROMIUM_CORE_GN_DEFINES+=' symbol_level=%{debug_level} blink_symbol_level=%{debug_level}'
 CHROMIUM_CORE_GN_DEFINES+=' angle_has_histograms=false'
 export CHROMIUM_CORE_GN_DEFINES
 
@@ -2129,6 +2118,10 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Mon May 20 2024 Than Ngo <than@redhat.com> - 125.0.6422.60-3
+- remove unneeded BRs
+- workarounds for el7 build
+
 * Sun May 19 2024 Than Ngo <than@redhat.com> - 125.0.6422.60-2
 - fix build errors on el7
 
