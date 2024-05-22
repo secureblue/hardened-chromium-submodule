@@ -211,13 +211,17 @@
 %global bundlelibaom 1
 %global bundlelibavif 1
 %global bundlesnappy 1
-
-# Fedora's Python 2 stack is being removed, we use the bundled Python libraries
-# This can be revisited once we upgrade to Python 3
 %global bundlepylibs 0
 %global bundlelibxslt 0
 %global bundleflac 0
 %global bundledoubleconversion 0
+%global bundlelibXNVCtrl 0
+%global bundlehighway 0
+%global bundlelibusbx 0
+%global bundlelibevent 0
+%global bundlelibsecret 0
+%global bundleopus 0
+%global bundlelcms2 0
 
 # RHEL 7.9 dropped minizip.
 # enable bundleminizip for Fedora > 39 due to switch to minizip-ng
@@ -228,8 +232,6 @@
 %endif
 
 %if 0%{?rhel} == 7 || 0%{?rhel} == 8
-%global bundleopus 1
-%global bundlelibusbx 1
 %global bundleharfbuzz 1
 %global bundlelibwebp 1
 %global bundlelibpng 1
@@ -240,14 +242,9 @@
 %global bundleffmpegfree 1
 %global bundlebrotli 1
 %global bundlelibopenjpeg2 1
-%global bundlelcms2 1
 %global bundlelibtiff 1
 %global bundlecrc32c 1
-%global bundlelibsecret 1
-%global bundlelibXNVCtrl 1
 %global bundlelibxml 1
-%global bundlelibevent 1
-%global bundlehighway 1
 %global bundledav1d 1
 %else
 %if 0%{?fedora} > 38 || 0%{?rhel} > 9
@@ -255,10 +252,7 @@
 %else
 %global bundlebrotli 1
 %endif
-%global bundlehighway 0
 %global bundledav1d 0
-%global bundleopus 0
-%global bundlelibusbx 0
 %global bundlelibwebp 0
 %global bundlelibpng 0
 %global bundlelibjpeg 0
@@ -267,7 +261,6 @@
 %global bundleffmpegfree 0
 %global bundlefreetype 0
 %global bundlelibopenjpeg2 0
-%global bundlelcms2 0
 %global bundlelibtiff 0
 %if 0%{?rhel} == 9
 %global bundlecrc32c 1
@@ -276,10 +269,7 @@
 %global bundlecrc32c 0
 %global bundleharfbuzz 0
 %endif
-%global bundlelibsecret 0
-%global bundlelibXNVCtrl 0
 %global bundlelibxml 0
-%global bundlelibevent 0
 %endif
 
 ### From 2013 until early 2021, Google permitted distribution builds of
@@ -316,8 +306,8 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 125.0.6422.60
-Release: 3%{?dist}
+Version: 125.0.6422.76
+Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -441,6 +431,8 @@ Patch131: chromium-107-proprietary-codecs.patch
 Patch132: chromium-118-sigtrap_system_ffmpeg.patch
 # need for old ffmpeg 6.0/5.x on epel9 and fedora < 40
 Patch133: chromium-121-system-old-ffmpeg.patch
+# disable FFmpegAllowLists by default to allow external ffmpeg
+patch134: chromium-125-disable-FFmpegAllowLists.patch
 
 # revert AV1 VAAPI video encode due to old libva on el9 (rhel9.3)
 Patch140: chromium-122-revert-av1enc-el9.patch
@@ -486,9 +478,6 @@ Patch354: chromium-120-split-threshold-for-reg-with-hint.patch
 
 # use system libstdc++
 Patch355: chromium-125-system-libstdc++.patch
-
-# disable FFmpegAllowLists by default to allow external ffmpeg
-patch356: chromium-125-disable-FFmpegAllowLists.patch
 
 # set clang_lib path
 Patch358: chromium-124-rust-clang_lib.patch
@@ -1174,6 +1163,7 @@ udev.
 %patch -P131 -p1 -b .prop-codecs
 %patch -P132 -p1 -b .sigtrap_system_ffmpeg
 %patch -P133 -p1 -b .system-old-ffmpeg
+%patch -P134 -p1 -b .disable-FFmpegAllowLists
 %endif
 
 # EPEL specific patches
@@ -1250,7 +1240,6 @@ cp /opt/rh/%{toolset}-%{dts_version}/root/usr/include/c++/%{dts_version}/optiona
 %if ! %{use_custom_libcxx}
 %patch -P355 -p1 -b .system-libstdc++
 %endif
-%patch -P356 -p1 -b .disable-FFmpegAllowLists
 %patch -P358 -p1 -b .rust-clang_lib
 %patch -P359 -p1 -b .libavif-deps
 
@@ -2118,6 +2107,14 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Wed May 22 2024 Than Ngo <than@redhat.com> - 125.0.6422.76-1
+- fix bz#2282246, update to 125.0.6422.76
+  * High CVE-2024-5157: Use after free in Scheduling
+  * High CVE-2024-5158: Type Confusion in V8
+  * High CVE-2024-5159: Heap buffer overflow in ANGLE
+  * High CVE-2024-5160: Heap buffer overflow in Dawn
+- cleanup
+
 * Mon May 20 2024 Than Ngo <than@redhat.com> - 125.0.6422.60-3
 - remove unneeded BRs
 - workarounds for el7 build
