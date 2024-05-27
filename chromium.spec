@@ -36,7 +36,7 @@
 # enable|disable headless client build
 %global build_headless 1
 %ifarch ppc64le
-%global build_headless 0
+%global cfi 0
 %endif
 
 # enable|disable chrome-remote-desktop build
@@ -179,6 +179,11 @@
 %endif
 %endif
 
+%ifarch ppc64le
+# workaround for a bug in new llvm on f40/rawhide (ppc64le)
+%global cfi 0
+%endif
+
 # set correct toolchain
 %if %{clang}
 %global toolchain clang
@@ -307,7 +312,7 @@
 
 Name:	chromium%{chromium_channel}
 Version: 125.0.6422.112
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -674,9 +679,7 @@ BuildRequires: pkgconfig(Qt6Core)
 BuildRequires: pkgconfig(Qt6Widgets)
 %endif
 
-%if %{cfi}
 BuildRequires: compiler-rt
-%endif
 
 %if ! %{bundleharfbuzz}
 BuildRequires:	harfbuzz-devel >= 2.4.0
@@ -1471,7 +1474,7 @@ sed -i 's|OFFICIAL_BUILD|GOOGLE_CHROME_BUILD|g' tools/generate_shim_headers/gene
 CHROMIUM_CORE_GN_DEFINES+=' chrome_pgo_phase=0'
 
 %if ! %{cfi}
-CHROMIUM_CORE_GN_DEFINES+=' is_cfi=false'
+CHROMIUM_CORE_GN_DEFINES+=' is_cfi=false use_thin_lto=false'
 %endif
 
 %if %{useapikey}
@@ -2107,6 +2110,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Tue May 28 2024 Than Ngo <than@redhat.com> - 125.0.6422.112-2
+- Workaround for build error on pp64le
+
 * Sun May 26 2024 Than Ngo <than@redhat.com> - 125.0.6422.112-1
 - update to 125.0.6422.112
   * High CVE-2024-5274: Type Confusion in V8
