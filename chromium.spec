@@ -36,7 +36,7 @@
 # enable|disable headless client build
 %global build_headless 1
 %ifarch ppc64le
-%global cfi 0
+%global build_headless 0
 %endif
 
 # enable|disable chrome-remote-desktop build
