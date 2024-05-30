@@ -99,6 +99,10 @@
 %endif
 %endif
 
+%if 0%{?fedora} >= 40
+%global noopenh264 1
+%endif
+
 # Workaround for https://bugzilla.redhat.com/show_bug.cgi?id=2239523
 # Disable BTI until this is fixed upstream.
 %global disable_bti 0
@@ -312,7 +316,7 @@
 
 Name:	chromium%{chromium_channel}
 Version: 125.0.6422.112
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -649,6 +653,10 @@ Conflicts: ffmpeg-libs%{_isa} < 5.1.4
 Conflicts: libavformat-free%{_isa} < 6.0.1
 Conflicts: ffmpeg-libs%{_isa} < 6.0.1-2
 %endif
+%endif
+
+%if 0%{?noopenh264}
+BuildRequires: pkgconfig(openh264)
 %endif
 
 # build with system libaom
@@ -1542,8 +1550,14 @@ CHROMIUM_BROWSER_GN_DEFINES+=' ffmpeg_branding="Chrome" proprietary_codecs=true 
 %else
 CHROMIUM_BROWSER_GN_DEFINES+=' ffmpeg_branding="Chromium" proprietary_codecs=false is_component_ffmpeg=false enable_ffmpeg_video_decoders=false media_use_ffmpeg=true'
 %endif
+# link against noopenh264 library
+%if 0%{?noopenh264}
+CHROMIUM_BROWSER_GN_DEFINES+=' media_use_openh264=true'
+CHROMIUM_BROWSER_GN_DEFINES+=' rtc_use_h264=true'
+%else
 CHROMIUM_BROWSER_GN_DEFINES+=' media_use_openh264=false'
 CHROMIUM_BROWSER_GN_DEFINES+=' rtc_use_h264=false'
+%endif
 CHROMIUM_BROWSER_GN_DEFINES+=' use_kerberos=true'
 
 %if %{use_qt}
@@ -1701,6 +1715,9 @@ system_libs=()
 %endif
 %if ! %{bundleflac}
 	system_libs+=(flac)
+%endif
+%if 0%{?noopenh264}
+	system_libs+=(openh264)
 %endif
 
 build/linux/unbundle/replace_gn_files.py --system-libraries ${system_libs[@]}
@@ -2110,6 +2127,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Wed May 29 2024 Than Ngo <than@redhat.com> - 125.0.6422.112-3
+- build against noopenh264
+
 * Tue May 28 2024 Than Ngo <than@redhat.com> - 125.0.6422.112-2
 - Workaround for build error on pp64le
 
