@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# Copyright 2021-2023, Than Ngo <than@redhat.com>
+# Copyright 2021-2024, Than Ngo <than@redhat.com>
 # Copyright 2010,2015-2019 Tom Callaway <tcallawa@redhat.com>
 # Copyright 2013-2016 Tomas Popela <tpopela@redhat.com>
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -335,6 +335,8 @@ if __name__ == '__main__':
   if (args.ffmpegclean):
     print("Cleaning ffmpeg from proprietary things...")
     os.system("./clean_ffmpeg.sh %s %d" % (latest_dir, 0 if args.ffmpegarm else 1))
+    print("Cleaning openh264 from proprietary things...")
+    os.system("find %s/third_party/openh264/src -type f -not -name '*.h' -delete " % latest_dir)
     print("Done!")
 
   if (not args.prep):
