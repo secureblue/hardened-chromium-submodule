@@ -315,8 +315,8 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 125.0.6422.112
-Release: 3%{?dist}
+Version: 125.0.6422.141
+Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -2127,6 +2127,18 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Fri May 31 2024 Than Ngo <than@redhat.com> - 125.0.6422.141-1
+- update to 125.0.6422.141
+  * High CVE-2024-5493: Heap buffer overflow in WebRTC
+  * High CVE-2024-5494: Use after free in Dawn
+  * High CVE-2024-5495: Use after free in Dawn
+  * High CVE-2024-5496: Use after free in Media Session
+  * High CVE-2024-5497: Out of bounds memory access in Keyboard Inputs
+  * High CVE-2024-5498: Use after free in Presentation API
+  * High CVE-2024-5499: Out of bounds write in Streams API
+- fixed rhbz#2264332 - Chromium is unable to send/receive video on MS Teams
+- cleanup chromium.conf
+
 * Wed May 29 2024 Than Ngo <than@redhat.com> - 125.0.6422.112-3
 - build against noopenh264
 
