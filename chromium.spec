@@ -687,7 +687,11 @@ BuildRequires: pkgconfig(Qt6Core)
 BuildRequires: pkgconfig(Qt6Widgets)
 %endif
 
+%if 0%{?rhel} == 7
+BuildRequires: llvm-toolset-%{llvm_toolset_version}-compiler-rt
+%else
 BuildRequires: compiler-rt
+%endif
 
 %if ! %{bundleharfbuzz}
 BuildRequires:	harfbuzz-devel >= 2.4.0
