@@ -209,10 +209,6 @@
 %endif
 %endif
 
-# Chromium's fork of ICU is now something we can't unbundle.
-# This is left here to ease the change if that ever switches.
-%global bundleicu 1
-
 # bundle re2, jsoncpp, woff2 - build errors with use_custom_libcxx=true
 %global bundlere2 1
 %global bundlejsoncpp 1
@@ -250,6 +246,7 @@
 %global bundlefontconfig 1
 %global bundleffmpegfree 1
 %global bundlebrotli 1
+%global bundleicu 1
 %global bundlelibopenjpeg2 1
 %global bundlelibtiff 1
 %global bundlecrc32c 1
@@ -258,8 +255,10 @@
 %else
 %if 0%{?fedora} > 38 || 0%{?rhel} > 9
 %global bundlebrotli 0
+%global bundleicu 0
 %else
 %global bundlebrotli 1
+%global bundleicu 1
 %endif
 %global bundledav1d 0
 %global bundlelibwebp 0
@@ -826,7 +825,7 @@ BuildRequires:	libffi-devel
 # If this is true, we're using the bundled icu.
 # We'd like to use the system icu every time, but we cannot always do that.
 # Not newer than 54 (at least not right now)
-BuildRequires:	libicu-devel = 54.1
+BuildRequires:	libicu-devel >= 68
 %endif
 
 %if ! %{bundlelibjpeg}
@@ -1806,7 +1805,10 @@ ln -s ../..%{chromium_path}/%{chromium_browser_channel}.sh %{buildroot}%{_bindir
 mkdir -p %{buildroot}%{_mandir}/man1/
 
 pushd %{builddir}
-	cp -a chrom*.pak resources.pak icudtl.dat %{buildroot}%{chromium_path}
+%if %{bundleicu}
+	cp -a icudtl.dat %{buildroot}%{chromium_path}
+%endif
+	cp -a chrom*.pak resources.pak %{buildroot}%{chromium_path}
 	cp -a locales/*.pak %{buildroot}%{chromium_path}/locales/
 	%ifarch x86_64 aarch64 ppc64le
 		cp -a libvk_swiftshader.so %{buildroot}%{chromium_path}
@@ -1916,7 +1918,7 @@ popd
 # need to strip binaries explicitly when debug is disable
 %if ! %{enable_debug}
 pushd %{buildroot}%{chromium_path}/
-for f in *.so chrome_crashpad_handler chrome-sandbox chromium-browser headless_shell chromedriver ; do
+for f in *.so *.so.1 chrome_crashpad_handler chrome-sandbox chromium-browser headless_shell chromedriver ; do
    [ -f $f ] && strip $f
 done
 popd
@@ -2030,7 +2032,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %{chromium_path}/libEGL.so*
 %{chromium_path}/libGLESv2.so*
 %endif
+%if %{bundleicu}
 %{chromium_path}/icudtl.dat
+%endif
 %dir %{chromium_path}/
 %dir %{chromium_path}/locales/
 %lang(af) %{chromium_path}/locales/af.pak
