@@ -126,7 +126,7 @@
 %global useapikey 1
 
 # Leave this alone, please.
-%global builddir out/Release
+%global chromebuilddir out/Release
 %global headlessbuilddir out/Headless
 %global remotingbuilddir out/Remoting
 
@@ -1734,17 +1734,17 @@ fi
 %if %{bootstrap}
 tools/gn/bootstrap/bootstrap.py --gn-gen-args="$CHROMIUM_CORE_GN_DEFINES $CHROMIUM_BROWSER_GN_DEFINES"
 %else
-mkdir -p %{builddir} && cp -a %{_bindir}/gn %{builddir}/
+mkdir -p %{chromebuilddir} && cp -a %{_bindir}/gn %{chromebuilddir}/
 %endif
 
-%{builddir}/gn --script-executable=%{chromium_pybin} gen --args="$CHROMIUM_CORE_GN_DEFINES $CHROMIUM_BROWSER_GN_DEFINES" %{builddir}
+%{chromebuilddir}/gn --script-executable=%{chromium_pybin} gen --args="$CHROMIUM_CORE_GN_DEFINES $CHROMIUM_BROWSER_GN_DEFINES" %{chromebuilddir}
 
 %if %{build_headless}
-%{builddir}/gn --script-executable=%{chromium_pybin} gen --args="$CHROMIUM_CORE_GN_DEFINES $CHROMIUM_HEADLESS_GN_DEFINES" %{headlessbuilddir}
+%{chromebuilddir}/gn --script-executable=%{chromium_pybin} gen --args="$CHROMIUM_CORE_GN_DEFINES $CHROMIUM_HEADLESS_GN_DEFINES" %{headlessbuilddir}
 %endif
 
 %if %{build_remoting}
-%{builddir}/gn --script-executable=%{chromium_pybin} gen --args="$CHROMIUM_CORE_GN_DEFINES $CHROMIUM_BROWSER_GN_DEFINES" %{remotingbuilddir}
+%{chromebuilddir}/gn --script-executable=%{chromium_pybin} gen --args="$CHROMIUM_CORE_GN_DEFINES $CHROMIUM_BROWSER_GN_DEFINES" %{remotingbuilddir}
 %endif
 
 %if %{build_headless}
@@ -1752,18 +1752,18 @@ mkdir -p %{builddir} && cp -a %{_bindir}/gn %{builddir}/
 %build_target %{headlessbuilddir} headless_shell
 %endif
 
-%build_target %{builddir} chrome
-%build_target %{builddir} chrome_sandbox
+%build_target %{chromebuilddir} chrome
+%build_target %{chromebuilddir} chrome_sandbox
 
 %if %{build_chromedriver}
-%build_target %{builddir} chromedriver
+%build_target %{chromebuilddir} chromedriver
 %endif
 
 %if %{build_clear_key_cdm}
-%build_target %{builddir} clear_key_cdm
+%build_target %{chromebuilddir} clear_key_cdm
 %endif
 
-%build_target %{builddir} policy_templates
+%build_target %{chromebuilddir} policy_templates
 
 %if %{build_remoting}
 %build_target %{remotingbuilddir} remoting_all
@@ -1804,7 +1804,7 @@ sed -i "s|@@CHROMIUM_BROWSER_CHANNEL@@|$CHROMIUM_BROWSER_CHANNEL|g" %{buildroot}
 ln -s ../..%{chromium_path}/%{chromium_browser_channel}.sh %{buildroot}%{_bindir}/%{chromium_browser_channel}
 mkdir -p %{buildroot}%{_mandir}/man1/
 
-pushd %{builddir}
+pushd %{chromebuilddir}
 %if %{bundleicu}
 	cp -a icudtl.dat %{buildroot}%{chromium_path}
 %endif
