@@ -1,0 +1,96 @@
+diff -up chromium-126.0.6478.26/components/visited_url_ranking/internal/visited_url_ranking_service_impl.cc.std_variant chromium-126.0.6478.26/components/visited_url_ranking/internal/visited_url_ranking_service_impl.cc
+--- chromium-126.0.6478.26/components/visited_url_ranking/internal/visited_url_ranking_service_impl.cc.std_variant	2024-06-04 12:31:10.602282813 +0200
++++ chromium-126.0.6478.26/components/visited_url_ranking/internal/visited_url_ranking_service_impl.cc	2024-06-04 13:21:50.121345183 +0200
+@@ -7,7 +7,6 @@
+ #include <map>
+ #include <memory>
+ #include <queue>
+-#include <variant>
+ #include <vector>
+ 
+ #include "base/barrier_callback.h"
+@@ -41,20 +40,16 @@ std::vector<URLVisitAggregate> ComputeUR
+     for (std::pair<const URLMergeKey, URLVisitAggregate::URLVisitVariant>&
+              url_data : result.data) {
+       URLVisitAggregate& aggregate = url_visit_map[url_data.first];
+-      std::visit(
+-          URLVisitVariantHelper{
+-              [&aggregate](URLVisitAggregate::TabData& tab_data) {
+-                aggregate.fetcher_data_map.emplace(
+-                    tab_data.last_active_tab.session_name.has_value()
+-                        ? Fetcher::kSession
+-                        : Fetcher::kTabModel,
+-                    std::move(tab_data));
+-              },
+-              [&aggregate](URLVisitAggregate::HistoryData& history_data) {
+-                aggregate.fetcher_data_map.emplace(Fetcher::kHistory,
+-                                                   std::move(history_data));
+-              }},
+-          url_data.second);
++      if (std::holds_alternative<URLVisitAggregate::TabData>(url_data.second)) {
++        auto& tab_data = std::get<URLVisitAggregate::TabData>(url_data.second);
++        aggregate.fetcher_data_map.emplace(
++            tab_data.last_active_tab.session_name.has_value()
++                ? Fetcher::kSession
++                : Fetcher::kTabModel,
++            std::move(tab_data));
++      }
++      // TODO(crbug.com/330580109): Add support for history fetcher and
++      // associated aggregate data type.
+     }
+   }
+ 
+diff -up chromium-126.0.6478.26/components/visited_url_ranking/public/url_visit.cc.std_variant chromium-126.0.6478.26/components/visited_url_ranking/public/url_visit.cc
+--- chromium-126.0.6478.26/components/visited_url_ranking/public/url_visit.cc.std_variant	2024-06-04 12:29:20.593240495 +0200
++++ chromium-126.0.6478.26/components/visited_url_ranking/public/url_visit.cc	2024-06-04 12:29:57.253921979 +0200
+@@ -37,14 +37,12 @@ URLVisitAggregate& URLVisitAggregate::op
+ std::set<const GURL*> URLVisitAggregate::GetAssociatedURLs() const {
+   std::set<const GURL*> urls = {};
+   for (const auto& fetcher_entry : fetcher_data_map) {
+-    std::visit(URLVisitVariantHelper{
+-                   [&urls](const URLVisitAggregate::TabData& tab_data) {
+-                     urls.insert(&tab_data.last_active_tab.visit.url);
+-                   },
+-                   [&urls](const URLVisitAggregate::HistoryData& history_data) {
+-                     urls.insert(&history_data.last_visited.url_row.url());
+-                   }},
+-               fetcher_entry.second);
++    if (std::holds_alternative<URLVisitAggregate::TabData>(
++            fetcher_entry.second)) {
++      const auto& tab_data =
++          std::get<URLVisitAggregate::TabData>(fetcher_entry.second);
++      urls.insert(&tab_data.last_active_tab.visit.url);
++    }
+   }
+   return urls;
+ }
+diff -up chromium-126.0.6478.26/components/visited_url_ranking/public/url_visit.h.std_variant chromium-126.0.6478.26/components/visited_url_ranking/public/url_visit.h
+--- chromium-126.0.6478.26/components/visited_url_ranking/public/url_visit.h.std_variant	2024-06-04 11:05:39.505847241 +0200
++++ chromium-126.0.6478.26/components/visited_url_ranking/public/url_visit.h	2024-06-04 13:22:26.518007748 +0200
+@@ -8,6 +8,7 @@
+ #include <memory>
+ #include <optional>
+ #include <set>
++#include <variant>
+ #include <vector>
+ 
+ #include "base/functional/callback.h"
+@@ -140,18 +141,6 @@ struct URLVisitAggregate {
+   bool bookmarked = false;
+ };
+ 
+-// Helper to visit each variant of URLVisitVariant.
+-// Usage:
+-//   std::visit(URLVisitVariantHelper{
+-//         [](Variant1& variant1) {},
+-//         [](Variant2& variant1) {},
+-//         [](Variant3& variant1) {},
+-//      variant_data);
+-template <class... Ts>
+-struct URLVisitVariantHelper : Ts... {
+-  using Ts::operator()...;
+-};
+-
+ }  // namespace visited_url_ranking
+ 
+ #endif  // COMPONENTS_VISITED_URL_RANKING_PUBLIC_URL_VISIT_H_

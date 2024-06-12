@@ -1,7 +1,7 @@
-diff -up chromium-99.0.4844.51/printing/backend/cups_helper.cc.el7cups chromium-99.0.4844.51/printing/backend/cups_helper.cc
---- chromium-99.0.4844.51/printing/backend/cups_helper.cc.el7cups	2022-02-28 19:05:55.000000000 -0500
-+++ chromium-99.0.4844.51/printing/backend/cups_helper.cc	2022-03-05 15:17:45.516887985 -0500
-@@ -34,18 +34,6 @@ namespace printing {
+diff -up chromium-126.0.6478.26/printing/backend/cups_helper.cc.el7cups chromium-126.0.6478.26/printing/backend/cups_helper.cc
+--- chromium-126.0.6478.26/printing/backend/cups_helper.cc.el7cups	2024-06-03 17:16:32.197509643 +0200
++++ chromium-126.0.6478.26/printing/backend/cups_helper.cc	2024-06-03 17:32:23.028376333 +0200
+@@ -41,18 +41,6 @@ namespace printing {
  // This section contains helper code for PPD parsing for semantic capabilities.
  namespace {
  
@@ -20,62 +20,57 @@ diff -up chromium-99.0.4844.51/printing/backend/cups_helper.cc.el7cups chromium-
  // CUPS default max copies value (parsed from kCupsMaxCopies PPD attribute).
  constexpr int32_t kDefaultMaxCopies = 9999;
  constexpr char kCupsMaxCopies[] = "cupsMaxCopies";
-@@ -527,8 +515,7 @@ const int kDefaultIPPServerPort = 631;
+@@ -761,8 +749,7 @@ const int kDefaultIPPServerPort = 631;
  // Helper wrapper around http_t structure, with connection and cleanup
  // functionality.
  HttpConnectionCUPS::HttpConnectionCUPS(const GURL& print_server_url,
 -                                       http_encryption_t encryption,
--                                       bool blocking)
-+                                       http_encryption_t encryption)
-     : http_(nullptr) {
+-                                       bool blocking) {
++                                       http_encryption_t encryption) {
    // If we have an empty url, use default print server.
    if (print_server_url.is_empty())
-@@ -538,17 +525,10 @@ HttpConnectionCUPS::HttpConnectionCUPS(c
+     return;
+@@ -771,31 +758,22 @@ HttpConnectionCUPS::HttpConnectionCUPS(c
    if (port == url::PORT_UNSPECIFIED)
      port = kDefaultIPPServerPort;
  
 -  if (httpConnect2) {
--    http_ = httpConnect2(print_server_url.host().c_str(), port,
--                         /*addrlist=*/nullptr, AF_UNSPEC, encryption,
--                         blocking ? 1 : 0, kCupsTimeout.InMilliseconds(),
--                         /*cancel=*/nullptr);
+-    http_.reset(httpConnect2(print_server_url.host().c_str(), port,
+-                             /*addrlist=*/nullptr, AF_UNSPEC, encryption,
+-                             blocking ? 1 : 0, kCupsTimeout.InMilliseconds(),
+-                             /*cancel=*/nullptr));
 -  } else {
 -    // Continue to use deprecated CUPS calls because because older Linux
 -    // distribution such as RHEL/CentOS 7 are shipped with CUPS 1.6.
--    http_ =
--        httpConnectEncrypt(print_server_url.host().c_str(), port, encryption);
+-    http_.reset(
++  http_.reset(
+         httpConnectEncrypt(print_server_url.host().c_str(), port, encryption));
 -  }
-+  // Continue to use deprecated CUPS calls because because older Linux
-+  // distribution such as RHEL/CentOS 7 are shipped with CUPS 1.6.
-+  http_ =
-+      httpConnectEncrypt(print_server_url.host().c_str(), port, encryption);
  
    if (!http_) {
      LOG(ERROR) << "CP_CUPS: Failed connecting to print server: "
-@@ -556,8 +536,6 @@ HttpConnectionCUPS::HttpConnectionCUPS(c
+                << print_server_url;
      return;
    }
- 
--  if (!httpConnect2)
--    httpBlocking(http_, blocking ? 1 : 0);
+-
+-  if (!httpConnect2) {
+-    httpBlocking(http(), blocking ? 1 : 0);
+-  }
  }
  
- HttpConnectionCUPS::~HttpConnectionCUPS() {
-@@ -565,6 +543,10 @@ HttpConnectionCUPS::~HttpConnectionCUPS(
-     httpClose(http_);
- }
+ HttpConnectionCUPS::~HttpConnectionCUPS() = default;
  
 +void HttpConnectionCUPS::SetBlocking(bool blocking) {
-+  httpBlocking(http_, blocking ? 1 : 0);
++  httpBlocking(http(), blocking ? 1 : 0);
 +}
 +
  http_t* HttpConnectionCUPS::http() {
-   return http_;
+   return http_.get();
  }
-diff -up chromium-99.0.4844.51/printing/backend/cups_helper.h.el7cups chromium-99.0.4844.51/printing/backend/cups_helper.h
---- chromium-99.0.4844.51/printing/backend/cups_helper.h.el7cups	2022-02-28 19:05:55.000000000 -0500
-+++ chromium-99.0.4844.51/printing/backend/cups_helper.h	2022-03-05 15:17:45.517887991 -0500
-@@ -34,10 +34,11 @@ constexpr cups_ptype_t kDestinationsFilt
+diff -up chromium-126.0.6478.26/printing/backend/cups_helper.h.el7cups chromium-126.0.6478.26/printing/backend/cups_helper.h
+--- chromium-126.0.6478.26/printing/backend/cups_helper.h.el7cups	2024-06-03 17:23:35.923307842 +0200
++++ chromium-126.0.6478.26/printing/backend/cups_helper.h	2024-06-03 17:25:50.887855460 +0200
+@@ -36,10 +36,11 @@ constexpr cups_ptype_t kDestinationsFilt
  class COMPONENT_EXPORT(PRINT_BACKEND) HttpConnectionCUPS {
   public:
    HttpConnectionCUPS(const GURL& print_server_url,
@@ -89,10 +84,10 @@ diff -up chromium-99.0.4844.51/printing/backend/cups_helper.h.el7cups chromium-9
    http_t* http();
  
   private:
-diff -up chromium-99.0.4844.51/printing/backend/print_backend_cups.cc.el7cups chromium-99.0.4844.51/printing/backend/print_backend_cups.cc
---- chromium-99.0.4844.51/printing/backend/print_backend_cups.cc.el7cups	2022-02-28 19:05:55.000000000 -0500
-+++ chromium-99.0.4844.51/printing/backend/print_backend_cups.cc	2022-03-05 15:17:45.517887991 -0500
-@@ -146,7 +146,7 @@ mojom::ResultCode PrintBackendCUPS::Enum
+diff -up chromium-126.0.6478.26/printing/backend/print_backend_cups.cc.el7cups chromium-126.0.6478.26/printing/backend/print_backend_cups.cc
+--- chromium-126.0.6478.26/printing/backend/print_backend_cups.cc.el7cups	2024-06-03 17:26:44.607871149 +0200
++++ chromium-126.0.6478.26/printing/backend/print_backend_cups.cc	2024-06-03 17:29:15.889810651 +0200
+@@ -149,7 +149,7 @@ mojom::ResultCode PrintBackendCUPS::Enum
    // not showing as available.  Using cupsEnumDests() allows us to do our own
    // filtering should any duplicates occur.
    CupsDestsData dests_data = {0, nullptr};
@@ -101,7 +96,7 @@ diff -up chromium-99.0.4844.51/printing/backend/print_backend_cups.cc.el7cups ch
    if (print_server_url_.is_empty()) {
      VLOG(1) << "CUPS: using cupsEnumDests to enumerate printers";
      if (!cupsEnumDests(CUPS_DEST_FLAGS_NONE, kCupsTimeoutMs,
-@@ -173,7 +173,7 @@ mojom::ResultCode PrintBackendCUPS::Enum
+@@ -176,7 +176,7 @@ mojom::ResultCode PrintBackendCUPS::Enum
      // no printer drivers installed.  Rely upon CUPS error code to distinguish
      // between these.
      DCHECK(!dests_data.dests);
@@ -110,7 +105,7 @@ diff -up chromium-99.0.4844.51/printing/backend/print_backend_cups.cc.el7cups ch
        VLOG(1) << "CUPS: Error getting printers from CUPS server"
                << ", server: " << print_server_url_
                << ", error: " << static_cast<int>(last_error) << " - "
-@@ -336,7 +336,8 @@ int PrintBackendCUPS::GetDests(cups_dest
+@@ -311,7 +311,8 @@ int PrintBackendCUPS::GetDests(cups_dest
    if (print_server_url_.is_empty())
      return cupsGetDests2(CUPS_HTTP_DEFAULT, dests);
  
@@ -120,7 +115,7 @@ diff -up chromium-99.0.4844.51/printing/backend/print_backend_cups.cc.el7cups ch
  
    // This call must be made in the same scope as `http` because its destructor
    // closes the connection.
-@@ -362,7 +363,8 @@ base::FilePath PrintBackendCUPS::GetPPD(
+@@ -337,7 +338,8 @@ base::FilePath PrintBackendCUPS::GetPPD(
      // connection will timeout after 10 seconds of no data period. And it will
      // return the same way as if data was completely and successfully
      // downloaded.
@@ -130,7 +125,7 @@ diff -up chromium-99.0.4844.51/printing/backend/print_backend_cups.cc.el7cups ch
      ppd_file_path = cupsGetPPD2(http.http(), name);
      // Check if the get full PPD, since non-blocking call may simply return
      // normally after timeout expired.
-@@ -398,7 +400,8 @@ PrintBackendCUPS::ScopedDestination Prin
+@@ -373,7 +375,8 @@ ScopedDestination PrintBackendCUPS::GetN
      // Use default (local) print server.
      dest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, printer_name.c_str(), nullptr);
    } else {

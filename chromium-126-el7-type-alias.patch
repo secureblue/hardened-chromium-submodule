@@ -1,7 +1,7 @@
-diff -up chromium-125.0.6422.60/components/plus_addresses/plus_address_service.cc.el7 chromium-125.0.6422.60/components/plus_addresses/plus_address_service.cc
---- chromium-125.0.6422.60/components/plus_addresses/plus_address_service.cc.el7	2024-05-18 14:12:06.510863456 +0200
-+++ chromium-125.0.6422.60/components/plus_addresses/plus_address_service.cc	2024-05-18 14:13:39.670666352 +0200
-@@ -165,7 +165,7 @@ std::vector<Suggestion> PlusAddressServi
+diff -up chromium-126.0.6478.26/components/plus_addresses/plus_address_service.cc.el7-type-alias chromium-126.0.6478.26/components/plus_addresses/plus_address_service.cc
+--- chromium-126.0.6478.26/components/plus_addresses/plus_address_service.cc.el7-type-alias	2024-05-29 18:01:08.000000000 +0200
++++ chromium-126.0.6478.26/components/plus_addresses/plus_address_service.cc	2024-06-02 17:32:29.917153207 +0200
+@@ -196,7 +196,7 @@ std::vector<Suggestion> PlusAddressServi
      bool is_off_the_record,
      std::u16string_view focused_field_value,
      autofill::AutofillSuggestionTriggerSource trigger_source) {
@@ -10,16 +10,16 @@ diff -up chromium-125.0.6422.60/components/plus_addresses/plus_address_service.c
    if (!SupportsPlusAddresses(last_committed_primary_main_frame_origin,
                               is_off_the_record)) {
      return {};
-@@ -176,7 +176,7 @@ std::vector<Suggestion> PlusAddressServi
+@@ -207,7 +207,7 @@ std::vector<Suggestion> PlusAddressServi
    std::optional<std::string> maybe_address =
-       GetPlusAddress(last_committed_primary_main_frame_origin);
+       GetPlusAddress(OriginToFacet(last_committed_primary_main_frame_origin));
    if (maybe_address == std::nullopt) {
 -    if (trigger_source != kManualFallbackPlusAddresses &&
 +    if (trigger_source != AutofillSuggestionTriggerSource::kManualFallbackPlusAddresses &&
          !normalized_field_value.empty()) {
        return {};
      }
-@@ -191,7 +191,7 @@ std::vector<Suggestion> PlusAddressServi
+@@ -222,7 +222,7 @@ std::vector<Suggestion> PlusAddressServi
  
    // Only suggest filling a plus address whose prefix matches the field's value.
    std::u16string address = base::UTF8ToUTF16(*maybe_address);

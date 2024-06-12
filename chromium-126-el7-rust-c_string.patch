@@ -1,0 +1,1667 @@
+replace c_string as it is not supported by old rust in el7
+
+diff --git a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/gen/clone.rs b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/gen/clone.rs
+--- a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/gen/clone.rs
++++ b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/gen/clone.rs
+@@ -1338,6 +1338,7 @@ impl Clone for crate::Lit {
+         match self {
+             crate::Lit::Str(v0) => crate::Lit::Str(v0.clone()),
+             crate::Lit::ByteStr(v0) => crate::Lit::ByteStr(v0.clone()),
++            crate::Lit::CStr(v0) => crate::Lit::CStr(v0.clone()),
+             crate::Lit::Byte(v0) => crate::Lit::Byte(v0.clone()),
+             crate::Lit::Char(v0) => crate::Lit::Char(v0.clone()),
+             crate::Lit::Int(v0) => crate::Lit::Int(v0.clone()),
+diff --git a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/gen/debug.rs b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/gen/debug.rs
+--- a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/gen/debug.rs
++++ b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/gen/debug.rs
+@@ -1958,6 +1958,7 @@ impl Debug for crate::Lit {
+         match self {
+             crate::Lit::Str(v0) => v0.debug(formatter, "Str"),
+             crate::Lit::ByteStr(v0) => v0.debug(formatter, "ByteStr"),
++            crate::Lit::CStr(v0) => v0.debug(formatter, "CStr"),
+             crate::Lit::Byte(v0) => v0.debug(formatter, "Byte"),
+             crate::Lit::Char(v0) => v0.debug(formatter, "Char"),
+             crate::Lit::Int(v0) => v0.debug(formatter, "Int"),
+diff --git a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/gen/eq.rs b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/gen/eq.rs
+--- a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/gen/eq.rs
++++ b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/gen/eq.rs
+@@ -1300,6 +1300,7 @@ impl PartialEq for crate::Lit {
+         match (self, other) {
+             (crate::Lit::Str(self0), crate::Lit::Str(other0)) => self0 == other0,
+             (crate::Lit::ByteStr(self0), crate::Lit::ByteStr(other0)) => self0 == other0,
++            (crate::Lit::CStr(self0), crate::Lit::CStr(other0)) => self0 == other0,
+             (crate::Lit::Byte(self0), crate::Lit::Byte(other0)) => self0 == other0,
+             (crate::Lit::Char(self0), crate::Lit::Char(other0)) => self0 == other0,
+             (crate::Lit::Int(self0), crate::Lit::Int(other0)) => self0 == other0,
+@@ -1325,6 +1326,8 @@ impl Eq for crate::LitByte {}
+ #[cfg_attr(doc_cfg, doc(cfg(feature = "extra-traits")))]
+ impl Eq for crate::LitByteStr {}
+ #[cfg_attr(doc_cfg, doc(cfg(feature = "extra-traits")))]
++impl Eq for crate::LitCStr {}
++#[cfg_attr(doc_cfg, doc(cfg(feature = "extra-traits")))]
+ impl Eq for crate::LitChar {}
+ #[cfg_attr(doc_cfg, doc(cfg(feature = "extra-traits")))]
+ impl Eq for crate::LitFloat {}
+diff --git a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/gen/fold.rs b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/gen/fold.rs
+--- a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/gen/fold.rs
++++ b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/gen/fold.rs
+@@ -581,6 +581,9 @@ pub trait Fold {
+     fn fold_lit_byte_str(&mut self, i: crate::LitByteStr) -> crate::LitByteStr {
+         fold_lit_byte_str(self, i)
+     }
++    fn fold_lit_cstr(&mut self, i: crate::LitCStr) -> crate::LitCStr {
++        fold_lit_cstr(self, i)
++    }
+     fn fold_lit_char(&mut self, i: crate::LitChar) -> crate::LitChar {
+         fold_lit_char(self, i)
+     }
+@@ -2628,6 +2631,7 @@ where
+         crate::Lit::ByteStr(_binding_0) => {
+             crate::Lit::ByteStr(f.fold_lit_byte_str(_binding_0))
+         }
++        crate::Lit::CStr(_binding_0) => crate::Lit::CStr(f.fold_lit_cstr(_binding_0)),
+         crate::Lit::Byte(_binding_0) => crate::Lit::Byte(f.fold_lit_byte(_binding_0)),
+         crate::Lit::Char(_binding_0) => crate::Lit::Char(f.fold_lit_char(_binding_0)),
+         crate::Lit::Int(_binding_0) => crate::Lit::Int(f.fold_lit_int(_binding_0)),
+@@ -2663,6 +2667,15 @@ where
+     node.set_span(span);
+     node
+ }
++pub fn fold_lit_cstr<F>(f: &mut F, node: crate::LitCStr) -> crate::LitCStr
++where
++    F: Fold + ?Sized,
++{
++    let span = f.fold_span(node.span());
++    let mut node = node;
++    node.set_span(span);
++    node
++}
+ pub fn fold_lit_char<F>(f: &mut F, node: crate::LitChar) -> crate::LitChar
+ where
+     F: Fold + ?Sized,
+diff --git a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/gen/hash.rs b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/gen/hash.rs
+--- a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/gen/hash.rs
++++ b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/gen/hash.rs
+@@ -1682,28 +1682,32 @@ impl Hash for crate::Lit {
+                 state.write_u8(1u8);
+                 v0.hash(state);
+             }
+-            crate::Lit::Byte(v0) => {
++            crate::Lit::CStr(v0) => {
+                 state.write_u8(2u8);
+                 v0.hash(state);
+             }
+-            crate::Lit::Char(v0) => {
++            crate::Lit::Byte(v0) => {
+                 state.write_u8(3u8);
+                 v0.hash(state);
+             }
+-            crate::Lit::Int(v0) => {
++            crate::Lit::Char(v0) => {
+                 state.write_u8(4u8);
+                 v0.hash(state);
+             }
+-            crate::Lit::Float(v0) => {
++            crate::Lit::Int(v0) => {
+                 state.write_u8(5u8);
+                 v0.hash(state);
+             }
+-            crate::Lit::Bool(v0) => {
++            crate::Lit::Float(v0) => {
+                 state.write_u8(6u8);
+                 v0.hash(state);
+             }
+-            crate::Lit::Verbatim(v0) => {
++            crate::Lit::Bool(v0) => {
+                 state.write_u8(7u8);
++                v0.hash(state);
++            }
++            crate::Lit::Verbatim(v0) => {
++                state.write_u8(8u8);
+                 v0.to_string().hash(state);
+             }
+         }
+diff --git a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/gen/visit.rs b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/gen/visit.rs
+--- a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/gen/visit.rs
++++ b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/gen/visit.rs
+@@ -547,6 +547,9 @@ pub trait Visit<'ast> {
+     fn visit_lit_byte_str(&mut self, i: &'ast crate::LitByteStr) {
+         visit_lit_byte_str(self, i);
+     }
++    fn visit_lit_cstr(&mut self, i: &'ast crate::LitCStr) {
++        visit_lit_cstr(self, i);
++    }
+     fn visit_lit_char(&mut self, i: &'ast crate::LitChar) {
+         visit_lit_char(self, i);
+     }
+@@ -2694,6 +2697,9 @@ where
+         crate::Lit::ByteStr(_binding_0) => {
+             v.visit_lit_byte_str(_binding_0);
+         }
++        crate::Lit::CStr(_binding_0) => {
++            v.visit_lit_cstr(_binding_0);
++        }
+         crate::Lit::Byte(_binding_0) => {
+             v.visit_lit_byte(_binding_0);
+         }
+@@ -2729,6 +2735,10 @@ pub fn visit_lit_byte_str<'ast, V>(v: &mut V, node: &'ast crate::LitByteStr)
+ where
+     V: Visit<'ast> + ?Sized,
+ {}
++pub fn visit_lit_cstr<'ast, V>(v: &mut V, node: &'ast crate::LitCStr)
++where
++    V: Visit<'ast> + ?Sized,
++{}
+ pub fn visit_lit_char<'ast, V>(v: &mut V, node: &'ast crate::LitChar)
+ where
+     V: Visit<'ast> + ?Sized,
+diff --git a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/gen/visit_mut.rs b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/gen/visit_mut.rs
+--- a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/gen/visit_mut.rs
++++ b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/gen/visit_mut.rs
+@@ -548,6 +548,9 @@ pub trait VisitMut {
+     fn visit_lit_byte_str_mut(&mut self, i: &mut crate::LitByteStr) {
+         visit_lit_byte_str_mut(self, i);
+     }
++    fn visit_lit_cstr_mut(&mut self, i: &mut crate::LitCStr) {
++        visit_lit_cstr_mut(self, i);
++    }
+     fn visit_lit_char_mut(&mut self, i: &mut crate::LitChar) {
+         visit_lit_char_mut(self, i);
+     }
+@@ -2694,6 +2697,9 @@ where
+         crate::Lit::ByteStr(_binding_0) => {
+             v.visit_lit_byte_str_mut(_binding_0);
+         }
++        crate::Lit::CStr(_binding_0) => {
++            v.visit_lit_cstr_mut(_binding_0);
++        }
+         crate::Lit::Byte(_binding_0) => {
+             v.visit_lit_byte_mut(_binding_0);
+         }
+@@ -2729,6 +2735,10 @@ pub fn visit_lit_byte_str_mut<V>(v: &mut V, node: &mut crate::LitByteStr)
+ where
+     V: VisitMut + ?Sized,
+ {}
++pub fn visit_lit_cstr_mut<V>(v: &mut V, node: &mut crate::LitCStr)
++where
++    V: VisitMut + ?Sized,
++{}
+ pub fn visit_lit_char_mut<V>(v: &mut V, node: &mut crate::LitChar)
+ where
+     V: VisitMut + ?Sized,
+diff --git a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/lib.rs b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/lib.rs
+--- a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/lib.rs
++++ b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/lib.rs
+@@ -418,7 +418,9 @@ mod lit;
+ #[doc(hidden)] // https://github.com/dtolnay/syn/issues/1566
+ pub use crate::lit::StrStyle;
+ #[doc(inline)]
+-pub use crate::lit::{Lit, LitBool, LitByte, LitByteStr, LitChar, LitFloat, LitInt, LitStr};
++pub use crate::lit::{
++    Lit, LitBool, LitByte, LitByteStr, LitCStr, LitChar, LitFloat, LitInt, LitStr,
++};
+ 
+ #[cfg(feature = "parsing")]
+ mod lookahead;
+diff --git a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/lit.rs b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/lit.rs
+--- a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/lit.rs
++++ b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/lit.rs
+@@ -6,6 +6,7 @@ use crate::{Error, Result};
+ use proc_macro2::{Ident, Literal, Span};
+ #[cfg(feature = "parsing")]
+ use proc_macro2::{TokenStream, TokenTree};
++use std::ffi::{CStr, CString};
+ use std::fmt::{self, Display};
+ #[cfg(feature = "extra-traits")]
+ use std::hash::{Hash, Hasher};
+@@ -27,6 +28,9 @@ ast_enum_of_structs! {
+         /// A byte string literal: `b"foo"`.
+         ByteStr(LitByteStr),
+ 
++        /// A nul-terminated C-string literal: `c"foo"`.
++        CStr(LitCStr),
++
+         /// A byte literal: `b'f'`.
+         Byte(LitByte),
+ 
+@@ -63,6 +67,13 @@ ast_struct! {
+     }
+ }
+ 
++ast_struct! {
++    /// A nul-terminated C-string literal: `c"foo"`.
++    pub struct LitCStr {
++        repr: Box<LitRepr>,
++    }
++}
++
+ ast_struct! {
+     /// A byte literal: `b'f'`.
+     pub struct LitByte {
+@@ -294,6 +305,41 @@ impl LitByteStr {
+     }
+ }
+ 
++impl LitCStr {
++    pub fn new(value: &CStr, span: Span) -> Self {
++        let mut token = Literal::c_string(value);
++        token.set_span(span);
++        LitCStr {
++            repr: Box::new(LitRepr {
++                token,
++                suffix: Box::<str>::default(),
++            }),
++        }
++    }
++
++    pub fn value(&self) -> CString {
++        let repr = self.repr.token.to_string();
++        let (value, _suffix) = value::parse_lit_c_str(&repr);
++        value
++    }
++
++    pub fn span(&self) -> Span {
++        self.repr.token.span()
++    }
++
++    pub fn set_span(&mut self, span: Span) {
++        self.repr.token.set_span(span);
++    }
++
++    pub fn suffix(&self) -> &str {
++        &self.repr.suffix
++    }
++
++    pub fn token(&self) -> Literal {
++        self.repr.token.clone()
++    }
++}
++
+ impl LitByte {
+     pub fn new(value: u8, span: Span) -> Self {
+         let mut token = Literal::u8_suffixed(value);
+@@ -368,7 +414,7 @@ impl LitInt {
+     pub fn new(repr: &str, span: Span) -> Self {
+         let (digits, suffix) = match value::parse_lit_int(repr) {
+             Some(parse) => parse,
+-            None => panic!("Not an integer literal: `{}`", repr),
++            None => panic!("not an integer literal: `{}`", repr),
+         };
+ 
+         let mut token: Literal = repr.parse().unwrap();
+@@ -447,7 +493,7 @@ impl From<Literal> for LitInt {
+                 }),
+             }
+         } else {
+-            panic!("Not an integer literal: `{}`", repr);
++            panic!("not an integer literal: `{}`", repr);
+         }
+     }
+ }
+@@ -462,7 +508,7 @@ impl LitFloat {
+     pub fn new(repr: &str, span: Span) -> Self {
+         let (digits, suffix) = match value::parse_lit_float(repr) {
+             Some(parse) => parse,
+-            None => panic!("Not a float literal: `{}`", repr),
++            None => panic!("not a float literal: `{}`", repr),
+         };
+ 
+         let mut token: Literal = repr.parse().unwrap();
+@@ -519,7 +565,7 @@ impl From<Literal> for LitFloat {
+                 }),
+             }
+         } else {
+-            panic!("Not a float literal: `{}`", repr);
++            panic!("not a float literal: `{}`", repr);
+         }
+     }
+ }
+@@ -555,7 +601,7 @@ impl LitBool {
+ 
+ #[cfg(feature = "extra-traits")]
+ mod debug_impls {
+-    use crate::lit::{LitBool, LitByte, LitByteStr, LitChar, LitFloat, LitInt, LitStr};
++    use crate::lit::{LitBool, LitByte, LitByteStr, LitCStr, LitChar, LitFloat, LitInt, LitStr};
+     use std::fmt::{self, Debug};
+ 
+     #[cfg_attr(doc_cfg, doc(cfg(feature = "extra-traits")))]
+@@ -590,6 +636,22 @@ mod debug_impls {
+         }
+     }
+ 
++    #[cfg_attr(doc_cfg, doc(cfg(feature = "extra-traits")))]
++    impl Debug for LitCStr {
++        fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
++            self.debug(formatter, "LitCStr")
++        }
++    }
++
++    impl LitCStr {
++        pub(crate) fn debug(&self, formatter: &mut fmt::Formatter, name: &str) -> fmt::Result {
++            formatter
++                .debug_struct(name)
++                .field("token", &format_args!("{}", self.repr.token))
++                .finish()
++        }
++    }
++
+     #[cfg_attr(doc_cfg, doc(cfg(feature = "extra-traits")))]
+     impl Debug for LitByte {
+         fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+@@ -750,6 +812,7 @@ macro_rules! lit_extra_traits {
+ 
+ lit_extra_traits!(LitStr);
+ lit_extra_traits!(LitByteStr);
++lit_extra_traits!(LitCStr);
+ lit_extra_traits!(LitByte);
+ lit_extra_traits!(LitChar);
+ lit_extra_traits!(LitInt);
+@@ -790,7 +853,7 @@ pub(crate) mod parsing {
+     use crate::buffer::Cursor;
+     use crate::error::Result;
+     use crate::lit::{
+-        value, Lit, LitBool, LitByte, LitByteStr, LitChar, LitFloat, LitFloatRepr, LitInt,
++        value, Lit, LitBool, LitByte, LitByteStr, LitCStr, LitChar, LitFloat, LitFloatRepr, LitInt,
+         LitIntRepr, LitStr,
+     };
+     use crate::parse::{Parse, ParseStream};
+@@ -889,6 +952,17 @@ pub(crate) mod parsing {
+         }
+     }
+ 
++    #[cfg_attr(doc_cfg, doc(cfg(feature = "parsing")))]
++    impl Parse for LitCStr {
++        fn parse(input: ParseStream) -> Result<Self> {
++            let head = input.fork();
++            match input.parse() {
++                Ok(Lit::CStr(lit)) => Ok(lit),
++                _ => Err(head.error("expected C string literal")),
++            }
++        }
++    }
++
+     #[cfg_attr(doc_cfg, doc(cfg(feature = "parsing")))]
+     impl Parse for LitByte {
+         fn parse(input: ParseStream) -> Result<Self> {
+@@ -947,7 +1021,7 @@ pub(crate) mod parsing {
+ 
+ #[cfg(feature = "printing")]
+ mod printing {
+-    use crate::lit::{LitBool, LitByte, LitByteStr, LitChar, LitFloat, LitInt, LitStr};
++    use crate::lit::{LitBool, LitByte, LitByteStr, LitCStr, LitChar, LitFloat, LitInt, LitStr};
+     use proc_macro2::TokenStream;
+     use quote::{ToTokens, TokenStreamExt};
+ 
+@@ -965,6 +1039,13 @@ mod printing {
+         }
+     }
+ 
++    #[cfg_attr(doc_cfg, doc(cfg(feature = "printing")))]
++    impl ToTokens for LitCStr {
++        fn to_tokens(&self, tokens: &mut TokenStream) {
++            self.repr.token.to_tokens(tokens);
++        }
++    }
++
+     #[cfg_attr(doc_cfg, doc(cfg(feature = "printing")))]
+     impl ToTokens for LitByte {
+         fn to_tokens(&self, tokens: &mut TokenStream) {
+@@ -1004,11 +1085,13 @@ mod printing {
+ mod value {
+     use crate::bigint::BigInt;
+     use crate::lit::{
+-        Lit, LitBool, LitByte, LitByteStr, LitChar, LitFloat, LitFloatRepr, LitInt, LitIntRepr,
+-        LitRepr, LitStr,
++        Lit, LitBool, LitByte, LitByteStr, LitCStr, LitChar, LitFloat, LitFloatRepr, LitInt,
++        LitIntRepr, LitRepr, LitStr,
+     };
+     use proc_macro2::{Literal, Span};
++    use std::ascii;
+     use std::char;
++    use std::ffi::CString;
+     use std::ops::{Index, RangeFrom};
+ 
+     impl Lit {
+@@ -1041,6 +1124,13 @@ mod value {
+                     }
+                     _ => {}
+                 },
++                // c"...", cr"...", cr#"..."#
++                b'c' => {
++                    let (_, suffix) = parse_lit_c_str(&repr);
++                    return Lit::CStr(LitCStr {
++                        repr: Box::new(LitRepr { token, suffix }),
++                    });
++                }
+                 // '...'
+                 b'\'' => {
+                     let (_, suffix) = parse_lit_char(&repr);
+@@ -1079,20 +1169,18 @@ mod value {
+                         });
+                     }
+                 }
+-                // c"...", cr"...", cr#"..."#
+-                // TODO: add a Lit::CStr variant?
+-                b'c' => return Lit::Verbatim(token),
+                 b'(' if repr == "(/*ERROR*/)" => return Lit::Verbatim(token),
+                 _ => {}
+             }
+ 
+-            panic!("Unrecognized literal: `{}`", repr);
++            panic!("unrecognized literal: `{}`", repr);
+         }
+ 
+         pub fn suffix(&self) -> &str {
+             match self {
+                 Lit::Str(lit) => lit.suffix(),
+                 Lit::ByteStr(lit) => lit.suffix(),
++                Lit::CStr(lit) => lit.suffix(),
+                 Lit::Byte(lit) => lit.suffix(),
+                 Lit::Char(lit) => lit.suffix(),
+                 Lit::Int(lit) => lit.suffix(),
+@@ -1105,6 +1193,7 @@ mod value {
+             match self {
+                 Lit::Str(lit) => lit.span(),
+                 Lit::ByteStr(lit) => lit.span(),
++                Lit::CStr(lit) => lit.span(),
+                 Lit::Byte(lit) => lit.span(),
+                 Lit::Char(lit) => lit.span(),
+                 Lit::Int(lit) => lit.span(),
+@@ -1118,6 +1207,7 @@ mod value {
+             match self {
+                 Lit::Str(lit) => lit.set_span(span),
+                 Lit::ByteStr(lit) => lit.set_span(span),
++                Lit::CStr(lit) => lit.set_span(span),
+                 Lit::Byte(lit) => lit.set_span(span),
+                 Lit::Char(lit) => lit.set_span(span),
+                 Lit::Int(lit) => lit.set_span(span),
+@@ -1170,13 +1260,13 @@ mod value {
+                         b'x' => {
+                             let (byte, rest) = backslash_x(s);
+                             s = rest;
+-                            assert!(byte <= 0x7F, "Invalid \\x byte in string literal");
++                            assert!(byte <= 0x7F, "invalid \\x byte in string literal");
+                             char::from_u32(u32::from(byte)).unwrap()
+                         }
+                         b'u' => {
+-                            let (chr, rest) = backslash_u(s);
++                            let (ch, rest) = backslash_u(s);
+                             s = rest;
+-                            chr
++                            ch
+                         }
+                         b'n' => '\n',
+                         b'r' => '\r',
+@@ -1192,11 +1282,14 @@ mod value {
+                                 _ => continue 'outer,
+                             }
+                         },
+-                        b => panic!("unexpected byte {:?} after \\ character in byte literal", b),
++                        b => panic!(
++                            "unexpected byte '{}' after \\ character in string literal",
++                            ascii::escape_default(b),
++                        ),
+                     }
+                 }
+                 b'\r' => {
+-                    assert_eq!(byte(s, 1), b'\n', "Bare CR not allowed in string");
++                    assert_eq!(byte(s, 1), b'\n', "bare CR not allowed in string");
+                     s = &s[2..];
+                     '\n'
+                 }
+@@ -1283,11 +1376,14 @@ mod value {
+                                 continue 'outer;
+                             }
+                         },
+-                        b => panic!("unexpected byte {:?} after \\ character in byte literal", b),
++                        b => panic!(
++                            "unexpected byte '{}' after \\ character in byte-string literal",
++                            ascii::escape_default(b),
++                        ),
+                     }
+                 }
+                 b'\r' => {
+-                    assert_eq!(byte(v, 1), b'\n', "Bare CR not allowed in string");
++                    assert_eq!(byte(v, 1), b'\n', "bare CR not allowed in string");
+                     v = &v[2..];
+                     b'\n'
+                 }
+@@ -1310,6 +1406,92 @@ mod value {
+         (String::from(value).into_bytes(), suffix)
+     }
+ 
++    // Returns (content, suffix).
++    pub(crate) fn parse_lit_c_str(s: &str) -> (CString, Box<str>) {
++        assert_eq!(byte(s, 0), b'c');
++        match byte(s, 1) {
++            b'"' => parse_lit_c_str_cooked(s),
++            b'r' => parse_lit_c_str_raw(s),
++            _ => unreachable!(),
++        }
++    }
++
++    // Clippy false positive
++    // https://github.com/rust-lang-nursery/rust-clippy/issues/2329
++    #[allow(clippy::needless_continue)]
++    fn parse_lit_c_str_cooked(mut s: &str) -> (CString, Box<str>) {
++        assert_eq!(byte(s, 0), b'c');
++        assert_eq!(byte(s, 1), b'"');
++        s = &s[2..];
++
++        // We're going to want to have slices which don't respect codepoint boundaries.
++        let mut v = s.as_bytes();
++
++        let mut out = Vec::new();
++        'outer: loop {
++            let byte = match byte(v, 0) {
++                b'"' => break,
++                b'\\' => {
++                    let b = byte(v, 1);
++                    v = &v[2..];
++                    match b {
++                        b'x' => {
++                            let (b, rest) = backslash_x(v);
++                            assert!(b != 0, "\\x00 is not allowed in C-string literal");
++                            v = rest;
++                            b
++                        }
++                        b'u' => {
++                            let (ch, rest) = backslash_u(v);
++                            assert!(ch != '\0', "\\u{{0}} is not allowed in C-string literal");
++                            v = rest;
++                            out.extend_from_slice(ch.encode_utf8(&mut [0u8; 4]).as_bytes());
++                            continue 'outer;
++                        }
++                        b'n' => b'\n',
++                        b'r' => b'\r',
++                        b't' => b'\t',
++                        b'\\' => b'\\',
++                        b'\'' => b'\'',
++                        b'"' => b'"',
++                        b'\r' | b'\n' => loop {
++                            let byte = byte(v, 0);
++                            if matches!(byte, b' ' | b'\t' | b'\n' | b'\r') {
++                                v = &v[1..];
++                            } else {
++                                continue 'outer;
++                            }
++                        },
++                        b => panic!(
++                            "unexpected byte '{}' after \\ character in byte literal",
++                            ascii::escape_default(b),
++                        ),
++                    }
++                }
++                b'\r' => {
++                    assert_eq!(byte(v, 1), b'\n', "bare CR not allowed in string");
++                    v = &v[2..];
++                    b'\n'
++                }
++                b => {
++                    v = &v[1..];
++                    b
++                }
++            };
++            out.push(byte);
++        }
++
++        assert_eq!(byte(v, 0), b'"');
++        let suffix = s[s.len() - v.len() + 1..].to_owned().into_boxed_str();
++        (CString::new(out).unwrap(), suffix)
++    }
++
++    fn parse_lit_c_str_raw(s: &str) -> (CString, Box<str>) {
++        assert_eq!(byte(s, 0), b'c');
++        let (value, suffix) = parse_lit_str_raw(&s[1..]);
++        (CString::new(String::from(value)).unwrap(), suffix)
++    }
++
+     // Returns (value, suffix).
+     pub(crate) fn parse_lit_byte(s: &str) -> (u8, Box<str>) {
+         assert_eq!(byte(s, 0), b'b');
+@@ -1335,7 +1517,10 @@ mod value {
+                     b'0' => b'\0',
+                     b'\'' => b'\'',
+                     b'"' => b'"',
+-                    b => panic!("unexpected byte {:?} after \\ character in byte literal", b),
++                    b => panic!(
++                        "unexpected byte '{}' after \\ character in byte literal",
++                        ascii::escape_default(b),
++                    ),
+                 }
+             }
+             b => {
+@@ -1362,13 +1547,13 @@ mod value {
+                     b'x' => {
+                         let (byte, rest) = backslash_x(s);
+                         s = rest;
+-                        assert!(byte <= 0x80, "Invalid \\x byte in string literal");
++                        assert!(byte <= 0x7F, "invalid \\x byte in character literal");
+                         char::from_u32(u32::from(byte)).unwrap()
+                     }
+                     b'u' => {
+-                        let (chr, rest) = backslash_u(s);
++                        let (ch, rest) = backslash_u(s);
+                         s = rest;
+-                        chr
++                        ch
+                     }
+                     b'n' => '\n',
+                     b'r' => '\r',
+@@ -1377,7 +1562,10 @@ mod value {
+                     b'0' => '\0',
+                     b'\'' => '\'',
+                     b'"' => '"',
+-                    b => panic!("unexpected byte {:?} after \\ character in byte literal", b),
++                    b => panic!(
++                        "unexpected byte '{}' after \\ character in character literal",
++                        ascii::escape_default(b),
++                    ),
+                 }
+             }
+             _ => {
+@@ -1414,7 +1602,10 @@ mod value {
+         (ch, &s[2..])
+     }
+ 
+-    fn backslash_u(mut s: &str) -> (char, &str) {
++    fn backslash_u<S>(mut s: &S) -> (char, &S)
++    where
++        S: Index<RangeFrom<usize>, Output = S> + AsRef<[u8]> + ?Sized,
++    {
+         if byte(s, 0) != b'{' {
+             panic!("{}", "expected { after \\u");
+         }
+diff --git a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/whitespace.rs b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/whitespace.rs
+--- a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/src/whitespace.rs
++++ b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/src/whitespace.rs
+@@ -41,11 +41,11 @@ pub(crate) fn skip(mut s: &str) -> &str {
+             }
+         }
+         match byte {
+-            b' ' | 0x09..=0x0d => {
++            b' ' | 0x09..=0x0D => {
+                 s = &s[1..];
+                 continue;
+             }
+-            b if b <= 0x7f => {}
++            b if b <= 0x7F => {}
+             _ => {
+                 let ch = s.chars().next().unwrap();
+                 if is_whitespace(ch) {
+diff --git a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/tests/debug/gen.rs b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/tests/debug/gen.rs
+--- a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/tests/debug/gen.rs
++++ b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/tests/debug/gen.rs
+@@ -2864,6 +2864,7 @@ impl Debug for Lite<syn::Lit> {
+         match &self.value {
+             syn::Lit::Str(_val) => write!(formatter, "{:?}", _val.value()),
+             syn::Lit::ByteStr(_val) => write!(formatter, "{:?}", _val.value()),
++            syn::Lit::CStr(_val) => write!(formatter, "{:?}", _val.value()),
+             syn::Lit::Byte(_val) => write!(formatter, "{:?}", _val.value()),
+             syn::Lit::Char(_val) => write!(formatter, "{:?}", _val.value()),
+             syn::Lit::Int(_val) => write!(formatter, "{}", _val),
+@@ -2901,6 +2902,11 @@ impl Debug for Lite<syn::LitByteStr> {
+         write!(formatter, "{:?}", self.value.value())
+     }
+ }
++impl Debug for Lite<syn::LitCStr> {
++    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
++        write!(formatter, "{:?}", self.value.value())
++    }
++}
+ impl Debug for Lite<syn::LitChar> {
+     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+         write!(formatter, "{:?}", self.value.value())
+diff --git a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/tests/test_lit.rs b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/tests/test_lit.rs
+--- a/third_party/rust/chromium_crates_io/vendor/syn-2.0.55/tests/test_lit.rs
++++ b/third_party/rust/chromium_crates_io/vendor/syn-2.0.60/tests/test_lit.rs
+@@ -1,5 +1,6 @@
+ #![allow(
+     clippy::float_cmp,
++    clippy::needless_raw_string_hashes,
+     clippy::non_ascii_literal,
+     clippy::single_match_else,
+     clippy::uninlined_format_args
+@@ -10,9 +11,11 @@ mod macros;
+ 
+ use proc_macro2::{Delimiter, Group, Literal, Span, TokenStream, TokenTree};
+ use quote::ToTokens;
++use std::ffi::CStr;
+ use std::str::FromStr;
+ use syn::{Lit, LitFloat, LitInt, LitStr};
+ 
++#[track_caller]
+ fn lit(s: &str) -> Lit {
+     let mut tokens = TokenStream::from_str(s).unwrap().into_iter();
+     match tokens.next().unwrap() {
+@@ -26,7 +29,9 @@ fn lit(s: &str) -> Lit {
+ 
+ #[test]
+ fn strings() {
++    #[track_caller]
+     fn test_string(s: &str, value: &str) {
++        let s = s.trim();
+         match lit(s) {
+             Lit::Str(lit) => {
+                 assert_eq!(lit.value(), value);
+@@ -39,16 +44,16 @@ fn strings() {
+         }
+     }
+ 
+-    test_string("\"a\"", "a");
+-    test_string("\"\\n\"", "\n");
+-    test_string("\"\\r\"", "\r");
+-    test_string("\"\\t\"", "\t");
+-    test_string("\"🐕\"", "🐕"); // NOTE: This is an emoji
+-    test_string("\"\\\"\"", "\"");
+-    test_string("\"'\"", "'");
+-    test_string("\"\"", "");
+-    test_string("\"\\u{1F415}\"", "\u{1F415}");
+-    test_string("\"\\u{1_2__3_}\"", "\u{123}");
++    test_string(r#"  ""  "#, "");
++    test_string(r#"  "a"  "#, "a");
++    test_string(r#"  "\n"  "#, "\n");
++    test_string(r#"  "\r"  "#, "\r");
++    test_string(r#"  "\t"  "#, "\t");
++    test_string(r#"  "🐕"  "#, "🐕"); // NOTE: This is an emoji
++    test_string(r#"  "\""  "#, "\"");
++    test_string(r#"  "'"  "#, "'");
++    test_string(r#"  "\u{1F415}"  "#, "\u{1F415}");
++    test_string(r#"  "\u{1_2__3_}"  "#, "\u{123}");
+     test_string(
+         "\"contains\nnewlines\\\nescaped newlines\"",
+         "contains\nnewlinesescaped newlines",
+@@ -65,7 +70,9 @@ fn strings() {
+ 
+ #[test]
+ fn byte_strings() {
++    #[track_caller]
+     fn test_byte_string(s: &str, value: &[u8]) {
++        let s = s.trim();
+         match lit(s) {
+             Lit::ByteStr(lit) => {
+                 assert_eq!(lit.value(), value);
+@@ -78,13 +85,13 @@ fn byte_strings() {
+         }
+     }
+ 
+-    test_byte_string("b\"a\"", b"a");
+-    test_byte_string("b\"\\n\"", b"\n");
+-    test_byte_string("b\"\\r\"", b"\r");
+-    test_byte_string("b\"\\t\"", b"\t");
+-    test_byte_string("b\"\\\"\"", b"\"");
+-    test_byte_string("b\"'\"", b"'");
+-    test_byte_string("b\"\"", b"");
++    test_byte_string(r#"  b""  "#, b"");
++    test_byte_string(r#"  b"a"  "#, b"a");
++    test_byte_string(r#"  b"\n"  "#, b"\n");
++    test_byte_string(r#"  b"\r"  "#, b"\r");
++    test_byte_string(r#"  b"\t"  "#, b"\t");
++    test_byte_string(r#"  b"\""  "#, b"\"");
++    test_byte_string(r#"  b"'"  "#, b"'");
+     test_byte_string(
+         "b\"contains\nnewlines\\\nescaped newlines\"",
+         b"contains\nnewlinesescaped newlines",
+@@ -95,9 +102,50 @@ fn byte_strings() {
+     test_byte_string("br##\"...\"##q", b"...");
+ }
+ 
++#[test]
++fn c_strings() {
++    #[track_caller]
++    fn test_c_string(s: &str, value: &CStr) {
++        let s = s.trim();
++        match lit(s) {
++            Lit::CStr(lit) => {
++                assert_eq!(*lit.value(), *value);
++                let again = lit.into_token_stream().to_string();
++                if again != s {
++                    test_c_string(&again, value);
++                }
++            }
++            wrong => panic!("{:?}", wrong),
++        }
++    }
++
++    test_c_string(r#"  c""  "#, c"");
++    test_c_string(r#"  c"a"  "#, c"a");
++    test_c_string(r#"  c"\n"  "#, c"\n");
++    test_c_string(r#"  c"\r"  "#, c"\r");
++    test_c_string(r#"  c"\t"  "#, c"\t");
++    test_c_string(r#"  c"\\"  "#, c"\\");
++    test_c_string(r#"  c"\'"  "#, c"'");
++    test_c_string(r#"  c"\""  "#, c"\"");
++    test_c_string(
++        "c\"contains\nnewlines\\\nescaped newlines\"",
++        c"contains\nnewlinesescaped newlines",
++    );
++    test_c_string("cr\"raw\nstring\\\nhere\"", c"raw\nstring\\\nhere");
++    test_c_string("c\"...\"q", c"...");
++    test_c_string("cr\"...\"", c"...");
++    test_c_string("cr##\"...\"##", c"...");
++    test_c_string(
++        r#"  c"hello\x80我叫\u{1F980}"  "#, // from the RFC
++        c"hello\x80我叫\u{1F980}",
++    );
++}
++
+ #[test]
+ fn bytes() {
++    #[track_caller]
+     fn test_byte(s: &str, value: u8) {
++        let s = s.trim();
+         match lit(s) {
+             Lit::Byte(lit) => {
+                 assert_eq!(lit.value(), value);
+@@ -108,18 +156,20 @@ fn bytes() {
+         }
+     }
+ 
+-    test_byte("b'a'", b'a');
+-    test_byte("b'\\n'", b'\n');
+-    test_byte("b'\\r'", b'\r');
+-    test_byte("b'\\t'", b'\t');
+-    test_byte("b'\\''", b'\'');
+-    test_byte("b'\"'", b'"');
+-    test_byte("b'a'q", b'a');
++    test_byte(r#"  b'a'  "#, b'a');
++    test_byte(r#"  b'\n'  "#, b'\n');
++    test_byte(r#"  b'\r'  "#, b'\r');
++    test_byte(r#"  b'\t'  "#, b'\t');
++    test_byte(r#"  b'\''  "#, b'\'');
++    test_byte(r#"  b'"'  "#, b'"');
++    test_byte(r#"  b'a'q  "#, b'a');
+ }
+ 
+ #[test]
+ fn chars() {
++    #[track_caller]
+     fn test_char(s: &str, value: char) {
++        let s = s.trim();
+         match lit(s) {
+             Lit::Char(lit) => {
+                 assert_eq!(lit.value(), value);
+@@ -132,19 +182,20 @@ fn chars() {
+         }
+     }
+ 
+-    test_char("'a'", 'a');
+-    test_char("'\\n'", '\n');
+-    test_char("'\\r'", '\r');
+-    test_char("'\\t'", '\t');
+-    test_char("'🐕'", '🐕'); // NOTE: This is an emoji
+-    test_char("'\\''", '\'');
+-    test_char("'\"'", '"');
+-    test_char("'\\u{1F415}'", '\u{1F415}');
+-    test_char("'a'q", 'a');
++    test_char(r#"  'a'  "#, 'a');
++    test_char(r#"  '\n'  "#, '\n');
++    test_char(r#"  '\r'  "#, '\r');
++    test_char(r#"  '\t'  "#, '\t');
++    test_char(r#"  '🐕'  "#, '🐕'); // NOTE: This is an emoji
++    test_char(r#"  '\''  "#, '\'');
++    test_char(r#"  '"'  "#, '"');
++    test_char(r#"  '\u{1F415}'  "#, '\u{1F415}');
++    test_char(r#"  'a'q  "#, 'a');
+ }
+ 
+ #[test]
+ fn ints() {
++    #[track_caller]
+     fn test_int(s: &str, value: u64, suffix: &str) {
+         match lit(s) {
+             Lit::Int(lit) => {
+@@ -185,6 +236,7 @@ fn ints() {
+ 
+ #[test]
+ fn floats() {
++    #[track_caller]
+     fn test_float(s: &str, value: f64, suffix: &str) {
+         match lit(s) {
+             Lit::Float(lit) => {
+@@ -224,11 +276,13 @@ fn negative() {
+ 
+ #[test]
+ fn suffix() {
++    #[track_caller]
+     fn get_suffix(token: &str) -> String {
+         let lit = syn::parse_str::<Lit>(token).unwrap();
+         match lit {
+             Lit::Str(lit) => lit.suffix().to_owned(),
+             Lit::ByteStr(lit) => lit.suffix().to_owned(),
++            Lit::CStr(lit) => lit.suffix().to_owned(),
+             Lit::Byte(lit) => lit.suffix().to_owned(),
+             Lit::Char(lit) => lit.suffix().to_owned(),
+             Lit::Int(lit) => lit.suffix().to_owned(),
+@@ -239,9 +293,13 @@ fn suffix() {
+ 
+     assert_eq!(get_suffix("\"\"s"), "s");
+     assert_eq!(get_suffix("r\"\"r"), "r");
++    assert_eq!(get_suffix("r#\"\"#r"), "r");
+     assert_eq!(get_suffix("b\"\"b"), "b");
+     assert_eq!(get_suffix("br\"\"br"), "br");
+-    assert_eq!(get_suffix("r#\"\"#r"), "r");
++    assert_eq!(get_suffix("br#\"\"#br"), "br");
++    assert_eq!(get_suffix("c\"\"c"), "c");
++    assert_eq!(get_suffix("cr\"\"cr"), "cr");
++    assert_eq!(get_suffix("cr#\"\"#cr"), "cr");
+     assert_eq!(get_suffix("'c'c"), "c");
+     assert_eq!(get_suffix("b'b'b"), "b");
+     assert_eq!(get_suffix("1i32"), "i32");
+diff -Nur a/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.78/build.rs b/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.81/build.rs
+--- a/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.78/build.rs	2024-04-10 23:25:21.000000000 +0200
++++ b/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.81/build.rs	2024-05-29 18:02:25.000000000 +0200
+@@ -36,10 +36,10 @@
+ 
+ use std::env;
+ use std::ffi::OsString;
++use std::iter;
+ use std::path::Path;
+ use std::process::{self, Command, Stdio};
+ use std::str;
+-use std::u32;
+ 
+ fn main() {
+     let rustc = rustc_minor_version().unwrap_or(u32::MAX);
+@@ -63,6 +63,11 @@
+         println!("cargo:rustc-cfg=no_source_text");
+     }
+ 
++    if rustc < 79 {
++        println!("cargo:rustc-cfg=no_literal_byte_character");
++        println!("cargo:rustc-cfg=no_literal_c_string");
++    }
++
+     if !cfg!(feature = "proc-macro") {
+         println!("cargo:rerun-if-changed=build.rs");
+         return;
+@@ -138,15 +143,15 @@
+     let out_dir = cargo_env_var("OUT_DIR");
+     let probefile = Path::new("build").join("probe.rs");
+ 
+-    // Make sure to pick up Cargo rustc configuration.
+-    let mut cmd = if let Some(wrapper) = env::var_os("RUSTC_WRAPPER") {
+-        let mut cmd = Command::new(wrapper);
+-        // The wrapper's first argument is supposed to be the path to rustc.
+-        cmd.arg(rustc);
+-        cmd
+-    } else {
+-        Command::new(rustc)
+-    };
++    let rustc_wrapper = env::var_os("RUSTC_WRAPPER").filter(|wrapper| !wrapper.is_empty());
++    let rustc_workspace_wrapper =
++        env::var_os("RUSTC_WORKSPACE_WRAPPER").filter(|wrapper| !wrapper.is_empty());
++    let mut rustc = rustc_wrapper
++        .into_iter()
++        .chain(rustc_workspace_wrapper)
++        .chain(iter::once(rustc));
++    let mut cmd = Command::new(rustc.next().unwrap());
++    cmd.args(rustc);
+ 
+     if !rustc_bootstrap {
+         cmd.env_remove("RUSTC_BOOTSTRAP");
+@@ -156,6 +161,7 @@
+         .arg("--edition=2021")
+         .arg("--crate-name=proc_macro2")
+         .arg("--crate-type=lib")
++        .arg("--cap-lints=allow")
+         .arg("--emit=dep-info,metadata")
+         .arg("--out-dir")
+         .arg(out_dir)
+diff -Nur a/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.78/src/fallback.rs b/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.81/src/fallback.rs
+--- a/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.78/src/fallback.rs	2024-04-10 23:25:21.000000000 +0200
++++ b/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.81/src/fallback.rs	2024-05-29 18:02:25.000000000 +0200
+@@ -15,7 +15,9 @@
+ use core::ops::Range;
+ use core::ops::RangeBounds;
+ use core::ptr;
+-use core::str::FromStr;
++use core::str::{self, FromStr};
++use std::ffi::CStr;
++#[cfg(procmacro2_semver_exempt)]
+ use std::path::PathBuf;
+ 
+ /// Force use of proc-macro2's fallback implementation of the API for now, even
+@@ -297,11 +299,13 @@
+     }
+ }
+ 
++#[cfg(procmacro2_semver_exempt)]
+ #[derive(Clone, PartialEq, Eq)]
+ pub(crate) struct SourceFile {
+     path: PathBuf,
+ }
+ 
++#[cfg(procmacro2_semver_exempt)]
+ impl SourceFile {
+     /// Get the path to this source file as a string.
+     pub fn path(&self) -> PathBuf {
+@@ -313,6 +317,7 @@
+     }
+ }
+ 
++#[cfg(procmacro2_semver_exempt)]
+ impl Debug for SourceFile {
+     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+         f.debug_struct("SourceFile")
+@@ -922,7 +927,7 @@
+ 
+ #[derive(Clone)]
+ pub(crate) struct Literal {
+-    repr: String,
++    pub(crate) repr: String,
+     span: Span,
+ }
+ 
+@@ -1003,71 +1008,98 @@
+         Literal::_new(s)
+     }
+ 
+-    pub fn string(t: &str) -> Literal {
+-        let mut repr = String::with_capacity(t.len() + 2);
++    pub fn string(string: &str) -> Literal {
++        let mut repr = String::with_capacity(string.len() + 2);
+         repr.push('"');
+-        let mut chars = t.chars();
+-        while let Some(ch) = chars.next() {
+-            if ch == '\0' {
+-                repr.push_str(
+-                    if chars
+-                        .as_str()
+-                        .starts_with(|next| '0' <= next && next <= '7')
+-                    {
+-                        // circumvent clippy::octal_escapes lint
+-                        "\\x00"
+-                    } else {
+-                        "\\0"
+-                    },
+-                );
+-            } else if ch == '\'' {
+-                // escape_debug turns this into "\'" which is unnecessary.
+-                repr.push(ch);
+-            } else {
+-                repr.extend(ch.escape_debug());
+-            }
+-        }
++        escape_utf8(string, &mut repr);
+         repr.push('"');
+         Literal::_new(repr)
+     }
+ 
+-    pub fn character(t: char) -> Literal {
++    pub fn character(ch: char) -> Literal {
+         let mut repr = String::new();
+         repr.push('\'');
+-        if t == '"' {
++        if ch == '"' {
+             // escape_debug turns this into '\"' which is unnecessary.
+-            repr.push(t);
++            repr.push(ch);
+         } else {
+-            repr.extend(t.escape_debug());
++            repr.extend(ch.escape_debug());
++        }
++        repr.push('\'');
++        Literal::_new(repr)
++    }
++
++    pub fn byte_character(byte: u8) -> Literal {
++        let mut repr = "b'".to_string();
++        #[allow(clippy::match_overlapping_arm)]
++        match byte {
++            b'\0' => repr.push_str(r"\0"),
++            b'\t' => repr.push_str(r"\t"),
++            b'\n' => repr.push_str(r"\n"),
++            b'\r' => repr.push_str(r"\r"),
++            b'\'' => repr.push_str(r"\'"),
++            b'\\' => repr.push_str(r"\\"),
++            b'\x20'..=b'\x7E' => repr.push(byte as char),
++            _ => {
++                let _ = write!(repr, r"\x{:02X}", byte);
++            }
+         }
+         repr.push('\'');
+         Literal::_new(repr)
+     }
+ 
+     pub fn byte_string(bytes: &[u8]) -> Literal {
+-        let mut escaped = "b\"".to_string();
++        let mut repr = "b\"".to_string();
+         let mut bytes = bytes.iter();
+         while let Some(&b) = bytes.next() {
+             #[allow(clippy::match_overlapping_arm)]
+             match b {
+-                b'\0' => escaped.push_str(match bytes.as_slice().first() {
++                b'\0' => repr.push_str(match bytes.as_slice().first() {
+                     // circumvent clippy::octal_escapes lint
+                     Some(b'0'..=b'7') => r"\x00",
+                     _ => r"\0",
+                 }),
+-                b'\t' => escaped.push_str(r"\t"),
+-                b'\n' => escaped.push_str(r"\n"),
+-                b'\r' => escaped.push_str(r"\r"),
+-                b'"' => escaped.push_str("\\\""),
+-                b'\\' => escaped.push_str("\\\\"),
+-                b'\x20'..=b'\x7E' => escaped.push(b as char),
++                b'\t' => repr.push_str(r"\t"),
++                b'\n' => repr.push_str(r"\n"),
++                b'\r' => repr.push_str(r"\r"),
++                b'"' => repr.push_str("\\\""),
++                b'\\' => repr.push_str(r"\\"),
++                b'\x20'..=b'\x7E' => repr.push(b as char),
+                 _ => {
+-                    let _ = write!(escaped, "\\x{:02X}", b);
++                    let _ = write!(repr, r"\x{:02X}", b);
+                 }
+             }
+         }
+-        escaped.push('"');
+-        Literal::_new(escaped)
++        repr.push('"');
++        Literal::_new(repr)
++    }
++
++    pub fn c_string(string: &CStr) -> Literal {
++        let mut repr = "c\"".to_string();
++        let mut bytes = string.to_bytes();
++        while !bytes.is_empty() {
++            let (valid, invalid) = match str::from_utf8(bytes) {
++                Ok(all_valid) => {
++                    bytes = b"";
++                    (all_valid, bytes)
++                }
++                Err(utf8_error) => {
++                    let (valid, rest) = bytes.split_at(utf8_error.valid_up_to());
++                    let valid = str::from_utf8(valid).unwrap();
++                    let invalid = utf8_error
++                        .error_len()
++                        .map_or(rest, |error_len| &rest[..error_len]);
++                    bytes = &bytes[valid.len() + invalid.len()..];
++                    (valid, invalid)
++                }
++            };
++            escape_utf8(valid, &mut repr);
++            for &byte in invalid {
++                let _ = write!(repr, r"\x{:02X}", byte);
++            }
++        }
++        repr.push('"');
++        Literal::_new(repr)
+     }
+ 
+     pub fn span(&self) -> Span {
+@@ -1168,3 +1200,27 @@
+         debug.finish()
+     }
+ }
++
++fn escape_utf8(string: &str, repr: &mut String) {
++    let mut chars = string.chars();
++    while let Some(ch) = chars.next() {
++        if ch == '\0' {
++            repr.push_str(
++                if chars
++                    .as_str()
++                    .starts_with(|next| '0' <= next && next <= '7')
++                {
++                    // circumvent clippy::octal_escapes lint
++                    r"\x00"
++                } else {
++                    r"\0"
++                },
++            );
++        } else if ch == '\'' {
++            // escape_debug turns this into "\'" which is unnecessary.
++            repr.push(ch);
++        } else {
++            repr.extend(ch.escape_debug());
++        }
++    }
++}
+diff -Nur a/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.78/src/lib.rs b/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.81/src/lib.rs
+--- a/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.78/src/lib.rs	2024-04-10 23:25:21.000000000 +0200
++++ b/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.81/src/lib.rs	2024-05-29 18:02:25.000000000 +0200
+@@ -86,7 +86,7 @@
+ //! a different thread.
+ 
+ // Proc-macro2 types in rustdoc of other crates get linked to here.
+-#![doc(html_root_url = "https://docs.rs/proc-macro2/1.0.78")]
++#![doc(html_root_url = "https://docs.rs/proc-macro2/1.0.81")]
+ #![cfg_attr(any(proc_macro_span, super_unstable), feature(proc_macro_span))]
+ #![cfg_attr(super_unstable, feature(proc_macro_def_site))]
+ #![cfg_attr(doc_cfg, feature(doc_cfg))]
+@@ -96,6 +96,7 @@
+     clippy::cast_possible_truncation,
+     clippy::checked_conversions,
+     clippy::doc_markdown,
++    clippy::incompatible_msrv,
+     clippy::items_after_statements,
+     clippy::iter_without_into_iter,
+     clippy::let_underscore_untyped,
+@@ -169,6 +170,7 @@
+ use core::ops::RangeBounds;
+ use core::str::FromStr;
+ use std::error::Error;
++use std::ffi::CStr;
+ #[cfg(procmacro2_semver_exempt)]
+ use std::path::PathBuf;
+ 
+@@ -676,12 +678,12 @@
+     Brace,
+     /// `[ ... ]`
+     Bracket,
+-    /// `Ø ... Ø`
++    /// `∅ ... ∅`
+     ///
+-    /// An implicit delimiter, that may, for example, appear around tokens
++    /// An invisible delimiter, that may, for example, appear around tokens
+     /// coming from a "macro variable" `$var`. It is important to preserve
+     /// operator priorities in cases like `$var * 3` where `$var` is `1 + 2`.
+-    /// Implicit delimiters may not survive roundtrip of a token stream through
++    /// Invisible delimiters may not survive roundtrip of a token stream through
+     /// a string.
+     None,
+ }
+@@ -1233,9 +1235,19 @@
+         Literal::_new(imp::Literal::character(ch))
+     }
+ 
++    /// Byte character literal.
++    pub fn byte_character(byte: u8) -> Literal {
++        Literal::_new(imp::Literal::byte_character(byte))
++    }
++
+     /// Byte string literal.
+-    pub fn byte_string(s: &[u8]) -> Literal {
+-        Literal::_new(imp::Literal::byte_string(s))
++    pub fn byte_string(bytes: &[u8]) -> Literal {
++        Literal::_new(imp::Literal::byte_string(bytes))
++    }
++
++    /// C string literal.
++    pub fn c_string(string: &CStr) -> Literal {
++        Literal::_new(imp::Literal::c_string(string))
+     }
+ 
+     /// Returns the span encompassing this literal.
+diff -Nur a/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.78/src/wrapper.rs b/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.81/src/wrapper.rs
+--- a/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.78/src/wrapper.rs	2024-04-10 23:25:21.000000000 +0200
++++ b/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.81/src/wrapper.rs	2024-05-29 18:02:25.000000000 +0200
+@@ -7,6 +7,7 @@
+ use core::ops::Range;
+ use core::ops::RangeBounds;
+ use core::str::FromStr;
++use std::ffi::CStr;
+ use std::panic;
+ #[cfg(super_unstable)]
+ use std::path::PathBuf;
+@@ -846,19 +847,38 @@
+         }
+     }
+ 
+-    pub fn string(t: &str) -> Literal {
++    pub fn string(string: &str) -> Literal {
+         if inside_proc_macro() {
+-            Literal::Compiler(proc_macro::Literal::string(t))
++            Literal::Compiler(proc_macro::Literal::string(string))
+         } else {
+-            Literal::Fallback(fallback::Literal::string(t))
++            Literal::Fallback(fallback::Literal::string(string))
+         }
+     }
+ 
+-    pub fn character(t: char) -> Literal {
++    pub fn character(ch: char) -> Literal {
+         if inside_proc_macro() {
+-            Literal::Compiler(proc_macro::Literal::character(t))
++            Literal::Compiler(proc_macro::Literal::character(ch))
+         } else {
+-            Literal::Fallback(fallback::Literal::character(t))
++            Literal::Fallback(fallback::Literal::character(ch))
++        }
++    }
++
++    pub fn byte_character(byte: u8) -> Literal {
++        if inside_proc_macro() {
++            Literal::Compiler({
++                #[cfg(not(no_literal_byte_character))]
++                {
++                    proc_macro::Literal::byte_character(byte)
++                }
++
++                #[cfg(no_literal_byte_character)]
++                {
++                    let fallback = fallback::Literal::byte_character(byte);
++                    fallback.repr.parse::<proc_macro::Literal>().unwrap()
++                }
++            })
++        } else {
++            Literal::Fallback(fallback::Literal::byte_character(byte))
+         }
+     }
+ 
+@@ -870,6 +890,25 @@
+         }
+     }
+ 
++    pub fn c_string(string: &CStr) -> Literal {
++        if inside_proc_macro() {
++            Literal::Compiler({
++                #[cfg(not(no_literal_c_string))]
++                {
++                    proc_macro::Literal::c_string(string)
++                }
++
++                #[cfg(no_literal_c_string)]
++                {
++                    let fallback = fallback::Literal::c_string(string);
++                    fallback.repr.parse::<proc_macro::Literal>().unwrap()
++                }
++            })
++        } else {
++            Literal::Fallback(fallback::Literal::c_string(string))
++        }
++    }
++
+     pub fn span(&self) -> Span {
+         match self {
+             Literal::Compiler(lit) => Span::Compiler(lit.span()),
+diff -Nur a/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.78/tests/marker.rs b/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.81/tests/marker.rs
+--- a/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.78/tests/marker.rs	2024-04-10 23:25:21.000000000 +0200
++++ b/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.81/tests/marker.rs	2024-05-29 18:02:25.000000000 +0200
+@@ -21,6 +21,7 @@
+             $(
+                 {
+                     // Implemented for types that implement $marker.
++                    #[allow(dead_code)]
+                     trait IsNotImplemented {
+                         fn assert_not_implemented() {}
+                     }
+diff -Nur a/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.78/tests/test.rs b/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.81/tests/test.rs
+--- a/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.78/tests/test.rs	2024-04-10 23:25:21.000000000 +0200
++++ b/third_party/rust/chromium_crates_io/vendor/proc-macro2-1.0.81/tests/test.rs	2024-05-29 18:02:25.000000000 +0200
+@@ -1,11 +1,14 @@
+ #![allow(
+     clippy::assertions_on_result_states,
+     clippy::items_after_statements,
++    clippy::needless_pass_by_value,
++    clippy::needless_raw_string_hashes,
+     clippy::non_ascii_literal,
+     clippy::octal_escapes
+ )]
+ 
+ use proc_macro2::{Ident, Literal, Punct, Spacing, Span, TokenStream, TokenTree};
++use std::ffi::CStr;
+ use std::iter;
+ use std::str::{self, FromStr};
+ 
+@@ -96,12 +99,22 @@
+ 
+ #[test]
+ fn literal_string() {
+-    assert_eq!(Literal::string("foo").to_string(), "\"foo\"");
+-    assert_eq!(Literal::string("\"").to_string(), "\"\\\"\"");
+-    assert_eq!(Literal::string("didn't").to_string(), "\"didn't\"");
+-    assert_eq!(
+-        Literal::string("a\00b\07c\08d\0e\0").to_string(),
+-        "\"a\\x000b\\x007c\\08d\\0e\\0\"",
++    #[track_caller]
++    fn assert(literal: Literal, expected: &str) {
++        assert_eq!(literal.to_string(), expected.trim());
++    }
++
++    assert(Literal::string(""), r#"  ""  "#);
++    assert(Literal::string("aA"), r#"  "aA"  "#);
++    assert(Literal::string("\t"), r#"  "\t"  "#);
++    assert(Literal::string("❤"), r#"  "❤"  "#);
++    assert(Literal::string("'"), r#"  "'"  "#);
++    assert(Literal::string("\""), r#"  "\""  "#);
++    assert(Literal::string("\0"), r#"  "\0"  "#);
++    assert(Literal::string("\u{1}"), r#"  "\u{1}"  "#);
++    assert(
++        Literal::string("a\00b\07c\08d\0e\0"),
++        r#"  "a\x000b\x007c\08d\0e\0"  "#,
+     );
+ 
+     "\"\\\r\n    x\"".parse::<TokenStream>().unwrap();
+@@ -133,15 +146,42 @@
+ }
+ 
+ #[test]
++fn literal_byte_character() {
++    #[track_caller]
++    fn assert(literal: Literal, expected: &str) {
++        assert_eq!(literal.to_string(), expected.trim());
++    }
++
++    assert(Literal::byte_character(b'a'), r#"  b'a'  "#);
++    assert(Literal::byte_character(b'\0'), r#"  b'\0'  "#);
++    assert(Literal::byte_character(b'\t'), r#"  b'\t'  "#);
++    assert(Literal::byte_character(b'\n'), r#"  b'\n'  "#);
++    assert(Literal::byte_character(b'\r'), r#"  b'\r'  "#);
++    assert(Literal::byte_character(b'\''), r#"  b'\''  "#);
++    assert(Literal::byte_character(b'\\'), r#"  b'\\'  "#);
++    assert(Literal::byte_character(b'\x1f'), r#"  b'\x1F'  "#);
++    assert(Literal::byte_character(b'"'), r#"  b'"'  "#);
++}
++
++#[test]
+ fn literal_byte_string() {
+-    assert_eq!(Literal::byte_string(b"").to_string(), "b\"\"");
+-    assert_eq!(
+-        Literal::byte_string(b"\0\t\n\r\"\\2\x10").to_string(),
+-        "b\"\\0\\t\\n\\r\\\"\\\\2\\x10\"",
+-    );
+-    assert_eq!(
+-        Literal::byte_string(b"a\00b\07c\08d\0e\0").to_string(),
+-        "b\"a\\x000b\\x007c\\08d\\0e\\0\"",
++    #[track_caller]
++    fn assert(literal: Literal, expected: &str) {
++        assert_eq!(literal.to_string(), expected.trim());
++    }
++
++    assert(Literal::byte_string(b""), r#"  b""  "#);
++    assert(Literal::byte_string(b"\0"), r#"  b"\0"  "#);
++    assert(Literal::byte_string(b"\t"), r#"  b"\t"  "#);
++    assert(Literal::byte_string(b"\n"), r#"  b"\n"  "#);
++    assert(Literal::byte_string(b"\r"), r#"  b"\r"  "#);
++    assert(Literal::byte_string(b"\""), r#"  b"\""  "#);
++    assert(Literal::byte_string(b"\\"), r#"  b"\\"  "#);
++    assert(Literal::byte_string(b"\x1f"), r#"  b"\x1F"  "#);
++    assert(Literal::byte_string(b"'"), r#"  b"'"  "#);
++    assert(
++        Literal::byte_string(b"a\00b\07c\08d\0e\0"),
++        r#"  b"a\x000b\x007c\08d\0e\0"  "#,
+     );
+ 
+     "b\"\\\r\n    x\"".parse::<TokenStream>().unwrap();
+@@ -152,6 +192,41 @@
+ 
+ #[test]
+ fn literal_c_string() {
++    #[track_caller]
++    fn assert(literal: Literal, expected: &str) {
++        assert_eq!(literal.to_string(), expected.trim());
++    }
++
++    assert(Literal::c_string(<&CStr>::default()), r#"  c""  "#);
++    assert(
++        Literal::c_string(CStr::from_bytes_with_nul(b"aA\0").unwrap()),
++        r#"  c"aA"  "#,
++    );
++    assert(
++        Literal::c_string(CStr::from_bytes_with_nul(b"aA\0").unwrap()),
++        r#"  c"aA"  "#,
++    );
++    assert(
++        Literal::c_string(CStr::from_bytes_with_nul(b"\t\0").unwrap()),
++        r#"  c"\t"  "#,
++    );
++    assert(
++        Literal::c_string(CStr::from_bytes_with_nul(b"\xE2\x9D\xA4\0").unwrap()),
++        r#"  c"❤"  "#,
++    );
++    assert(
++        Literal::c_string(CStr::from_bytes_with_nul(b"'\0").unwrap()),
++        r#"  c"'"  "#,
++    );
++    assert(
++        Literal::c_string(CStr::from_bytes_with_nul(b"\"\0").unwrap()),
++        r#"  c"\""  "#,
++    );
++    assert(
++        Literal::c_string(CStr::from_bytes_with_nul(b"\x7F\xFF\xFE\xCC\xB3\0").unwrap()),
++        r#"  c"\u{7f}\xFF\xFE\u{333}"  "#,
++    );
++
+     let strings = r###"
+         c"hello\x80我叫\u{1F980}"  // from the RFC
+         cr"\"
+@@ -188,49 +263,80 @@
+ 
+ #[test]
+ fn literal_character() {
+-    assert_eq!(Literal::character('x').to_string(), "'x'");
+-    assert_eq!(Literal::character('\'').to_string(), "'\\''");
+-    assert_eq!(Literal::character('"').to_string(), "'\"'");
++    #[track_caller]
++    fn assert(literal: Literal, expected: &str) {
++        assert_eq!(literal.to_string(), expected.trim());
++    }
++
++    assert(Literal::character('a'), r#"  'a'  "#);
++    assert(Literal::character('\t'), r#"  '\t'  "#);
++    assert(Literal::character('❤'), r#"  '❤'  "#);
++    assert(Literal::character('\''), r#"  '\''  "#);
++    assert(Literal::character('"'), r#"  '"'  "#);
++    assert(Literal::character('\0'), r#"  '\0'  "#);
++    assert(Literal::character('\u{1}'), r#"  '\u{1}'  "#);
+ }
+ 
+ #[test]
+ fn literal_integer() {
+-    assert_eq!(Literal::u8_suffixed(10).to_string(), "10u8");
+-    assert_eq!(Literal::u16_suffixed(10).to_string(), "10u16");
+-    assert_eq!(Literal::u32_suffixed(10).to_string(), "10u32");
+-    assert_eq!(Literal::u64_suffixed(10).to_string(), "10u64");
+-    assert_eq!(Literal::u128_suffixed(10).to_string(), "10u128");
+-    assert_eq!(Literal::usize_suffixed(10).to_string(), "10usize");
+-
+-    assert_eq!(Literal::i8_suffixed(10).to_string(), "10i8");
+-    assert_eq!(Literal::i16_suffixed(10).to_string(), "10i16");
+-    assert_eq!(Literal::i32_suffixed(10).to_string(), "10i32");
+-    assert_eq!(Literal::i64_suffixed(10).to_string(), "10i64");
+-    assert_eq!(Literal::i128_suffixed(10).to_string(), "10i128");
+-    assert_eq!(Literal::isize_suffixed(10).to_string(), "10isize");
+-
+-    assert_eq!(Literal::u8_unsuffixed(10).to_string(), "10");
+-    assert_eq!(Literal::u16_unsuffixed(10).to_string(), "10");
+-    assert_eq!(Literal::u32_unsuffixed(10).to_string(), "10");
+-    assert_eq!(Literal::u64_unsuffixed(10).to_string(), "10");
+-    assert_eq!(Literal::u128_unsuffixed(10).to_string(), "10");
+-    assert_eq!(Literal::usize_unsuffixed(10).to_string(), "10");
+-
+-    assert_eq!(Literal::i8_unsuffixed(10).to_string(), "10");
+-    assert_eq!(Literal::i16_unsuffixed(10).to_string(), "10");
+-    assert_eq!(Literal::i32_unsuffixed(10).to_string(), "10");
+-    assert_eq!(Literal::i64_unsuffixed(10).to_string(), "10");
+-    assert_eq!(Literal::i128_unsuffixed(10).to_string(), "10");
+-    assert_eq!(Literal::isize_unsuffixed(10).to_string(), "10");
++    #[track_caller]
++    fn assert(literal: Literal, expected: &str) {
++        assert_eq!(literal.to_string(), expected);
++    }
++
++    assert(Literal::u8_suffixed(10), "10u8");
++    assert(Literal::u16_suffixed(10), "10u16");
++    assert(Literal::u32_suffixed(10), "10u32");
++    assert(Literal::u64_suffixed(10), "10u64");
++    assert(Literal::u128_suffixed(10), "10u128");
++    assert(Literal::usize_suffixed(10), "10usize");
++
++    assert(Literal::i8_suffixed(10), "10i8");
++    assert(Literal::i16_suffixed(10), "10i16");
++    assert(Literal::i32_suffixed(10), "10i32");
++    assert(Literal::i64_suffixed(10), "10i64");
++    assert(Literal::i128_suffixed(10), "10i128");
++    assert(Literal::isize_suffixed(10), "10isize");
++
++    assert(Literal::u8_unsuffixed(10), "10");
++    assert(Literal::u16_unsuffixed(10), "10");
++    assert(Literal::u32_unsuffixed(10), "10");
++    assert(Literal::u64_unsuffixed(10), "10");
++    assert(Literal::u128_unsuffixed(10), "10");
++    assert(Literal::usize_unsuffixed(10), "10");
++
++    assert(Literal::i8_unsuffixed(10), "10");
++    assert(Literal::i16_unsuffixed(10), "10");
++    assert(Literal::i32_unsuffixed(10), "10");
++    assert(Literal::i64_unsuffixed(10), "10");
++    assert(Literal::i128_unsuffixed(10), "10");
++    assert(Literal::isize_unsuffixed(10), "10");
++
++    assert(Literal::i32_suffixed(-10), "-10i32");
++    assert(Literal::i32_unsuffixed(-10), "-10");
+ }
+ 
+ #[test]
+ fn literal_float() {
+-    assert_eq!(Literal::f32_suffixed(10.0).to_string(), "10f32");
+-    assert_eq!(Literal::f64_suffixed(10.0).to_string(), "10f64");
+-
+-    assert_eq!(Literal::f32_unsuffixed(10.0).to_string(), "10.0");
+-    assert_eq!(Literal::f64_unsuffixed(10.0).to_string(), "10.0");
++    #[track_caller]
++    fn assert(literal: Literal, expected: &str) {
++        assert_eq!(literal.to_string(), expected);
++    }
++
++    assert(Literal::f32_suffixed(10.0), "10f32");
++    assert(Literal::f32_suffixed(-10.0), "-10f32");
++    assert(Literal::f64_suffixed(10.0), "10f64");
++    assert(Literal::f64_suffixed(-10.0), "-10f64");
++
++    assert(Literal::f32_unsuffixed(10.0), "10.0");
++    assert(Literal::f32_unsuffixed(-10.0), "-10.0");
++    assert(Literal::f64_unsuffixed(10.0), "10.0");
++    assert(Literal::f64_unsuffixed(-10.0), "-10.0");
++
++    assert(
++        Literal::f64_unsuffixed(1e100),
++        "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.0",
++    );
+ }
+ 
+ #[test]
+@@ -248,9 +354,13 @@
+     assert_eq!(token_count("1._m"), 3);
+     assert_eq!(token_count("\"\"s"), 1);
+     assert_eq!(token_count("r\"\"r"), 1);
++    assert_eq!(token_count("r#\"\"#r"), 1);
+     assert_eq!(token_count("b\"\"b"), 1);
+     assert_eq!(token_count("br\"\"br"), 1);
+-    assert_eq!(token_count("r#\"\"#r"), 1);
++    assert_eq!(token_count("br#\"\"#br"), 1);
++    assert_eq!(token_count("c\"\"c"), 1);
++    assert_eq!(token_count("cr\"\"cr"), 1);
++    assert_eq!(token_count("cr#\"\"#cr"), 1);
+     assert_eq!(token_count("'c'c"), 1);
+     assert_eq!(token_count("b'b'b"), 1);
+     assert_eq!(token_count("0E"), 1);
+@@ -378,7 +488,7 @@
+     roundtrip("'a");
+     roundtrip("'_");
+     roundtrip("'static");
+-    roundtrip("'\\u{10__FFFF}'");
++    roundtrip(r"'\u{10__FFFF}'");
+     roundtrip("\"\\u{10_F0FF__}foo\\u{1_0_0_0__}\"");
+ }
+ 
+@@ -401,6 +511,7 @@
+     fail("\"\\\r  \""); // backslash carriage return
+     fail("'aa'aa");
+     fail("br##\"\"#");
++    fail("cr##\"\"#");
+     fail("\"\\\n\u{85}\r\"");
+ }
+ 

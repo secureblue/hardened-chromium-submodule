@@ -183,11 +183,6 @@
 %endif
 %endif
 
-%ifarch ppc64le
-# workaround for a bug in new llvm on f40/rawhide (ppc64le)
-%global cfi 0
-%endif
-
 # set correct toolchain
 %if %{clang}
 %global toolchain clang
@@ -256,12 +251,13 @@
 %if 0%{?fedora} > 38 || 0%{?rhel} > 9
 %global bundlebrotli 0
 %global bundleicu 0
+%global bundlelibwebp 0
 %else
 %global bundlebrotli 1
 %global bundleicu 1
+%global bundlelibwebp 1
 %endif
 %global bundledav1d 0
-%global bundlelibwebp 0
 %global bundlelibpng 0
 %global bundlelibjpeg 0
 %global bundlelibdrm 0
@@ -314,7 +310,7 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 125.0.6422.141
+Version: 126.0.6478.55
 Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
@@ -373,7 +369,7 @@ Patch90: chromium-121-system-libxml.patch
 Patch91: chromium-108-system-opus.patch
 
 # need to explicitly include a kernel header on EL7 to support MFD_CLOEXEC, F_SEAL_SHRINK, F_ADD_SEALS, F_SEAL_SEAL
-Patch100: chromium-116-el7-include-fcntl-memfd.patch
+Patch100: chromium-126-el7-include-fcntl-memfd.patch
 
 # add define HAVE_STRNDUP on epel7
 Patch101: chromium-108-el7-wayland-strndup-error.patch
@@ -387,7 +383,7 @@ Patch103: chromium-110-epel7-old-headers-workarounds.patch
 
 # Use old cups (chromium's code workaround breaks on gcc)
 # Revert: https://github.com/chromium/chromium/commit/c3213f8779ddc427e89d982514185ed5e4c94e91
-Patch104: chromium-99.0.4844.51-epel7-old-cups.patch
+Patch104: chromium-126-el7-old-cups.patch
 
 # libdrm on EL7 is rather old and chromium assumes newer
 # This gets us by for now
@@ -406,14 +402,14 @@ Patch108: chromium-118-el7_v4l2_quantization.patch
 Patch109: chromium-114-wireless-el7.patch
 Patch110: chromium-115-buildflag-el7.patch
 Patch111: chromium-122-el7-inline-function.patch
-Patch112: chromium-125-el7-rust-proc-macro2.patch
+Patch112: chromium-126-el7-rust-c_string.patch
 Patch113: chromium-121-el7-clang-version-warning.patch
 Patch114: chromium-123-el7-clang-build-failure.patch
 Patch115: chromium-124-el7-size_t.patch
 
 # fixes for old clang version in el7 (clang <= 15)
 # compiler build errors, no matching constructor for initialization
-Patch116: chromium-125-el7-no_matching_constructor.patch
+Patch116: chromium-126-el7-no_matching_constructor.patch
 Patch117: chromium-115-el7-compiler-SkColor4f.patch
 
 # workaround for clang bug, https://github.com/llvm/llvm-project/issues/57826
@@ -425,9 +421,13 @@ Patch119: chromium-125-el7-typename.patch
 # error: invalid operands to binary expression
 Patch120: chromium-117-el7-string-convert.patch
 Patch121: chromium-125-el7-assert.patch
-Patch122: chromium-125-el7-constexpr.patch
-Patch123: chromium-125-el7-type-alias.patch
+Patch122: chromium-126-el7-constexpr.patch
+Patch123: chromium-126-el7-type-alias.patch
 Patch124: chromium-125-el7-optional-workaround-assert.patch
+Patch125: chromium-126-el7-interator.patch
+Patch126: chromium-126-el7-colormap.patch
+Patch127: chromium-126-el7-stdformat.patch
+Patch128: chromium-126-el7-std_variant.patch
 
 # system ffmpeg
 # need for old ffmpeg 5.x on epel9
@@ -465,10 +465,10 @@ Patch312: chromium-123-fstack-protector-strong.patch
 # rust is old, function or associated item not found in `OsStr`
 Patch313: chromium-123-rust-clap_lex.patch
 
-Patch314: chromium-124-clang16-buildflags.patch
+Patch314: chromium-126-clang16-buildflags.patch
 
 # remove ldflags -Wl,-mllvm,-disable-auto-upgrade-debug-info which is not supported
-Patch315: chromium-122-clang16-disable-auto-upgrade-debug-info.patch
+Patch315: chromium-126-clang16-disable-auto-upgrade-debug-info.patch
 
 # add -ftrivial-auto-var-init=zero and -fwrapv
 Patch316: chromium-122-clang-build-flags.patch
@@ -481,17 +481,14 @@ Patch317: chromium-124-libdav1d-aarch64.patch
 # Disable BTI until this is fixed upstream.
 Patch352: chromium-117-workaround_for_crash_on_BTI_capable_system.patch
 
-# remove flag split-threshold-for-reg-with-hint, it' not supported in clang <= 17
-Patch354: chromium-120-split-threshold-for-reg-with-hint.patch
+# remove flag split-threshold-for-reg-with-hint, it's not supported in clang <= 17
+Patch354: chromium-126-split-threshold-for-reg-with-hint.patch
 
 # use system libstdc++
-Patch355: chromium-125-system-libstdc++.patch
+Patch355: chromium-126-system-libstdc++.patch
 
 # set clang_lib path
 Patch358: chromium-124-rust-clang_lib.patch
-
-# ERROR Unresolved dependencies
-Patch359: chromium-124-libavif-deps.patch
 
 # PowerPC64 LE support
 # Patches taken from Debian, Timothy Pearson's patchset
@@ -564,10 +561,6 @@ Patch413: fix-unknown-warning-option-messages.diff
 # upstream patches
 # 64kpage support on el8
 Patch500: chromium-124-el8-support-64kpage.patch
-# add missing include for usage of FieldDataManager in autofill_agent.h
-Patch501: chromium-125-missing-include-FieldDataManager.patch
-# [devtools] fix a missing build dependency to a generated file
-Patch502: chromium-125-devtools-build-dependency.patch
 
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
 # http://build.chromium.org/buildbot/official/
@@ -1195,7 +1188,7 @@ cp /opt/rh/%{toolset}-%{dts_version}/root/usr/include/c++/%{dts_version}/optiona
 %patch -P109 -p1 -b .wireless
 %patch -P110 -p1 -b .buildflag-el7
 %patch -P111 -p1 -b .inline-function-el7
-%patch -P112 -p1 -R -b  .rust-proc-macro2
+%patch -P112 -p1 -R -b .rust-s_ctring
 %patch -P113 -p1 -b .el7-clang-version-warning
 %patch -P114 -p1 -b .clang-build-failure
 %patch -P115 -p1 -b .el7-size_t
@@ -1208,6 +1201,10 @@ cp /opt/rh/%{toolset}-%{dts_version}/root/usr/include/c++/%{dts_version}/optiona
 %patch -P122 -p1 -b .constexpr
 %patch -P123 -p1 -b .el7-type-alias
 %patch -P124 -p1 -b .el7-workaround-assert
+%patch -P125 -p1 -b .el7-interator
+%patch -P126 -p1 -b .el7-colormap
+%patch -P127 -p1 -b .el7-stdformat
+%patch -P128 -p1 -b .el7-std_variant
 %endif
 
 %if 0%{?rhel} == 9
@@ -1250,12 +1247,14 @@ cp /opt/rh/%{toolset}-%{dts_version}/root/usr/include/c++/%{dts_version}/optiona
 %patch -P352 -p1 -b .workaround_for_crash_on_BTI_capable_system
 %endif
 
-%patch -P354 -p1 -b .revert-split-threshold-for-reg-with-hint
+%if 0%{?rhel} && 0%{?rhel} < 10 || 0%{?fedora} && 0%{?fedora} < 39
+%patch -P354 -p1 -b .split-threshold-for-reg-with-hint
+%endif
+
 %if ! %{use_custom_libcxx}
 %patch -P355 -p1 -b .system-libstdc++
 %endif
 %patch -P358 -p1 -b .rust-clang_lib
-%patch -P359 -p1 -b .libavif-deps
 
 %ifarch ppc64le
 %patch -P360 -p1 -b .0001-linux-seccomp-bpf-ppc64-glibc-workaround-in-SIGSYS-h
@@ -1325,8 +1324,6 @@ cp /opt/rh/%{toolset}-%{dts_version}/root/usr/include/c++/%{dts_version}/optiona
 %patch -P500 -p1 -b .el8-support-64kpage.patch
 %endif
 %endif
-%patch -P501 -p1 -b .missing-include-FieldDataManage
-%patch -P502 -p1 -b .devtools-build-dependency
 
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
@@ -1402,11 +1399,8 @@ FLAGS+=' -Wno-unused-const-variable -Wno-unneeded-internal-declaration -Wno-unkn
 %endif
 
 %if %{system_build_flags}
-CFLAGS=${CFLAGS/-g }
 CFLAGS=${CFLAGS/-fexceptions}
 CFLAGS=${CFLAGS/-Wp,-D_GLIBCXX_ASSERTIONS}
-CFLAGS=${CFLAGS/-fcf-protection}
-CFLAGS=${CFLAGS/-fstack-clash-protection}
 CFLAGS="$CFLAGS $FLAGS"
 CXXFLAGS="$CFLAGS"
 %else
@@ -2135,6 +2129,27 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Wed Jun 12 2024 Than Ngo <than@redhat.com> - 126.0.6478.55-1
+- update to 126.0.6478.55
+  * High CVE-2024-5830: Type Confusion in V8
+  * High CVE-2024-5831: Use after free in Dawn
+  * High CVE-2024-5832: Use after free in Dawn
+  * High CVE-2024-5833: Type Confusion in V8
+  * High CVE-2024-5834: Inappropriate implementation in Dawn
+  * High CVE-2024-5835: Heap buffer overflow in Tab Groups
+  * High CVE-2024-5836: Inappropriate Implementation in DevTools
+  * High CVE-2024-5837: Type Confusion in V8
+  * High CVE-2024-5838: Type Confusion in V8
+  * Medium CVE-2024-5839: Inappropriate Implementation in Memory Allocator
+  * Medium CVE-2024-5840: Policy Bypass in CORS
+  * Medium CVE-2024-5841: Use after free in V8
+  * Medium CVE-2024-5842: Use after free in Browser UI
+  * Medium CVE-2024-5843: Inappropriate implementation in Downloads
+  * Medium CVE-2024-5844: Heap buffer overflow in Tab Strip
+  * Medium CVE-2024-5845: Use after free in Audio
+  * Medium CVE-2024-5846: Use after free in PDFium
+  * Medium CVE-2024-5847: Use after free in PDFium
+
 * Fri May 31 2024 Than Ngo <than@redhat.com> - 125.0.6422.141-1
 - update to 125.0.6422.141
   * High CVE-2024-5493: Heap buffer overflow in WebRTC

@@ -1,0 +1,22 @@
+diff -up chromium-126.0.6478.26/build/config/compiler/BUILD.gn.clang16-buildflag chromium-126.0.6478.26/build/config/compiler/BUILD.gn
+--- chromium-126.0.6478.26/build/config/compiler/BUILD.gn.clang16-buildflag	2024-06-02 14:55:55.298242780 +0200
++++ chromium-126.0.6478.26/build/config/compiler/BUILD.gn	2024-06-02 15:04:43.839882669 +0200
+@@ -1889,9 +1889,6 @@ config("default_warnings") {
+ 
+         # TODO(crbug.com/40286317): Evaluate and possibly enable.
+         "-Wno-vla-extension",
+-
+-        # TODO(crbug.com/40284799): Fix and re-enable.
+-        "-Wno-thread-safety-reference-return",
+       ]
+ 
+       cflags_cc += [
+@@ -1902,7 +1899,7 @@ config("default_warnings") {
+       if (!is_nacl) {
+         cflags_cc += [
+           # TODO(crbug.com/41486292): Fix and re-enable.
+-          "-Wno-c++11-narrowing-const-reference",
++          "-Wno-c++11-narrowing",
+         ]
+       }
+     }

@@ -1,0 +1,12 @@
+diff -up chromium-126.0.6478.26/build/config/compiler/BUILD.gn.clang16-disable-auto-upgrade-debug-info chromium-126.0.6478.26/build/config/compiler/BUILD.gn
+--- chromium-126.0.6478.26/build/config/compiler/BUILD.gn.clang16-disable-auto-upgrade-debug-info	2024-06-02 18:00:17.914641767 +0200
++++ chromium-126.0.6478.26/build/config/compiler/BUILD.gn	2024-06-02 18:02:32.153544892 +0200
+@@ -780,7 +780,7 @@ config("compiler") {
+ 
+       # We only use one version of LLVM within a build so there's no need to
+       # upgrade debug info, which can be expensive since it runs the verifier.
+-      ldflags += [ "-Wl,-mllvm,-disable-auto-upgrade-debug-info" ]
++      ldflags += [ "" ]
+     }
+ 
+     # TODO(crbug.com/335365324): Enable on other platforms.

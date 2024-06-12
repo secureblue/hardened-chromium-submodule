@@ -1,0 +1,47 @@
+diff -up chromium-126.0.6478.26/third_party/wayland/src/cursor/os-compatibility.c.el7-memfd-fcntl-include chromium-126.0.6478.26/third_party/wayland/src/cursor/os-compatibility.c
+--- chromium-126.0.6478.26/third_party/wayland/src/cursor/os-compatibility.c.el7-memfd-fcntl-include	2024-05-29 18:03:08.000000000 +0200
++++ chromium-126.0.6478.26/third_party/wayland/src/cursor/os-compatibility.c	2024-06-02 15:13:21.636638066 +0200
+@@ -29,7 +29,8 @@
+ 
+ #include <sys/types.h>
+ #include <unistd.h>
+-#include <fcntl.h>
++#include <linux/fcntl.h> // for F_SEAL_SHRINK, F_ADD_SEALS, F_SEAL_SEAL
++#include <linux/memfd.h> // for MFD_CLOEXEC
+ #include <errno.h>
+ #include <signal.h>
+ #include <string.h>
+diff -up chromium-126.0.6478.26/third_party/wayland/src/src/wayland-shm.c.el7-memfd-fcntl-include chromium-126.0.6478.26/third_party/wayland/src/src/wayland-shm.c
+--- chromium-126.0.6478.26/third_party/wayland/src/src/wayland-shm.c.el7-memfd-fcntl-include	2024-05-29 18:03:08.000000000 +0200
++++ chromium-126.0.6478.26/third_party/wayland/src/src/wayland-shm.c	2024-06-02 15:13:21.635638045 +0200
+@@ -44,7 +44,7 @@
+ #include <signal.h>
+ #include <pthread.h>
+ #include <errno.h>
+-#include <fcntl.h>
++#include <linux/fcntl.h>
+ 
+ #include "wayland-os.h"
+ #include "wayland-util.h"
+diff -up chromium-126.0.6478.26/ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.cc.el7-memfd-fcntl-include chromium-126.0.6478.26/ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.cc
+--- chromium-126.0.6478.26/ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.cc.el7-memfd-fcntl-include	2024-06-02 15:13:21.636638066 +0200
++++ chromium-126.0.6478.26/ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.cc	2024-06-02 15:16:18.202679909 +0200
+@@ -5,6 +5,7 @@
+ #include "ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.h"
+ 
+ #include <sys/mman.h>
++#include <linux/memfd.h>
+ 
+ #include <string>
+ #include <string_view>
+diff -up chromium-126.0.6478.26/v8/src/base/platform/platform-posix.cc.el7-memfd-fcntl-include chromium-126.0.6478.26/v8/src/base/platform/platform-posix.cc
+--- chromium-126.0.6478.26/v8/src/base/platform/platform-posix.cc.el7-memfd-fcntl-include	2024-05-29 18:03:35.000000000 +0200
++++ chromium-126.0.6478.26/v8/src/base/platform/platform-posix.cc	2024-06-02 15:13:21.635638045 +0200
+@@ -60,6 +60,7 @@
+ 
+ #if V8_OS_LINUX
+ #include <sys/prctl.h>  // for prctl
++#include <linux/memfd.h> // for MFD_CLOEXEC
+ #endif
+ 
+ #if defined(V8_OS_FUCHSIA)
