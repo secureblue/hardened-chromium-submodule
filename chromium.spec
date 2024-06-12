@@ -454,6 +454,7 @@ Patch150: chromium-124-qt6.patch
 # disable memory tagging in epel7 and epel8 on aarch64 due to new feature IFUNC-Resolver
 # not supported in old glibc < 2.30, error: fatal error: 'sys/ifunc.h' file not found
 Patch305: chromium-124-arm64-memory_tagging.patch
+Patch306: chromium-126-ifunc-header.patch
 
 # compiler errors on el7/el8 and f38 (clang <17)
 Patch307: chromium-125-el-NativeValueTraits-p1.patch
@@ -1222,6 +1223,7 @@ cp /opt/rh/%{toolset}-%{dts_version}/root/usr/include/c++/%{dts_version}/optiona
 %if 0%{?rhel} && 0%{?rhel} <= 8
 %ifarch aarch64
 %patch -P305 -p1 -b .memory_tagging
+%patch -P306 -p1 -b .ifunc-header
 %patch -P317 -p1 -b .libdav1d-aarch64
 %endif
 %endif
