@@ -311,7 +311,7 @@
 
 Name:	chromium%{chromium_channel}
 Version: 126.0.6478.126
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -2131,6 +2131,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Sun Jul 07 2024 Than Ngo <than@redhat.com> - 126.0.6478.126-2
+- fixed rhbz#2293202, chromium Wayland UI regression
+
 * Tue Jun 25 2024 Than Ngo <than@redhat.com> - 126.0.6478.126-1
 - update to 126.0.6478.126
   * High CVE-2024-6290: Use after free in Dawn
