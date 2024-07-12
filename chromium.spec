@@ -196,7 +196,7 @@
 
 %if 0%{?rhel} > 9 || 0%{?fedora} > 39
 %global use_qt6 1
-%global use_qt 0
+%global use_qt 1
 %else
 %if 0%{?rhel} == 8 || 0%{?rhel} == 9 || 0%{?fedora}
 %global use_qt6 0
@@ -1125,6 +1125,20 @@ A minimal headless client built from Chromium. headless_shell is built
 without support for alsa, cups, dbus, gconf, gio, kerberos, pulseaudio, or 
 udev.
 
+%package qt5-ui
+Summary: Qt5 UI built from Chromium
+Requires: chromium%{_isa} = %{version}-%{release}
+
+%description qt5-ui
+Qt5 UI for chromium.
+
+%package qt6-ui
+Summary: Qt6 UI built from Chromium
+Requires: chromium%{_isa} = %{version}-%{release}
+
+%description qt6-ui
+Qt6 UI for chromium.
+
 %prep
 %setup -q -n chromium-%{version}
 
@@ -2005,17 +2019,21 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %{chromium_path}/%{chromium_browser_channel}
 %{chromium_path}/%{chromium_browser_channel}.sh
 %attr(4755, root, root) %{chromium_path}/chrome-sandbox
-%if %{use_qt}
-%{chromium_path}/libqt5_shim.so
-%endif
-%if %{use_qt6}
-%{chromium_path}/libqt6_shim.so
-%endif
 %{_mandir}/man1/%{chromium_browser_channel}.*
 %{_datadir}/icons/hicolor/*/apps/%{chromium_browser_channel}.png
 %{_datadir}/applications/*.desktop
 %{_datadir}/metainfo/*.appdata.xml
 %{_datadir}/gnome-control-center/default-apps/chromium-browser.xml
+
+%if %{use_qt}
+%files qt5-ui
+%{chromium_path}/libqt5_shim.so
+%endif
+
+%if %{use_qt6}
+%files qt6-ui
+%{chromium_path}/libqt6_shim.so
+%endif
 
 %files common
 %if %{build_clear_key_cdm}
