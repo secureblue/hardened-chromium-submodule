@@ -196,7 +196,7 @@
 
 %if 0%{?rhel} > 9 || 0%{?fedora} > 39
 %global use_qt6 1
-%global use_qt 1
+%global use_qt 0
 %else
 %if 0%{?rhel} == 8 || 0%{?rhel} == 9 || 0%{?fedora}
 %global use_qt6 0
