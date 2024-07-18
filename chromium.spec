@@ -311,7 +311,7 @@
 
 Name:	chromium%{chromium_channel}
 Version: 126.0.6478.182
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -1496,6 +1496,8 @@ CHROMIUM_CORE_GN_DEFINES+=' chrome_pgo_phase=0'
 
 %if ! %{cfi}
 CHROMIUM_CORE_GN_DEFINES+=' is_cfi=false use_thin_lto=false'
+%else
+CHROMIUM_CORE_GN_DEFINES+=' is_cfi=true use_thin_lto=true'
 %endif
 
 %if %{useapikey}
@@ -2149,6 +2151,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Thu Jul 18 2024 Than Ngo <than@redhat.com> - 126.0.6478.182-2
+- fixed condition for is_cfi/use_thin_lto on aarch64/ppc64le
+
 * Tue Jul 16 2024 Than Ngo <than@redhat.com> - 126.0.6478.182-1
 - update to 126.0.6478.182
   * High CVE-2024-6772: Inappropriate implementation in V8
