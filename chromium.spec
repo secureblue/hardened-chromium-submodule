@@ -494,8 +494,8 @@ Patch355: chromium-126-system-libstdc++.patch
 Patch358: chromium-124-rust-clang_lib.patch
 
 # PowerPC64 LE support
-# Patches taken from Debian, Timothy Pearson's patchset
-# https://salsa.debian.org/chromium-team/chromium/-/tree/master/debian/patches/ppc64le?ref_type=heads
+# Timothy Pearson's patchset
+# https://gitlab.solidsilicon.io/public-development/open-source/chromium/openpower-patches/-/tree/chromium-126/patches/ppc64le
 Patch360: 0001-linux-seccomp-bpf-ppc64-glibc-workaround-in-SIGSYS-h.patch
 Patch361: 0001-sandbox-Enable-seccomp_bpf-for-ppc64.patch
 Patch362: 0001-services-service_manager-sandbox-linux-Fix-TCGETS-de.patch
