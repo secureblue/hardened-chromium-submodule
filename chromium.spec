@@ -177,9 +177,11 @@
 
 # enable|disable control flow integrity support
 %global cfi 0
+%ifarch x86_64 aarch64
 %if %{clang}
 %if 0%{?fedora} || 0%{?rhel} > 7
 %global cfi 1
+%endif
 %endif
 %endif
 
