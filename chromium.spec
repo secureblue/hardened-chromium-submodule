@@ -377,20 +377,8 @@ Patch150: chromium-124-qt6.patch
 Patch305: chromium-124-arm64-memory_tagging.patch
 Patch306: chromium-126-ifunc-header.patch
 
-# compiler errors on el7/el8 and f38 (clang <17)
-Patch307: chromium-125-el-NativeValueTraits-p1.patch
-Patch308: chromium-125-el-NativeValueTraits-p2.patch
-
 # enable fstack-protector-strong
 Patch312: chromium-123-fstack-protector-strong.patch
-
-# rust is old, function or associated item not found in `OsStr`
-Patch313: chromium-123-rust-clap_lex.patch
-
-Patch314: chromium-126-clang16-buildflags.patch
-
-# remove ldflags -Wl,-mllvm,-disable-auto-upgrade-debug-info which is not supported
-Patch315: chromium-126-clang16-disable-auto-upgrade-debug-info.patch
 
 # add -ftrivial-auto-var-init=zero and -fwrapv
 Patch316: chromium-122-clang-build-flags.patch
@@ -1125,18 +1113,7 @@ Qt6 UI for chromium.
 %endif
 %endif
 
-%if 0%{?rhel} && 0%{?rhel} < 9 || 0%{?fedora} && 0%{?fedora} < 39
-%patch -P307 -p1 -b .el-NativeValueTraits-p1
-%patch -P308 -p1 -b .el-NativeValueTraits
-%patch -P314 -p1 -b .clang16-buildflag
-%patch -P315 -p1 -b .clang16-disable-auto-upgrade-debug-info
-%endif
-
 %patch -P312 -p1 -b .fstack-protector-strong
-
-%if 0%{?rhel} && 0%{?rhel} < 10
-%patch -P313 -p1 -b .rust-clap_lex
-%endif
 
 %if 0%{?rhel} >= 8 || 0%{?fedora}
 %patch -P316 -p1 -b .clang-build-flags
