@@ -1124,7 +1124,7 @@ Qt6 UI for chromium.
 %patch -P150 -p1 -b .qt6
 %endif
 
-%if 0%{?rhel} = 8
+%if 0%{?rhel} == 8
 %ifarch aarch64
 %patch -P305 -p1 -b .memory_tagging
 %patch -P306 -p1 -b .ifunc-header
