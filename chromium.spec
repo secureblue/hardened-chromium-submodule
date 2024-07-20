@@ -60,24 +60,13 @@
 %global dts_version 13
 %endif
 
-# set latest version for llvm-toolset on el7
-%global llvm_toolset_version 14.0
-
 # set name for toolset
-%if 0%{?rhel} == 7
-%global toolset devtoolset
-%else
 %global toolset gcc-toolset
-%endif
 
-%if 0%{?rhel} == 7
-%global chromium_pybin /opt/rh/rh-python38/root/usr/bin/python
-%else
 %if 0%{?rhel} == 8
 %global chromium_pybin /usr/bin/python3.9
 %else
 %global chromium_pybin %{__python3}
-%endif
 %endif
 
 # va-api only supported in rhel >= 9 and fedora
@@ -86,8 +75,8 @@
 # v4l2_codec only enable for fedora aarch64
 %global use_v4l2_codec 0
 
-# libva in EL7 and EL8 is too old.
-%if 0%{?rhel} == 7 || 0%{?rhel} == 8
+# libva is too old on el8.
+%if 0%{?rhel} == 8
 %global use_vaapi 0
 %endif
 
@@ -135,9 +124,6 @@
 # disable debuginfo due to a bug in debugedit on el7
 # error: canonicalization unexpectedly shrank by one character
 # https://bugzilla.redhat.com/show_bug.cgi?id=304121
-%if 0%{?rhel} == 7
-%global enable_debug 0
-%endif
 %if ! %{enable_debug}
 %global debug_package %{nil}
 %global debug_level 0
@@ -168,9 +154,6 @@
 
 # enable|disable use_custom_libcxx
 %global use_custom_libcxx 1
-%if 0%{?rhel} == 7
-%global use_custom_libcxx 0
-%endif
 
 # enable clang by default
 %global clang 1
@@ -229,11 +212,11 @@
 # enable bundleminizip for Fedora > 39 due to switch to minizip-ng
 # which breaks the build
 %global bundleminizip 0
-%if 0%{?rhel} == 7 || 0%{?fedora} > 39
+%if 0%{?fedora} > 39
 %global bundleminizip 1
 %endif
 
-%if 0%{?rhel} == 7 || 0%{?rhel} == 8
+%if 0%{?rhel} == 8
 %global bundleharfbuzz 1
 %global bundlelibwebp 1
 %global bundlelibpng 1
@@ -369,67 +352,6 @@ Patch90: chromium-121-system-libxml.patch
 
 # patch for using system opus
 Patch91: chromium-108-system-opus.patch
-
-# need to explicitly include a kernel header on EL7 to support MFD_CLOEXEC, F_SEAL_SHRINK, F_ADD_SEALS, F_SEAL_SEAL
-Patch100: chromium-126-el7-include-fcntl-memfd.patch
-
-# add define HAVE_STRNDUP on epel7
-Patch101: chromium-108-el7-wayland-strndup-error.patch
-
-# Workaround for old clang 14
-# error: defaulting this default constructor would delete it after its first declaration
-Patch102: chromium-125-el7-default-constructor-involving-anonymous-union.patch
-
-# Work around old and missing headers on EPEL7
-Patch103: chromium-110-epel7-old-headers-workarounds.patch
-
-# Use old cups (chromium's code workaround breaks on gcc)
-# Revert: https://github.com/chromium/chromium/commit/c3213f8779ddc427e89d982514185ed5e4c94e91
-Patch104: chromium-126-el7-old-cups.patch
-
-# libdrm on EL7 is rather old and chromium assumes newer
-# This gets us by for now
-Patch105: chromium-125-el7-old-libdrm.patch
-
-# error: no matching function for call to 'std::basic_string<char>::erase(std::basic_string<char>::const_iterator, __gnu_cxx::__normal_iterator<const char*, std::basic_string<char> >&)'
-#   33 |   property_name.erase(property_name.cbegin(), cur);
-# Not sure how this EVER worked anywhere, but it only seems to fail on EPEL-7.
-Patch106: chromium-98.0.4758.80-epel7-erase-fix.patch
-
-# Add additional operator== to make el7 happy.
-Patch107: chromium-122-el7-extra-operator.patch
-# old v4l2 on el7
-Patch108: chromium-118-el7_v4l2_quantization.patch 
-# workaround for old clang on el7
-Patch109: chromium-114-wireless-el7.patch
-Patch110: chromium-115-buildflag-el7.patch
-Patch111: chromium-122-el7-inline-function.patch
-Patch112: chromium-126-el7-rust-c_string.patch
-Patch113: chromium-121-el7-clang-version-warning.patch
-Patch114: chromium-123-el7-clang-build-failure.patch
-Patch115: chromium-124-el7-size_t.patch
-
-# fixes for old clang version in el7 (clang <= 15)
-# compiler build errors, no matching constructor for initialization
-Patch116: chromium-126-el7-no_matching_constructor.patch
-Patch117: chromium-115-el7-compiler-SkColor4f.patch
-
-# workaround for clang bug, https://github.com/llvm/llvm-project/issues/57826
-Patch118: chromium-124-el7-workaround_clang_bug-structured_binding.patch
-
-# missing typename
-Patch119: chromium-125-el7-typename.patch
-
-# error: invalid operands to binary expression
-Patch120: chromium-117-el7-string-convert.patch
-Patch121: chromium-125-el7-assert.patch
-Patch122: chromium-126-el7-constexpr.patch
-Patch123: chromium-126-el7-type-alias.patch
-Patch124: chromium-125-el7-optional-workaround-assert.patch
-Patch125: chromium-126-el7-interator.patch
-Patch126: chromium-126-el7-colormap.patch
-Patch127: chromium-126-el7-stdformat.patch
-Patch128: chromium-126-el7-std_variant.patch
 
 # system ffmpeg
 # need for old ffmpeg 5.x on epel9
@@ -1190,40 +1112,6 @@ Qt6 UI for chromium.
 %patch -P134 -p1 -b .disable-FFmpegAllowLists
 %endif
 
-# EPEL specific patches
-%if 0%{?rhel} == 7
-cp /opt/rh/%{toolset}-%{dts_version}/root/usr/include/c++/%{dts_version}/optional .
-%patch -P100 -p1 -b .el7-memfd-fcntl-include
-%patch -P101 -p1 -b .wayland-strndup-error
-%patch -P102 -p1 -b .default-constructor-involving-anonymous-union
-%patch -P103 -p1 -b .epel7-header-workarounds
-%patch -P104 -p1 -b .el7cups
-%patch -P105 -p1 -b .el7-old-libdrm
-%patch -P106 -p1 -b .el7-erase-fix
-%patch -P107 -p1 -b .el7-extra-operator-equalequal
-%patch -P108 -p1 -b .el7_v4l2_quantization
-%patch -P109 -p1 -b .wireless
-%patch -P110 -p1 -b .buildflag-el7
-%patch -P111 -p1 -b .inline-function-el7
-%patch -P112 -p1 -R -b .rust-s_ctring
-%patch -P113 -p1 -b .el7-clang-version-warning
-%patch -P114 -p1 -b .clang-build-failure
-%patch -P115 -p1 -b .el7-size_t
-%patch -P116 -p1 -b .no_matching_constructor
-%patch -P117 -p1 -b .workaround_clang-SkColor4f
-%patch -P118 -p1 -b .workaround_clang_bug-structured_binding
-%patch -P119 -p1 -b .typename
-%patch -P120 -p1 -b .string-convert
-%patch -P121 -p1 -b .assert
-%patch -P122 -p1 -b .constexpr
-%patch -P123 -p1 -b .el7-type-alias
-%patch -P124 -p1 -b .el7-workaround-assert
-%patch -P125 -p1 -b .el7-interator
-%patch -P126 -p1 -b .el7-colormap
-%patch -P127 -p1 -b .el7-stdformat
-%patch -P128 -p1 -b .el7-std_variant
-%endif
-
 %if 0%{?rhel} == 9
 %patch -P140 -p1 -b .revert-av1enc
 %endif
@@ -1236,7 +1124,7 @@ cp /opt/rh/%{toolset}-%{dts_version}/root/usr/include/c++/%{dts_version}/optiona
 %patch -P150 -p1 -b .qt6
 %endif
 
-%if 0%{?rhel} && 0%{?rhel} <= 8
+%if 0%{?rhel} = 8
 %ifarch aarch64
 %patch -P305 -p1 -b .memory_tagging
 %patch -P306 -p1 -b .ifunc-header
@@ -1453,16 +1341,6 @@ export CFLAGS
 export CXXFLAGS
 export LDFLAGS
 export RUSTFLAGS
-
-# enable toolset on el7
-%if 0%{?rhel} == 7
-. /opt/rh/rh-python38/enable
-%if %{clang}
-. /opt/rh/llvm-toolset-%{llvm_toolset_version}/enable
-%else
-. /opt/rh/%{toolset}-%{dts_version}/enable
-%endif
-%endif
 
 # enable gcc toolset on el8
 %if 0%{?rhel} == 8 && ! %{clang}
