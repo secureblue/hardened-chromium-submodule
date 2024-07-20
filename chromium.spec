@@ -307,9 +307,6 @@ Patch0: chromium-70.0.3538.67-sandbox-pie.patch
 # Use /etc/chromium for initial_prefs
 Patch1: chromium-115-initial_prefs-etc-path.patch
 
-# system libusb
-Patch2: chromium-120-system-libusb.patch
-
 # Do not mangle zlib
 Patch5: chromium-77.0.3865.75-no-zlib-mangle.patch
 
