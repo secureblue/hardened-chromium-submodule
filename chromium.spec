@@ -372,19 +372,20 @@ Patch141: chromium-118-dma_buf_export_sync_file-conflict.patch
 # add correct path for Qt6Gui header and libs
 Patch150: chromium-124-qt6.patch
 
-# disable memory tagging in epel7 and epel8 on aarch64 due to new feature IFUNC-Resolver
-# not supported in old glibc < 2.30, error: fatal error: 'sys/ifunc.h' file not found
-Patch305: chromium-124-arm64-memory_tagging.patch
-Patch306: chromium-126-ifunc-header.patch
+# disable memory tagging (epel8 on aarch64) due to new feature IFUNC-Resolver
+# it is not supported in old glibc < 2.30, error: fatal error: 'sys/ifunc.h' file not found
+Patch305: chromium-124-el8-arm64-memory_tagging.patch
+Patch306: chromium-126-el8-ifunc-header.patch
+# build error: unknown architectural extension on aarch64 (epel8)
+Patch307: chromium-124-el8-libdav1d-aarch64.patch
+# 64kpage support on aarch64 (el8)
+Patch308: chromium-124-el8-support-64kpage.patch
 
 # enable fstack-protector-strong
 Patch312: chromium-123-fstack-protector-strong.patch
 
 # add -ftrivial-auto-var-init=zero and -fwrapv
 Patch316: chromium-122-clang-build-flags.patch
-
-# build error: unknown architectural extension on aarch64 (epel and < f39)
-Patch317: chromium-124-libdav1d-aarch64.patch
 
 # Workaround for https://bugzilla.redhat.com/show_bug.cgi?id=2239523
 # https://bugs.chromium.org/p/chromium/issues/detail?id=1145581#c60
@@ -1037,7 +1038,6 @@ Qt6 UI for chromium.
 ### Chromium Fedora Patches ###
 %patch -P0 -p1 -b .sandboxpie
 %patch -P1 -p1 -b .etc
-%patch -P2 -p1 -b .system-libusb
 %patch -P5 -p1 -b .nozlibmangle
 %patch -P6 -p1 -b .nounrar
 %patch -P8 -p1 -b .widevine-other-locations
@@ -1090,17 +1090,16 @@ Qt6 UI for chromium.
 
 %if 0%{?rhel} == 8
 %ifarch aarch64
-%patch -P305 -p1 -b .memory_tagging
-%patch -P306 -p1 -b .ifunc-header
-%patch -P317 -p1 -b .libdav1d-aarch64
+%patch -P305 -p1 -b .el8-memory_tagging
+%patch -P306 -p1 -b .el8-ifunc-header
+%patch -P307 -p1 -b .el8-libdav1d-aarch64
+%patch -P308 -p1 -b .el8-support-64kpage.patch
 %endif
 %endif
 
 %patch -P312 -p1 -b .fstack-protector-strong
 
-%if 0%{?rhel} >= 8 || 0%{?fedora}
 %patch -P316 -p1 -b .clang-build-flags
-%endif
 
 %if %{disable_bti}
 %patch -P352 -p1 -b .workaround_for_crash_on_BTI_capable_system
@@ -1176,12 +1175,6 @@ Qt6 UI for chromium.
 
 %patch -P412 -p1 -b .fix-swiftshader-compile.patch
 %patch -P413 -p1 -b .fix-unknown-warning-option-messages
-%endif
-
-%%ifarch aarch64
-%if 0%{?rhel} == 8
-%patch -P500 -p1 -b .el8-support-64kpage.patch
-%endif
 %endif
 
 # Change shebang in all relevant files in this directory and all subdirectories
