@@ -466,10 +466,6 @@ Patch412: fix-swiftshader-compile.patch
 # Suppress harmless compiler warning messages that appear on ppc64 due to arch-specific warning flags being passed
 Patch413: fix-unknown-warning-option-messages.diff
 
-# upstream patches
-# 64kpage support on el8
-Patch500: chromium-124-el8-support-64kpage.patch
-
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
 # http://build.chromium.org/buildbot/official/
 # For Chromium Fedora use chromium-latest.py --stable --ffmpegclean --ffmpegarm
