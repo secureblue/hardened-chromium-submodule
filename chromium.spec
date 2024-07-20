@@ -366,9 +366,6 @@ Patch133: chromium-121-system-old-ffmpeg.patch
 # disable FFmpegAllowLists by default to allow external ffmpeg
 patch134: chromium-125-disable-FFmpegAllowLists.patch
 
-# revert AV1 VAAPI video encode due to old libva on el9 (rhel9.3)
-Patch140: chromium-122-revert-av1enc-el9.patch
-
 # file conflict with old kernel on el8/el9
 Patch141: chromium-118-dma_buf_export_sync_file-conflict.patch
 
@@ -1110,10 +1107,6 @@ Qt6 UI for chromium.
 %patch -P132 -p1 -b .sigtrap_system_ffmpeg
 %patch -P133 -p1 -b .system-old-ffmpeg
 %patch -P134 -p1 -b .disable-FFmpegAllowLists
-%endif
-
-%if 0%{?rhel} == 9
-%patch -P140 -p1 -b .revert-av1enc
 %endif
 
 %if 0%{?rhel} == 8 || 0%{?rhel} == 9
