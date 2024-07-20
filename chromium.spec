@@ -510,25 +510,17 @@ Source15: https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-%{esbuil
 BuildRequires: golang-github-evanw-esbuild
 %endif
 
-%if 0%{?rhel} == 7
-BuildRequires: rh-python38
-%endif
-
 %if %{clang}
-%if 0%{?rhel} == 7
-BuildRequires: llvm-toolset-%{llvm_toolset_version}
-%else
 BuildRequires: clang
 BuildRequires: clang-tools-extra
 BuildRequires: llvm
 BuildRequires: lld
-%endif
 # needs for libatomic
-%if 0%{?rhel} >= 7
+%if 0%{?rhel} >= 8
 BuildRequires: %{toolset}-%{dts_version}-libatomic-devel
 %endif
 %else
-%if 0%{?rhel} == 7 || 0%{?rhel} == 8
+%if 0%{?rhel} == 8
 BuildRequires: %{toolset}-%{dts_version}-binutils, %{toolset}-%{dts_version}-libatomic-devel
 %endif
 %if 0%{?fedora} || 0%{?rhel} > 8
@@ -589,11 +581,7 @@ BuildRequires: pkgconfig(Qt6Core)
 BuildRequires: pkgconfig(Qt6Widgets)
 %endif
 
-%if 0%{?rhel} == 7
-BuildRequires: llvm-toolset-%{llvm_toolset_version}-compiler-rt
-%else
 BuildRequires: compiler-rt
-%endif
 
 %if ! %{bundleharfbuzz}
 BuildRequires:	harfbuzz-devel >= 2.4.0
@@ -839,17 +827,12 @@ Requires: u2f-hidraw-policy
 
 Requires: chromium-common%{_isa} = %{version}-%{release}
 
-# rhel 7: x86_64
-# rhel 8 or newer: x86_64, aarch64
-# fedora 38 or newer: x86_64, aarch64, ppc64le
-%if 0%{?rhel} == 7
-ExclusiveArch: x86_64
-%else
+# rhel 8 or newer and fedora < 40: x86_64, aarch64
+# fedora 40 or newer: x86_64, aarch64, ppc64le
 %if 0%{?fedora} >= 40
 ExclusiveArch: x86_64 aarch64 ppc64le
 %else
 ExclusiveArch: x86_64 aarch64
-%endif
 %endif
 
 # Bundled bits (I'm sure I've missed some)
