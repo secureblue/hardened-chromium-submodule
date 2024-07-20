@@ -453,15 +453,16 @@ Patch400: fix-rustc.patch
 Patch401: fix-rust-linking.patch
 Patch402: fix-breakpad-compile.patch
 Patch403: fix-partition-alloc-compile.patch
-Patch404: 0002-Add-ppc64-trap-instructions.patch
+Patch404: fix-study-crash.patch
+Patch405: memory-allocator-dcheck-assert-fix.patch
+Patch406: 0002-Add-ppc64-trap-instructions.patch
 
 Patch407: fix-ppc64-linux-syscalls-headers.patch
-Patch409: use-sysconf-page-size-on-ppc64.patch
+Patch408: use-sysconf-page-size-on-ppc64.patch
+Patch409: partition-alloc-4k-detect.patch
 
 Patch410: dawn-fix-typos.patch
 Patch411: dawn-fix-ppc64le-detection.patch
-
-Patch412: fix-swiftshader-compile.patch
 
 # Suppress harmless compiler warning messages that appear on ppc64 due to arch-specific warning flags being passed
 Patch413: fix-unknown-warning-option-messages.diff
@@ -1158,15 +1159,17 @@ Qt6 UI for chromium.
 %patch -P401 -p1 -b .fix-rust-linking
 %patch -P402 -p1 -b .fix-breakpad-compile
 %patch -P403 -p1 -b .fix-partition-alloc-compile
-%patch -P404 -p1 -b .0002-Add-ppc64-trap-instructions
+%patch -P404 -p1 -b .fix-study-crash
+%patch -P405 -p1 -b .memory-allocator-dcheck-assert-fix
+%patch -P406 -p1 -b .0002-Add-ppc64-trap-instructions
 
 %patch -P407 -p1 -b .fix-ppc64-linux-syscalls-headers
-%patch -P409 -p1 -b .use-sysconf-page-size-on-ppc64
+%patch -P408 -p1 -b .use-sysconf-page-size-on-ppc64
+%patch -P409 -p1 -b .partition-alloc-4k-detect
 
 %patch -P410 -p1 -b .dawn-fix-typos
 %patch -P411 -p1 -b .dawn-fix-ppc64le-detection
 
-%patch -P412 -p1 -b .fix-swiftshader-compile.patch
 %patch -P413 -p1 -b .fix-unknown-warning-option-messages
 %endif
 
@@ -1970,8 +1973,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
-* Thu Jul 18 2024 Than Ngo <than@redhat.com> - 126.0.6478.182-2
-- fixed condition for is_cfi/use_thin_lto on aarch64/ppc64le
+* Sat Jul 20 2024 Than Ngo <than@redhat.com> - 126.0.6478.182-2
+- fix condition for is_cfi/use_thin_lto on aarch64/ppc64le
+- update powerpc patches
 
 * Tue Jul 16 2024 Than Ngo <than@redhat.com> - 126.0.6478.182-1
 - update to 126.0.6478.182
