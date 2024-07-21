@@ -465,7 +465,10 @@ Patch410: dawn-fix-typos.patch
 Patch411: dawn-fix-ppc64le-detection.patch
 
 # Suppress harmless compiler warning messages that appear on ppc64 due to arch-specific warning flags being passed
-Patch413: fix-unknown-warning-option-messages.diff
+Patch412: fix-unknown-warning-option-messages.diff
+
+# error: undefined symbol: llvm::MCAsmInfoXCOFF::MCAsmInfoXCOFF()
+Patch413: fix-swiftshader-compile.patch
 
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
 # http://build.chromium.org/buildbot/official/
@@ -1170,7 +1173,8 @@ Qt6 UI for chromium.
 %patch -P410 -p1 -b .dawn-fix-typos
 %patch -P411 -p1 -b .dawn-fix-ppc64le-detection
 
-%patch -P413 -p1 -b .fix-unknown-warning-option-messages
+%patch -P412 -p1 -b .fix-unknown-warning-option-messages
+%patch -P413 -p1 -b .fix-swiftshader-compile
 %endif
 
 # Change shebang in all relevant files in this directory and all subdirectories
