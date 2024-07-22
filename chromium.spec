@@ -401,6 +401,7 @@ Patch358: chromium-124-rust-clang_lib.patch
 # PowerPC64 LE support
 # Timothy Pearson's patchset
 # https://gitlab.solidsilicon.io/public-development/open-source/chromium/openpower-patches/-/tree/chromium-126/patches/ppc64le
+Patch359: add-ppc64-architecture-string.patch
 Patch360: 0001-linux-seccomp-bpf-ppc64-glibc-workaround-in-SIGSYS-h.patch
 Patch361: 0001-sandbox-Enable-seccomp_bpf-for-ppc64.patch
 Patch362: 0001-services-service_manager-sandbox-linux-Fix-TCGETS-de.patch
@@ -1112,6 +1113,7 @@ Qt6 UI for chromium.
 %patch -P358 -p1 -b .rust-clang_lib
 
 %ifarch ppc64le
+%patch -P359 -p1 -b .add-ppc64-architecture-string
 %patch -P360 -p1 -b .0001-linux-seccomp-bpf-ppc64-glibc-workaround-in-SIGSYS-h
 %patch -P361 -p1 -b .0001-sandbox-Enable-seccomp_bpf-for-ppc64
 %patch -P362 -p1 -b .0001-services-service_manager-sandbox-linux-Fix-TCGETS-de
