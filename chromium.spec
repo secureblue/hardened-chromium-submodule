@@ -1,4 +1,5 @@
 %define _lto_cflags %{nil}
+%global _default_patch_fuzz 2
 
 # enable|disable system build flags
 %global system_build_flags 0
@@ -22,6 +23,10 @@
 
 # enable|disble bootstrap
 %global bootstrap 0
+# workaround for old gn on rhel, it causes build error: unknown function filter_labels_include()
+%if 0%{?rhel}
+%global bootstrap 1
+%endif
 
 # Fancy build status, so we at least know, where we are..
 # %1 where
@@ -75,7 +80,7 @@
 # v4l2_codec only enable for fedora aarch64
 %global use_v4l2_codec 0
 
-# libva is too old on el8.
+# libva is too old on el8
 %if 0%{?rhel} == 8
 %global use_vaapi 0
 %endif
@@ -101,10 +106,6 @@
 %global disable_bti 1
 %endif
 %endif
-
-# Seems like we might need this sometimes
-# Practically, no. But it's here in case we do.
-%global use_gold 0
 
 %global build_clear_key_cdm 0
 
@@ -196,6 +197,8 @@
 %global bundlelibaom 1
 %global bundlelibavif 1
 %global bundlesnappy 1
+%global bundleicu 1
+%global bundledav1d 1
 %global bundlepylibs 0
 %global bundlelibxslt 0
 %global bundleflac 0
@@ -226,7 +229,6 @@
 %global bundlefontconfig 1
 %global bundleffmpegfree 1
 %global bundlebrotli 1
-%global bundleicu 1
 %global bundlelibopenjpeg2 1
 %global bundlelibtiff 1
 %global bundlecrc32c 1
@@ -235,14 +237,11 @@
 %else
 %if 0%{?fedora} > 38 || 0%{?rhel} > 9
 %global bundlebrotli 0
-%global bundleicu 0
 %global bundlelibwebp 0
 %else
 %global bundlebrotli 1
-%global bundleicu 1
 %global bundlelibwebp 1
 %endif
-%global bundledav1d 0
 %global bundlelibpng 0
 %global bundlelibjpeg 0
 %global bundlelibdrm 0
@@ -295,8 +294,8 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 126.0.6478.182
-Release: 2%{?dist}
+Version: 127.0.6533.72
+Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -471,6 +470,12 @@ Patch412: fix-unknown-warning-option-messages.diff
 # error: undefined symbol: llvm::MCAsmInfoXCOFF::MCAsmInfoXCOFF()
 Patch413: fix-swiftshader-compile.patch
 
+# upstream patches
+Patch501: chromium-127-ninja-1.21.1-deps-part0.patch
+Patch502: chromium-127-ninja-1.21.1-deps-part1.patch
+Patch503: chromium-127-ninja-1.21.1-deps-part2.patch
+Patch504: chromium-127-ninja-1.21.1-deps-part3.patch
+
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
 # http://build.chromium.org/buildbot/official/
 # For Chromium Fedora use chromium-latest.py --stable --ffmpegclean --ffmpegarm
@@ -635,8 +640,9 @@ BuildRequires:	pciutils-devel
 BuildRequires:	pulseaudio-libs-devel
 
 # For screen sharing on Wayland
-%if 0%{?fedora} || 0%{?rhel} >= 8
-BuildRequires:	pkgconfig(libpipewire-0.3)
+# pipewire is old on el8, chromium needs new version, disable it temporary
+%if 0%{?fedora} || 0%{?rhel} > 8
+BuildRequires:	pipewire-devel
 %endif
 
 # for /usr/bin/appstream-util
@@ -1179,11 +1185,19 @@ Qt6 UI for chromium.
 %patch -P413 -p1 -b .fix-swiftshader-compile
 %endif
 
+%if 0%{?fedora} > 39
+%patch -P501 -p1 -b .ninja-1.21.1-deps
+%patch -P502 -p1 -b .ninja-1.21.1-deps
+%patch -P503 -p1 -b .ninja-1.21.1-deps
+%patch -P504 -p1 -b .ninja-1.21.1-deps
+%endif
+
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
 find -type f \( -iname "*.py" \) -exec sed -i '1s=^#! */usr/bin/\(python\|env python\)[23]\?=#!%{chromium_pybin}=' {} +
 
 # Add correct path for nodejs binary
+rm -rf third_party/node/linux/node-linux-x64*
 %if ! %{system_nodejs}
   pushd third_party/node/linux
 %ifarch x86_64
@@ -1311,7 +1325,6 @@ CHROMIUM_CORE_GN_DEFINES=""
 CHROMIUM_CORE_GN_DEFINES+=' custom_toolchain="//build/toolchain/linux/unbundle:default"'
 CHROMIUM_CORE_GN_DEFINES+=' host_toolchain="//build/toolchain/linux/unbundle:default"'
 CHROMIUM_CORE_GN_DEFINES+=' is_debug=false dcheck_always_on=false dcheck_is_configurable=false'
-CHROMIUM_CORE_GN_DEFINES+=' use_goma=false'
 CHROMIUM_CORE_GN_DEFINES+=' enable_nacl=false'
 CHROMIUM_CORE_GN_DEFINES+=' system_libdir="%{_lib}"'
 
@@ -1353,12 +1366,6 @@ CHROMIUM_CORE_GN_DEFINES+=' rust_sysroot_absolute="%{_prefix}"'
 CHROMIUM_CORE_GN_DEFINES+=" rustc_version=\"$rustc_version\""
 
 CHROMIUM_CORE_GN_DEFINES+=' use_sysroot=false'
-
-%if %{use_gold}
-CHROMIUM_CORE_GN_DEFINES+=' use_gold=true'
-%else
-CHROMIUM_CORE_GN_DEFINES+=' use_gold=false'
-%endif
 
 %ifarch aarch64
 CHROMIUM_CORE_GN_DEFINES+=' target_cpu="arm64"'
@@ -1429,8 +1436,10 @@ CHROMIUM_BROWSER_GN_DEFINES+=' use_vaapi=false'
 CHROMIUM_BROWSER_GN_DEFINES+=' use_v4l2_codec=true'
 %endif
 
-%if 0%{?fedora} || 0%{?rhel} >= 8
+%if 0%{?fedora} || 0%{?rhel} > 8
 CHROMIUM_BROWSER_GN_DEFINES+=' rtc_use_pipewire=true rtc_link_pipewire=true'
+%else
+CHROMIUM_BROWSER_GN_DEFINES+=' rtc_use_pipewire=false rtc_link_pipewire=false'
 %endif
 
 %if ! %{bundlelibjpeg}
@@ -1979,6 +1988,25 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Wed Jul 24 2024 Than Ngo <than@redhat.com> - 127.0.6533.72-1
+- update to 127.0.6533.72
+	* CVE-2024-6988: Use after free in Downloads
+	* CVE-2024-6989: Use after free in Loader
+	* CVE-2024-6991: Use after free in Dawn
+	* CVE-2024-6992: Out of bounds memory access in ANGLE
+	* CVE-2024-6993: Inappropriate implementation in Canvas
+	* CVE-2024-6994: Heap buffer overflow in Layout
+	* CVE-2024-6995: Inappropriate implementation in Fullscreen
+	* CVE-2024-6996: Race in Frames
+	* CVE-2024-6997: Use after free in Tabs
+	* CVE-2024-6998: Use after free in User Education
+	* CVE-2024-6999: Inappropriate implementation in FedCM
+	* CVE-2024-7000: Use after free in CSS. Reported by Anonymous
+	* CVE-2024-7001: Inappropriate implementation in HTML
+	* CVE-2024-7003: Inappropriate implementation in FedCM
+	* CVE-2024-7004: Insufficient validation of untrusted input in Safe Browsing
+	* CVE-2024-7005: Insufficient validation of untrusted input in Safe
+
 * Sat Jul 20 2024 Than Ngo <than@redhat.com> - 126.0.6478.182-2
 - fix condition for is_cfi/use_thin_lto on aarch64/ppc64le
 - update powerpc patches
