@@ -138,6 +138,7 @@ header_files="	libavcodec/x86/inline_asm.h \
 		libavcodec/pixels.h \
 		libavcodec/png.h \
 		libavcodec/pngdsp.h \
+		libavcodec/progressframe.h \
 		libavcodec/put_bits.h \
 		libavcodec/qpeldsp.h \
 		libavcodec/ratecontrol.h \
