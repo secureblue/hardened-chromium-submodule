@@ -315,10 +315,7 @@ if __name__ == '__main__':
     nacl_versions(chromium_version)
 
   if (args.cleansources):
-    junk_dirs = ['third_party/WebKit/Tools/Scripts/webkitpy/layout_tests',
-                 'webkit/data/layout_tests', 'third_party/hunspell/dictionaries',
-                 'chrome/test/data', 'native_client/tests',
-                 'third_party/WebKit/LayoutTests']
+    junk_dirs = ['build/linux/debian_bullseye_amd64-sysroot', 'build/linux/debian_bullseye_i386-sysroot']
 
     # First, the dirs:
     for directory in junk_dirs:
