@@ -237,12 +237,8 @@
 %global bundleminizip 1
 %endif
 
-%if 0%{?fedora} >= 39 || 0%{?rhel} > 9
-%global bundlebrotli 0
-%global bundlelibwebp 0
+%if 0%{?fedora} || 0%{?rhel} >= 9
 %global bundlezstd 0
-%global bundlecrc32c 0
-%global bundleharfbuzz 0
 %global bundlefontconfig 0
 %global bundledav1d 0
 %global bundlelibpng 0
@@ -253,6 +249,19 @@
 %global bundlelibopenjpeg2 0
 %global bundlelibtiff 0
 %global bundlelibxml 0
+%if 0%{?rhel} == 9
+%global bundlecrc32c 1
+%global bundleharfbuzz 1
+%global bundlebrotli 1
+%global bundleicu 1
+%global bundlelibwebp 1
+%else
+%global bundlecrc32c 0
+%global bundleharfbuzz 0
+%global bundlebrotli 0 
+%global bundleicu 0
+%global bundlelibwebp 0
+%endif
 %endif
 
 ### From 2013 until early 2021, Google permitted distribution builds of
