@@ -1278,7 +1278,7 @@ cp -a third_party/dav1d/version/version.h third_party/dav1d/libdav1d/include/dav
 %if 0%{?rhel} == 8
 tar -zxf %{SOURCE16}
 pushd rust-bindgen-0.69.4
-cargo build
+cargo --offline build
 mkdir -p ..%{_bindir} ..%{_libdir}
 cp target/debug/bindgen ..%{_bindir}
 pushd ..%{_libdir}
