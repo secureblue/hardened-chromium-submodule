@@ -1276,7 +1276,7 @@ cp -a third_party/dav1d/version/version.h third_party/dav1d/libdav1d/include/dav
 %build
 # build bindgen on el8
 %if 0%{?rhel} == 8
-%__rpmuncompress -x %{SOURCE16}
+xz -dc %{SOURCE16} | tar -xof -
 pushd rust-bindgen-0.69.4
 cargo build
 mkdir -p ..%{_bindir} ..%{_libdir}
