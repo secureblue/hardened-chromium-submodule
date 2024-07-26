@@ -1192,7 +1192,7 @@ Qt6 UI for chromium.
 
 %patch -P407 -p1 -b .fix-ppc64-linux-syscalls-headers
 %patch -P408 -p1 -b .use-sysconf-page-size-on-ppc64
-%patch -P409 -p1 -b .partition-alloc-4k-detect
+#%%patch -P409 -p1 -b .partition-alloc-4k-detect
 
 %patch -P410 -p1 -b .dawn-fix-typos
 %patch -P411 -p1 -b .dawn-fix-ppc64le-detection
