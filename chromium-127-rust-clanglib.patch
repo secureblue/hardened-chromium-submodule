@@ -1,3 +1,15 @@
+diff -up chromium-127.0.6533.72/build/rust/rust_bindgen.gni.me chromium-127.0.6533.72/build/rust/rust_bindgen.gni
+--- chromium-127.0.6533.72/build/rust/rust_bindgen.gni.me	2024-07-25 16:11:18.754551595 +0200
++++ chromium-127.0.6533.72/build/rust/rust_bindgen.gni	2024-07-25 16:11:33.997837660 +0200
+@@ -22,7 +22,7 @@ _libclang_path = rust_bindgen_root
+ if (host_os == "win") {
+   _libclang_path += "/bin"
+ } else {
+-  _libclang_path += "/lib"
++  _libclang_path += "/lib64"
+ }
+ 
+ # Template to build Rust/C bindings with bindgen.
 diff -up chromium-121.0.6167.57/build/config/clang/BUILD.gn.rust-clang_lib chromium-121.0.6167.57/build/config/clang/BUILD.gn
 --- chromium-121.0.6167.57/build/config/clang/BUILD.gn.rust-clang_lib	2024-01-10 16:43:01.000000000 +0100
 +++ chromium-121.0.6167.57/build/config/clang/BUILD.gn	2024-01-20 19:51:38.481992799 +0100

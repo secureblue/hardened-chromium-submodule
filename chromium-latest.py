@@ -315,7 +315,11 @@ if __name__ == '__main__':
     nacl_versions(chromium_version)
 
   if (args.cleansources):
-    junk_dirs = ['build/linux/debian_bullseye_amd64-sysroot', 'build/linux/debian_bullseye_i386-sysroot']
+    junk_dirs = ['build/linux/debian_bullseye_amd64-sysroot',
+                 'build/linux/debian_bullseye_i386-sysroot',
+                 'third_party/node/linux/node-linux-x64',
+                 'third_party/rust-toolchain',
+                 'third_party/rust-src']
 
     # First, the dirs:
     for directory in junk_dirs:

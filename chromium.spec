@@ -197,8 +197,22 @@
 %global bundlelibaom 1
 %global bundlelibavif 1
 %global bundlesnappy 1
+%global bundlezstd 1
 %global bundleicu 1
 %global bundledav1d 1
+%global bundlebrotli 1
+%global bundlelibwebp 1
+%global bundlecrc32c 1
+%global bundleharfbuzz 1
+%global bundlelibpng 1
+%global bundlelibjpeg 1
+%global bundlefreetype 1
+%global bundlelibdrm 1
+%global bundlefontconfig 1
+%global bundleffmpegfree 1
+%global bundlelibopenjpeg2 1
+%global bundlelibtiff 1
+%global bundlelibxml 1
 %global bundlepylibs 0
 %global bundlelibxslt 0
 %global bundleflac 0
@@ -211,7 +225,11 @@
 %global bundleopus 0
 %global bundlelcms2 0
 
-# RHEL 7.9 dropped minizip.
+# workaround for build error on aarch64
+%ifarch aarch64
+%global bundlehighway 1
+%endif
+
 # enable bundleminizip for Fedora > 39 due to switch to minizip-ng
 # which breaks the build
 %global bundleminizip 0
@@ -219,44 +237,21 @@
 %global bundleminizip 1
 %endif
 
-%if 0%{?rhel} == 8
-%global bundleharfbuzz 1
-%global bundlelibwebp 1
-%global bundlelibpng 1
-%global bundlelibjpeg 1
-%global bundlefreetype 1
-%global bundlelibdrm 1
-%global bundlefontconfig 1
-%global bundleffmpegfree 1
-%global bundlebrotli 1
-%global bundlelibopenjpeg2 1
-%global bundlelibtiff 1
-%global bundlecrc32c 1
-%global bundlelibxml 1
-%global bundledav1d 1
-%else
-%if 0%{?fedora} > 38 || 0%{?rhel} > 9
+%if 0%{?fedora} >= 39 || 0%{?rhel} > 9
 %global bundlebrotli 0
 %global bundlelibwebp 0
-%else
-%global bundlebrotli 1
-%global bundlelibwebp 1
-%endif
+%global bundlezstd 0
+%global bundlecrc32c 0
+%global bundleharfbuzz 0
+%global bundlefontconfig 0
+%global bundledav1d 0
 %global bundlelibpng 0
 %global bundlelibjpeg 0
 %global bundlelibdrm 0
-%global bundlefontconfig 0
 %global bundleffmpegfree 0
 %global bundlefreetype 0
 %global bundlelibopenjpeg2 0
 %global bundlelibtiff 0
-%if 0%{?rhel} == 9
-%global bundlecrc32c 1
-%global bundleharfbuzz 1
-%else
-%global bundlecrc32c 0
-%global bundleharfbuzz 0
-%endif
 %global bundlelibxml 0
 %endif
 
@@ -371,7 +366,7 @@ Patch150: chromium-124-qt6.patch
 # disable memory tagging (epel8 on aarch64) due to new feature IFUNC-Resolver
 # it is not supported in old glibc < 2.30, error: fatal error: 'sys/ifunc.h' file not found
 Patch305: chromium-124-el8-arm64-memory_tagging.patch
-Patch306: chromium-126-el8-ifunc-header.patch
+Patch306: chromium-127-el8-ifunc-header.patch
 # build error: unknown architectural extension on aarch64 (epel8)
 Patch307: chromium-124-el8-libdav1d-aarch64.patch
 # 64kpage support on aarch64 (el8)
@@ -395,7 +390,7 @@ Patch354: chromium-126-split-threshold-for-reg-with-hint.patch
 Patch355: chromium-126-system-libstdc++.patch
 
 # set clang_lib path
-Patch358: chromium-124-rust-clang_lib.patch
+Patch358: chromium-127-rust-clanglib.patch
 
 # PowerPC64 LE support
 # Timothy Pearson's patchset
@@ -475,6 +470,7 @@ Patch501: chromium-127-ninja-1.21.1-deps-part0.patch
 Patch502: chromium-127-ninja-1.21.1-deps-part1.patch
 Patch503: chromium-127-ninja-1.21.1-deps-part2.patch
 Patch504: chromium-127-ninja-1.21.1-deps-part3.patch
+Patch505: chromium-127-crabbyavif.patch
 
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
 # http://build.chromium.org/buildbot/official/
@@ -509,6 +505,9 @@ Source14: https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-%{esbuild_ve
 Source15: https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-%{esbuild_version}.tgz
 %endif
 
+# bindgen for epel8
+Source16: https://github.com/rust-lang/rust-bindgen/archive/refs/tags/v0.69.4.tar.gz
+
 # esbuild binary from fedora
 %if 0%{?fedora}
 BuildRequires: golang-github-evanw-esbuild
@@ -535,6 +534,16 @@ BuildRequires: binutils
 %endif
 
 BuildRequires: rustc
+%if 0%{?rhel} == 8
+# need to build bindgen on el8
+BuildRequires: cargo
+%else
+BuildRequires: bindgen-cli
+%endif
+
+%if ! %{bundlezstd}
+BuildRequires: libzstd-devel
+%endif
 
 # build with system ffmpeg-free
 %if ! %{bundleffmpegfree}
@@ -1191,13 +1200,13 @@ Qt6 UI for chromium.
 %patch -P503 -p1 -b .ninja-1.21.1-deps
 %patch -P504 -p1 -b .ninja-1.21.1-deps
 %endif
+%patch -P505 -p1 -b .crabbyavif
 
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
 find -type f \( -iname "*.py" \) -exec sed -i '1s=^#! */usr/bin/\(python\|env python\)[23]\?=#!%{chromium_pybin}=' {} +
 
 # Add correct path for nodejs binary
-rm -rf third_party/node/linux/node-linux-x64*
 %if ! %{system_nodejs}
   pushd third_party/node/linux
 %ifarch x86_64
@@ -1258,6 +1267,18 @@ cp -a third_party/dav1d/version/version.h third_party/dav1d/libdav1d/include/dav
 %endif
 
 %build
+# build bindgen on el8
+%if 0%{?rhel} == 8
+%__rpmuncompress -x %{SOURCE16}
+pushd rust-bindgen-0.69.4
+cargo build
+mkdir -p ..%{_bindir} ..%{_libdir}
+cp target/debug/bindgen ..%{_bindir}
+pushd ..%{_libdir}
+ln -fs %{_libdir}/libclang* .
+popd
+popd
+%endif
 
 # reduce warnings
 %if %{clang}
@@ -1314,6 +1335,12 @@ export RUSTC_BOOTSTRAP=1
 
 # set rustc version
 rustc_version="$(rustc --version)"
+# set rust bindgen root
+%if 0%{?rhel} == 8
+rust_bindgen_root="$PWD%{_prefix}"
+%else
+rust_bindgen_root="%{_prefix}"
+%endif
 
 # set clang version
 clang_version="$(clang --version | sed -n 's/clang version //p' | cut -d. -f1)"
@@ -1363,6 +1390,7 @@ CHROMIUM_CORE_GN_DEFINES+=' use_lld=false'
 
 # enable system rust
 CHROMIUM_CORE_GN_DEFINES+=' rust_sysroot_absolute="%{_prefix}"'
+CHROMIUM_CORE_GN_DEFINES+=" rust_bindgen_root=\"$rust_bindgen_root\""
 CHROMIUM_CORE_GN_DEFINES+=" rustc_version=\"$rustc_version\""
 
 CHROMIUM_CORE_GN_DEFINES+=' use_sysroot=false'
@@ -1567,6 +1595,9 @@ system_libs=()
 %endif
 %if ! %{bundleflac}
 	system_libs+=(flac)
+%endif
+%if ! %{bundlezstd}
+	system_libs+=(zstd)
 %endif
 %if 0%{?noopenh264}
 	system_libs+=(openh264)
