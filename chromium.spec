@@ -253,13 +253,11 @@
 %global bundlecrc32c 1
 %global bundleharfbuzz 1
 %global bundlebrotli 1
-%global bundleicu 1
 %global bundlelibwebp 1
 %else
 %global bundlecrc32c 0
 %global bundleharfbuzz 0
 %global bundlebrotli 0 
-%global bundleicu 0
 %global bundlelibwebp 0
 %endif
 %endif
