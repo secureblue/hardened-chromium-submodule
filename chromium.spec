@@ -513,7 +513,8 @@ Source15: https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-%{esbuil
 %endif
 
 # bindgen for epel8
-Source16: https://github.com/rust-lang/rust-bindgen/archive/refs/tags/v0.69.4.tar.gz
+Source16: https://than.fedorapeople.org/epel8/bindgen-cli-aarch64.tar.xz
+Source17: https://than.fedorapeople.org/epel8/bindgen-cli-x86_64.tar.xz
 
 # esbuild binary from fedora
 %if 0%{?fedora}
@@ -1213,6 +1214,20 @@ Qt6 UI for chromium.
 # See `man find` for how the `-exec command {} +` syntax works
 find -type f \( -iname "*.py" \) -exec sed -i '1s=^#! */usr/bin/\(python\|env python\)[23]\?=#!%{chromium_pybin}=' {} +
 
+# workaround for missing bindgen on el8
+%if 0%{?rhel} == 8
+%ifarch aarch64
+tar -Jxf %{SOURCE16}
+%endif
+%ifarch x86_64
+tar -Jxf %{SOURCE17}
+%endif
+mkdir -p usr/%{_lib}
+pushd usr/%{_lib}
+ln -fs %{_libdir}/libclang* .
+popd 
+%endif
+
 # Add correct path for nodejs binary
 %if ! %{system_nodejs}
   pushd third_party/node/linux
@@ -1274,18 +1289,6 @@ cp -a third_party/dav1d/version/version.h third_party/dav1d/libdav1d/include/dav
 %endif
 
 %build
-# build bindgen on el8
-%if 0%{?rhel} == 8
-tar -zxf %{SOURCE16}
-pushd rust-bindgen-0.69.4
-cargo --offline build
-mkdir -p ..%{_bindir} ..%{_libdir}
-cp target/debug/bindgen ..%{_bindir}
-pushd ..%{_libdir}
-ln -fs %{_libdir}/libclang* .
-popd
-popd
-%endif
 
 # reduce warnings
 %if %{clang}
