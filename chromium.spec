@@ -374,8 +374,6 @@ Patch150: chromium-124-qt6.patch
 # it is not supported in old glibc < 2.30, error: fatal error: 'sys/ifunc.h' file not found
 Patch305: chromium-124-el8-arm64-memory_tagging.patch
 Patch306: chromium-127-el8-ifunc-header.patch
-# build error: unknown architectural extension on aarch64 (epel8)
-Patch307: chromium-124-el8-libdav1d-aarch64.patch
 # 64kpage support on aarch64 (el8)
 Patch308: chromium-124-el8-support-64kpage.patch
 
@@ -1113,7 +1111,6 @@ Qt6 UI for chromium.
 %ifarch aarch64
 %patch -P305 -p1 -b .el8-memory_tagging
 %patch -P306 -p1 -b .el8-ifunc-header
-%patch -P307 -p1 -b .el8-libdav1d-aarch64
 %patch -P308 -p1 -b .el8-support-64kpage.patch
 %endif
 %endif
