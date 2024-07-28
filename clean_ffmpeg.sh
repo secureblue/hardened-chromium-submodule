@@ -236,6 +236,7 @@ manual_files=" libavcodec/aarch64/h264pred_neon.S \
 		libavcodec/aarch64/hpeldsp_neon.S \
 		libavcodec/aarch64/neon.S \
 		libavcodec/aarch64/vorbisdsp_neon.S \
+		libavcodec/aarch64/autorename_libavcodec_aarch64_vorbisdsp_neon.S \
 		libavcodec/aarch64/vorbisdsp_init.c \
 		libavcodec/aarch64/vp8dsp_neon.S \
 		libavcodec/x86/hpeldsp.asm \
@@ -273,6 +274,8 @@ manual_files=" libavcodec/aarch64/h264pred_neon.S \
 		libavutil/aarch64/cpu.c \
 		libavutil/aarch64/float_dsp_init.c \
 		libavutil/aarch64/float_dsp_neon.S \
+		libavutil/aarch64/autorename_libavutil_aarch64_float_dsp_neon.S \
+		libavutil/aarch64/tx_float_neon.S \
 		libavutil/aarch64/timer.h \
 		libavutil/cpu.c \
 		libavutil/fixed_dsp.c \
@@ -285,6 +288,7 @@ manual_files=" libavcodec/aarch64/h264pred_neon.S \
 		libavutil/x86/cpu.c \
 		libavutil/x86/float_dsp_init.c \
 		libavutil/x86/tx_float_init.c \
+		libavutil/aarch64/tx_float_init.c \
 		libavutil/x86/x86inc.asm \
 		libavutil/x86/x86util.asm "
 
