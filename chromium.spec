@@ -296,7 +296,7 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 127.0.6533.72
+Version: 127.0.6533.88
 Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
@@ -387,6 +387,8 @@ Patch316: chromium-122-clang-build-flags.patch
 # https://bugs.chromium.org/p/chromium/issues/detail?id=1145581#c60
 # Disable BTI until this is fixed upstream.
 Patch352: chromium-117-workaround_for_crash_on_BTI_capable_system.patch
+# workaround for build error on aarch64
+Patch353: chromium-127-aarch64-duplicate-case-value.patch
 
 # remove flag split-threshold-for-reg-with-hint, it's not supported in clang <= 17
 Patch354: chromium-126-split-threshold-for-reg-with-hint.patch
@@ -1121,6 +1123,10 @@ Qt6 UI for chromium.
 
 %if %{disable_bti}
 %patch -P352 -p1 -b .workaround_for_crash_on_BTI_capable_system
+%endif
+
+%ifarch aarch64 && 0%{?fedora} > 40
+%patch -P353 -p1 -b .duplicate-case-value
 %endif
 
 %if 0%{?rhel} && 0%{?rhel} < 10 || 0%{?fedora} && 0%{?fedora} < 40
@@ -2026,6 +2032,9 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Wed Jul 31 2024 Than Ngo <than@redhat.com> - 127.0.6533.88-1
+- update to 127.0.6533.88
+
 * Wed Jul 24 2024 Than Ngo <than@redhat.com> - 127.0.6533.72-1
 - update to 127.0.6533.72
 	* CVE-2024-6988: Use after free in Downloads
