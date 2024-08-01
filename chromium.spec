@@ -297,13 +297,10 @@
 
 Name:	chromium%{chromium_channel}
 Version: 127.0.6533.88
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
-
-### Chromium Fedora Patches ###
-Patch0: chromium-70.0.3538.67-sandbox-pie.patch
 
 # Use /etc/chromium for initial_prefs
 Patch1: chromium-115-initial_prefs-etc-path.patch
@@ -1057,7 +1054,6 @@ Qt6 UI for chromium.
 %setup -q -n chromium-%{version}
 
 ### Chromium Fedora Patches ###
-%patch -P0 -p1 -b .sandboxpie
 %patch -P1 -p1 -b .etc
 %patch -P5 -p1 -b .nozlibmangle
 %patch -P6 -p1 -b .nounrar
@@ -2032,6 +2028,10 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Thu Aug 01 2024 Than Ngo <than@redhat.com> - 127.0.6533.88-2
+- remove old patch that seems to be the cause of a crash
+  when the user set user.max_user_namespaces to 0
+
 * Wed Jul 31 2024 Than Ngo <than@redhat.com> - 127.0.6533.88-1
 - update to 127.0.6533.88
 
