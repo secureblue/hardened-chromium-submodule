@@ -1,0 +1,11 @@
+diff -up chromium-127.0.6533.88/ui/ozone/platform/wayland/gpu/wayland_surface_factory.cc.me chromium-127.0.6533.88/ui/ozone/platform/wayland/gpu/wayland_surface_factory.cc
+--- chromium-127.0.6533.88/ui/ozone/platform/wayland/gpu/wayland_surface_factory.cc.me	2024-08-06 17:38:26.560468274 +0200
++++ chromium-127.0.6533.88/ui/ozone/platform/wayland/gpu/wayland_surface_factory.cc	2024-08-06 17:39:00.137139610 +0200
+@@ -214,6 +214,7 @@ WaylandSurfaceFactory::GetAllowedGLImple
+     impls.emplace_back(gl::ANGLEImplementation::kOpenGL);
+     impls.emplace_back(gl::ANGLEImplementation::kOpenGLES);
+     impls.emplace_back(gl::ANGLEImplementation::kSwiftShader);
++    impls.emplace_back(gl::ANGLEImplementation::kVulkan);
+     impls.emplace_back(gl::kGLImplementationEGLGLES2);
+   }
+   return impls;

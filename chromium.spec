@@ -297,7 +297,7 @@
 
 Name:	chromium%{chromium_channel}
 Version: 127.0.6533.88
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -462,12 +462,13 @@ Patch409: partition-alloc-4k-detect.patch
 
 Patch410: dawn-fix-typos.patch
 Patch411: dawn-fix-ppc64le-detection.patch
+Patch412: add-ppc64-architecture-to-extensions.diff
 
 # Suppress harmless compiler warning messages that appear on ppc64 due to arch-specific warning flags being passed
-Patch412: fix-unknown-warning-option-messages.diff
+Patch413: fix-unknown-warning-option-messages.diff
 
 # error: undefined symbol: llvm::MCAsmInfoXCOFF::MCAsmInfoXCOFF()
-Patch413: fix-swiftshader-compile.patch
+Patch414: fix-swiftshader-compile.patch
 
 # upstream patches
 Patch501: chromium-127-ninja-1.21.1-deps-part0.patch
@@ -475,6 +476,7 @@ Patch502: chromium-127-ninja-1.21.1-deps-part1.patch
 Patch503: chromium-127-ninja-1.21.1-deps-part2.patch
 Patch504: chromium-127-ninja-1.21.1-deps-part3.patch
 Patch505: chromium-127-crabbyavif.patch
+Patch506: chromium-127-allow-enabling-vulkan-on-ozone-wayland.patch
 
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
 # http://build.chromium.org/buildbot/official/
@@ -1197,8 +1199,10 @@ Qt6 UI for chromium.
 %patch -P410 -p1 -b .dawn-fix-typos
 %patch -P411 -p1 -b .dawn-fix-ppc64le-detection
 
-%patch -P412 -p1 -b .fix-unknown-warning-option-messages
-%patch -P413 -p1 -b .fix-swiftshader-compile
+%patch -P412 -p1 -b .add-ppc64-architecture-to-extensions
+
+%patch -P413 -p1 -b .fix-unknown-warning-option-messages
+%patch -P414 -p1 -b .fix-swiftshader-compile
 %endif
 
 %if 0%{?fedora} > 39
@@ -1208,6 +1212,7 @@ Qt6 UI for chromium.
 %patch -P504 -p1 -b .ninja-1.21.1-deps
 %endif
 %patch -P505 -p1 -b .crabbyavif
+%patch -P506 -p1 -b .allow-enabling-vulkan-on-ozone-wayland
 
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
@@ -2028,6 +2033,11 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Tue Aug 06 2024 Than Ngo <than@redhat.com> - 127.0.6533.88-3
+- fix rhbz#2294773 - Allow enabling vulkan on ozone wayland for AMD vaapi
+- add ppc64le patch to fix runtime assertion trap on ppc64el systems
+- refresh ppc64le patch to work around broken 64k allocator code on arm64
+
 * Thu Aug 01 2024 Than Ngo <than@redhat.com> - 127.0.6533.88-2
 - remove old patch that seems to be the cause of a crash
   when the user set user.max_user_namespaces to 0
