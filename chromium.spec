@@ -296,8 +296,8 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 127.0.6533.88
-Release: 3%{?dist}
+Version: 127.0.6533.99
+Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -2033,6 +2033,15 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Wed Aug 07 2024 Than Ngo <than@redhat.com> - 127.0.6533.99-1
+- update to 127.0.6533.99
+  * Critical CVE-2024-7532: Out of bounds memory access in ANGLE
+  * High CVE-2024-7533: Use after free in Sharing
+  * High CVE-2024-7550: Type Confusion in V8
+  * High CVE-2024-7534: Heap buffer overflow in Layout
+  * High CVE-2024-7535: Inappropriate implementation in V8
+  * High CVE-2024-7536: Use after free in WebAudio
+
 * Tue Aug 06 2024 Than Ngo <than@redhat.com> - 127.0.6533.88-3
 - fix rhbz#2294773 - Allow enabling vulkan on ozone wayland for AMD vaapi
 - add ppc64le patch to fix runtime assertion trap on ppc64el systems
