@@ -1028,7 +1028,6 @@ Qt6 UI for chromium.
 %patch -P1 -p1 -b .etc
 %patch -P5 -p1 -b .nozlibmangle
 %patch -P6 -p1 -b .nounrar
-%patch -P8 -p1 -b .widevine-other-locations
 %patch -P11 -p1 -b .py3
 
 %patch -P20 -p1 -b .disable-font-test
