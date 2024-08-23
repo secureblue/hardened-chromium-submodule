@@ -366,13 +366,6 @@ Patch316: chromium-122-clang-build-flags.patch
 Patch352: chromium-117-workaround_for_crash_on_BTI_capable_system.patch
 # workaround for build error on aarch64
 Patch353: chromium-127-aarch64-duplicate-case-value.patch
-
-# remove flag split-threshold-for-reg-with-hint, it's not supported in clang <= 17
-Patch354: chromium-126-split-threshold-for-reg-with-hint.patch
-
-# use system libstdc++
-Patch355: chromium-126-system-libstdc++.patch
-
 # set clang_lib path
 Patch358: chromium-127-rust-clanglib.patch
 
