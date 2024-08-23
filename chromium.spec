@@ -379,13 +379,6 @@ Patch355: chromium-126-system-libstdc++.patch
 # set clang_lib path
 Patch358: chromium-127-rust-clanglib.patch
 
-# upstream patches
-Patch501: chromium-127-ninja-1.21.1-deps-part0.patch
-Patch502: chromium-127-ninja-1.21.1-deps-part1.patch
-Patch503: chromium-127-ninja-1.21.1-deps-part2.patch
-Patch504: chromium-127-ninja-1.21.1-deps-part3.patch
-Patch505: chromium-127-crabbyavif.patch
-
 # hardening patches
 
 Patch2000: disable-various-content-settings-by-default.patch
@@ -1088,15 +1081,6 @@ Qt6 UI for chromium.
 %patch -P355 -p1 -b .system-libstdc++
 %endif
 %patch -P358 -p1 -b .rust-clang_lib
-
-
-%if 0%{?fedora} > 39
-%patch -P501 -p1 -b .ninja-1.21.1-deps
-%patch -P502 -p1 -b .ninja-1.21.1-deps
-%patch -P503 -p1 -b .ninja-1.21.1-deps
-%patch -P504 -p1 -b .ninja-1.21.1-deps
-%endif
-%patch -P505 -p1 -b .crabbyavif
 
 %autopatch -p1 -m 2000 -M 2033
 %autopatch -p1 -m 3000 -M 3054
