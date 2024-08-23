@@ -153,9 +153,6 @@
 %global __provides_exclude_from ^(%{chromium_path}/.*\\.so|%{chromium_path}/.*\\.so.*)$
 %global __requires_exclude ^(%{chromium_path}/.*\\.so|%{chromium_path}/.*\\.so.*)$
 
-# enable|disable use_custom_libcxx
-%global use_custom_libcxx 1
-
 # enable clang by default
 %global clang 1
 
@@ -1077,9 +1074,6 @@ Qt6 UI for chromium.
 %patch -P353 -p1 -b .duplicate-case-value
 %endif
 
-%if ! %{use_custom_libcxx}
-%patch -P355 -p1 -b .system-libstdc++
-%endif
 %patch -P358 -p1 -b .rust-clang_lib
 
 %autopatch -p1 -m 2000 -M 2033
@@ -1291,9 +1285,6 @@ CHROMIUM_CORE_GN_DEFINES+=' icu_use_data_file=true'
 CHROMIUM_CORE_GN_DEFINES+=' target_os="linux"'
 CHROMIUM_CORE_GN_DEFINES+=' current_os="linux"'
 CHROMIUM_CORE_GN_DEFINES+=' treat_warnings_as_errors=false'
-%if ! %{use_custom_libcxx}
-CHROMIUM_CORE_GN_DEFINES+=' use_custom_libcxx=false'
-%endif
 CHROMIUM_CORE_GN_DEFINES+=' enable_iterator_debugging=false'
 CHROMIUM_CORE_GN_DEFINES+=' enable_vr=false'
 CHROMIUM_CORE_GN_DEFINES+=' enable_arcore=false'
