@@ -314,9 +314,6 @@ Patch5: chromium-77.0.3865.75-no-zlib-mangle.patch
 # Do not use unrar code, it is non-free
 Patch6: chromium-122-norar.patch
 
-# Try to load widevine from other places
-Patch8: chromium-117-widevine-other-locations.patch
-
 # Tell bootstrap.py to always use the version of Python we specify
 Patch11: chromium-93.0.4577.63-py3-bootstrap.patch
 
@@ -345,16 +342,9 @@ Patch82: chromium-98.0.4758.102-remoting-no-tests.patch
 # patch for using system brotli
 Patch89: chromium-125-system-brotli.patch
 
-# patch for using system libxml
-Patch90: chromium-121-system-libxml.patch
-
 # patch for using system opus
 Patch91: chromium-108-system-opus.patch
 
-# system ffmpeg
-# need for old ffmpeg 5.x on epel9
-Patch129: chromium-125-ffmpeg-5.x-reordered_opaque.patch
-Patch130: chromium-107-ffmpeg-5.x-duration.patch
 # disable the check
 Patch131: chromium-107-proprietary-codecs.patch
 # fix tab crash with SIGTRAP error when using system ffmpeg
@@ -362,20 +352,10 @@ Patch132: chromium-118-sigtrap_system_ffmpeg.patch
 # need for old ffmpeg 6.0/5.x on epel9 and fedora < 40
 Patch133: chromium-121-system-old-ffmpeg.patch
 # disable FFmpegAllowLists by default to allow external ffmpeg
-patch134: chromium-125-disable-FFmpegAllowLists.patch
-
-# file conflict with old kernel on el8/el9
-Patch141: chromium-118-dma_buf_export_sync_file-conflict.patch
+Patch134: chromium-125-disable-FFmpegAllowLists.patch
 
 # add correct path for Qt6Gui header and libs
 Patch150: chromium-124-qt6.patch
-
-# disable memory tagging (epel8 on aarch64) due to new feature IFUNC-Resolver
-# it is not supported in old glibc < 2.30, error: fatal error: 'sys/ifunc.h' file not found
-Patch305: chromium-124-el8-arm64-memory_tagging.patch
-Patch306: chromium-127-el8-ifunc-header.patch
-# 64kpage support on aarch64 (el8)
-Patch308: chromium-124-el8-support-64kpage.patch
 
 # enable fstack-protector-strong
 Patch312: chromium-123-fstack-protector-strong.patch
@@ -398,86 +378,6 @@ Patch355: chromium-126-system-libstdc++.patch
 
 # set clang_lib path
 Patch358: chromium-127-rust-clanglib.patch
-
-# PowerPC64 LE support
-# Timothy Pearson's patchset
-# https://gitlab.solidsilicon.io/public-development/open-source/chromium/openpower-patches/-/tree/chromium-126/patches/ppc64le
-Patch359: add-ppc64-architecture-string.patch
-Patch360: 0001-linux-seccomp-bpf-ppc64-glibc-workaround-in-SIGSYS-h.patch
-Patch361: 0001-sandbox-Enable-seccomp_bpf-for-ppc64.patch
-Patch362: 0001-services-service_manager-sandbox-linux-Fix-TCGETS-de.patch
-Patch363: 0001-sandbox-linux-bpf_dsl-Update-syscall-ranges-for-ppc6.patch
-Patch364: 0001-sandbox-linux-Implement-partial-support-for-ppc64-sy.patch
-Patch365: 0001-sandbox-linux-Update-IsSyscallAllowed-in-broker_proc.patch
-Patch366: 0001-sandbox-linux-Update-syscall-helpers-lists-for-ppc64.patch
-Patch367: 0002-sandbox-linux-bpf_dsl-Modify-seccomp_macros-to-add-s.patch
-Patch368: 0003-sandbox-linux-system_headers-Update-linux-seccomp-he.patch
-Patch369: 0004-sandbox-linux-system_headers-Update-linux-signal-hea.patch
-Patch370: 0005-sandbox-linux-seccomp-bpf-Add-ppc64-syscall-stub.patch
-Patch371: 0005-sandbox-linux-update-unit-test-for-ppc64.patch
-Patch372: 0006-sandbox-linux-disable-timedwait-time64-ppc64.patch
-Patch373: 0007-sandbox-linux-add-ppc64-stat.patch
-Patch374: Sandbox-linux-services-credentials.cc-PPC.patch
-Patch375: 0008-sandbox-fix-ppc64le-glibc234.patch
-
-Patch376: 0001-third_party-angle-Include-missing-header-cstddef-in-.patch
-Patch377: 0001-Add-PPC64-support-for-boringssl.patch
-Patch378: 0001-third_party-libvpx-Properly-generate-gni-on-ppc64.patch
-Patch379: 0001-third_party-lss-Don-t-look-for-mmap2-on-ppc64.patch
-Patch380: 0001-third_party-pffft-Include-altivec.h-on-ppc64-with-SI.patch
-Patch381: 0002-Add-PPC64-generated-files-for-boringssl.patch
-Patch382: 0002-third_party-lss-kernel-structs.patch
-
-Patch383: Rtc_base-system-arch.h-PPC.patch
-
-Patch384: 0002-Include-cstddef-to-fix-build.patch
-Patch385: 0004-third_party-crashpad-port-curl-transport-ppc64.patch
-
-Patch386: HACK-third_party-libvpx-use-generic-gnu.patch
-Patch387: HACK-debian-clang-disable-skia-musttail.patch
-
-Patch388: 0001-Add-ppc64-target-to-libaom.patch
-Patch389: 0001-Add-pregenerated-config-for-libaom-on-ppc64.patch
-
-Patch390: 0002-third_party-libvpx-Remove-bad-ppc64-config.patch
-Patch391: 0003-third_party-libvpx-Add-ppc64-generated-config.patch
-# Enabling VSX causes artifacts to appear in VP9 videos
-Patch394: 0004-third_party-libvpx-work-around-ambiguous-vsx.patch
-
-# Enable VSX acceleration in Skia.  Requires POWER8 or higher.
-Patch395: skia-vsx-instructions.patch
-
-Patch396: 0001-Implement-support-for-ppc64-on-Linux.patch
-Patch397: 0001-Implement-support-for-PPC64-on-Linux.patch
-Patch398: 0001-Force-baseline-POWER8-AltiVec-VSX-CPU-features-when-.patch
-Patch399: fix-clang-selection.patch
-Patch400: fix-rustc.patch
-Patch401: fix-rust-linking.patch
-Patch402: fix-breakpad-compile.patch
-Patch403: fix-partition-alloc-compile.patch
-Patch404: fix-study-crash.patch
-Patch405: memory-allocator-dcheck-assert-fix.patch
-Patch406: 0002-Add-ppc64-trap-instructions.patch
-
-Patch407: fix-ppc64-linux-syscalls-headers.patch
-Patch408: use-sysconf-page-size-on-ppc64.patch
-Patch409: partition-alloc-4k-detect.patch
-
-Patch410: dawn-fix-typos.patch
-Patch411: dawn-fix-ppc64le-detection.patch
-
-# Suppress harmless compiler warning messages that appear on ppc64 due to arch-specific warning flags being passed
-Patch412: fix-unknown-warning-option-messages.diff
-
-# error: undefined symbol: llvm::MCAsmInfoXCOFF::MCAsmInfoXCOFF()
-Patch413: fix-swiftshader-compile.patch
-
-# upstream patches
-Patch501: chromium-127-ninja-1.21.1-deps-part0.patch
-Patch502: chromium-127-ninja-1.21.1-deps-part1.patch
-Patch503: chromium-127-ninja-1.21.1-deps-part2.patch
-Patch504: chromium-127-ninja-1.21.1-deps-part3.patch
-Patch505: chromium-127-crabbyavif.patch
 
 # hardening patches
 
@@ -1150,41 +1050,19 @@ Qt6 UI for chromium.
 %patch -P89 -p1 -b .system-brotli
 %endif
 
-%if ! %{bundlelibxml}
-%if 0%{?fedora} && 0%{?fedora} < 40 || 0%{?rhel} && 0%{?rhel} < 10
-%patch -P90 -p1 -b .system-libxml
-%endif
-%endif
-
 %if ! %{bundleopus}
 %patch -P91 -p1 -b .system-opus
 %endif
 
 %if ! %{bundleffmpegfree}
-%if 0%{?rhel} == 9
-%patch -P129 -p1 -R -b .ffmpeg-5.x-reordered_opaque
-%patch -P130 -p1 -b .ffmpeg-5.x-duration
-%endif
 %patch -P131 -p1 -b .prop-codecs
 %patch -P132 -p1 -b .sigtrap_system_ffmpeg
 %patch -P133 -p1 -b .system-old-ffmpeg
 %patch -P134 -p1 -b .disable-FFmpegAllowLists
 %endif
 
-%if 0%{?rhel} == 8 || 0%{?rhel} == 9
-%patch -P141 -p1 -b .dma_buf_export_sync_file-conflict
-%endif
-
 %if 0%{?rhel} > 9 || 0%{?fedora} > 39
 %patch -P150 -p1 -b .qt6
-%endif
-
-%if 0%{?rhel} == 8
-%ifarch aarch64
-%patch -P305 -p1 -b .el8-memory_tagging
-%patch -P306 -p1 -b .el8-ifunc-header
-%patch -P308 -p1 -b .el8-support-64kpage.patch
-%endif
 %endif
 
 %patch -P312 -p1 -b .fstack-protector-strong
@@ -1199,89 +1077,10 @@ Qt6 UI for chromium.
 %patch -P353 -p1 -b .duplicate-case-value
 %endif
 
-%if 0%{?rhel} && 0%{?rhel} < 10 || 0%{?fedora} && 0%{?fedora} < 40
-%patch -P354 -p1 -b .split-threshold-for-reg-with-hint
-%endif
-
 %if ! %{use_custom_libcxx}
 %patch -P355 -p1 -b .system-libstdc++
 %endif
 %patch -P358 -p1 -b .rust-clang_lib
-
-%ifarch ppc64le
-%patch -P359 -p1 -b .add-ppc64-architecture-string
-%patch -P360 -p1 -b .0001-linux-seccomp-bpf-ppc64-glibc-workaround-in-SIGSYS-h
-%patch -P361 -p1 -b .0001-sandbox-Enable-seccomp_bpf-for-ppc64
-%patch -P362 -p1 -b .0001-services-service_manager-sandbox-linux-Fix-TCGETS-de
-%patch -P363 -p1 -b .0001-sandbox-linux-bpf_dsl-Update-syscall-ranges-for-ppc6
-%patch -P364 -p1 -b .0001-sandbox-linux-Implement-partial-support-for-ppc64-sy
-%patch -P365 -p1 -b .0001-sandbox-linux-Update-IsSyscallAllowed-in-broker_proc
-%patch -P366 -p1 -b .0001-sandbox-linux-Update-syscall-helpers-lists-for-ppc64
-%patch -P367 -p1 -b .0002-sandbox-linux-bpf_dsl-Modify-seccomp_macros-to-add-s
-%patch -P368 -p1 -b .0003-sandbox-linux-system_headers-Update-linux-seccomp-he
-%patch -P369 -p1 -b .0004-sandbox-linux-system_headers-Update-linux-signal-hea
-%patch -P370 -p1 -b .0005-sandbox-linux-seccomp-bpf-Add-ppc64-syscall-stub
-%patch -P371 -p1 -b .0005-sandbox-linux-update-unit-test-for-ppc64
-%patch -P372 -p1 -b .0006-sandbox-linux-disable-timedwait-time64-ppc64
-%patch -P373 -p1 -b .0007-sandbox-linux-add-ppc64-stat
-%patch -P374 -p1 -b .Sandbox-linux-services-credentials.cc-PPC
-%patch -P375 -p1 -b .0008-sandbox-fix-ppc64le-glibc234
-
-%patch -P376 -p1 -b .0001-third_party-angle-Include-missing-header-cstddef-in-
-%patch -P377 -p1 -b .0001-Add-PPC64-support-for-boringssl
-%patch -P378 -p1 -b .0001-third_party-libvpx-Properly-generate-gni-on-ppc64
-%patch -P379 -p1 -b .0001-third_party-lss-Don-t-look-for-mmap2-on-ppc64
-%patch -P380 -p1 -b .0001-third_party-pffft-Include-altivec.h-on-ppc64-with-SI
-%patch -P381 -p1 -b .002-Add-PPC64-generated-files-for-boringssl
-%patch -P382 -p1 -b .0002-third_party-lss-kernel-structs
-
-%patch -P383 -p1 -b .Rtc_base-system-arch.h-PPC
-
-%patch -P384 -p1 -b .0002-Include-cstddef-to-fix-build
-%patch -P385 -p1 -b .0004-third_party-crashpad-port-curl-transport-ppc64
-
-%patch -P386 -p1 -b .HACK-third_party-libvpx-use-generic-gnu
-%patch -P387 -p1 -b .HACK-debian-clang-disable-skia-musttail
-
-%patch -P388 -p1 -b .0001-Add-ppc64-target-to-libaom
-%patch -P389 -p1 -b .0001-Add-pregenerated-config-for-libaom-on-ppc64
-
-%patch -P390 -p1 -b .0002-third_party-libvpx-Remove-bad-ppc64-config
-%patch -P391 -p1 -b .0003-third_party-libvpx-Add-ppc64-generated-config
-%patch -P394 -p1 -b .0004-third_party-libvpx-work-around-ambiguous-vsx
-
-%patch -P395 -p1 -b .skia-vsx-instructions
-
-%patch -P396 -p1 -b .0001-Implement-support-for-ppc64-on-Linux
-%patch -P397 -p1 -b .0001-Implement-support-for-PPC64-on-Linux
-%patch -P398 -p1 -b .0001-Force-baseline-POWER8-AltiVec-VSX-CPU-features-when-
-%patch -P399 -p1 -b .fix-clang-selection
-%patch -P400 -p1 -b .fix-rustc
-%patch -P401 -p1 -b .fix-rust-linking
-%patch -P402 -p1 -b .fix-breakpad-compile
-%patch -P403 -p1 -b .fix-partition-alloc-compile
-%patch -P404 -p1 -b .fix-study-crash
-%patch -P405 -p1 -b .memory-allocator-dcheck-assert-fix
-%patch -P406 -p1 -b .0002-Add-ppc64-trap-instructions
-
-%patch -P407 -p1 -b .fix-ppc64-linux-syscalls-headers
-%patch -P408 -p1 -b .use-sysconf-page-size-on-ppc64
-#%%patch -P409 -p1 -b .partition-alloc-4k-detect
-
-%patch -P410 -p1 -b .dawn-fix-typos
-%patch -P411 -p1 -b .dawn-fix-ppc64le-detection
-
-%patch -P412 -p1 -b .fix-unknown-warning-option-messages
-%patch -P413 -p1 -b .fix-swiftshader-compile
-%endif
-
-%if 0%{?fedora} > 39
-%patch -P501 -p1 -b .ninja-1.21.1-deps
-%patch -P502 -p1 -b .ninja-1.21.1-deps
-%patch -P503 -p1 -b .ninja-1.21.1-deps
-%patch -P504 -p1 -b .ninja-1.21.1-deps
-%endif
-%patch -P505 -p1 -b .crabbyavif
 
 %autopatch -p1 -m 2000 -M 2033
 %autopatch -p1 -m 3000 -M 3054
