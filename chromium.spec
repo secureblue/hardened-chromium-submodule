@@ -371,89 +371,106 @@ Patch358: chromium-127-rust-clanglib.patch
 
 # hardening patches
 
-Patch2000: disable-various-content-settings-by-default.patch
-Patch2001: block-external-extensions.patch
-Patch2002: disable-autofill-by-default.patch
-Patch2003: disable-background-mode-by-default.patch
-Patch2004: set-browser-defaults.patch
-Patch2005: disable-disk-cache.patch
-Patch2006: disable-metrics-reporting.patch
-Patch2007: disable-promotions-by-default.patch
-Patch2008: disable-remote-access-by-default.patch
-Patch2009: disable-search-suggest-by-default.patch
-Patch2010: enable-audio-service-sandbox.patch
-Patch2011: restrict-default-supported-http-auth-schemes.patch
-Patch2012: disable-variations.patch
-Patch2013: set-default-always-open-pdf-externally.patch
-Patch2014: set-default-extension-content-verification-enforce-strict.patch
-Patch2015: set-default-extension-install-verification-enforce-strict.patch
-Patch2016: set-default-secure-dns-mode-automatic.patch
-Patch2017: set-mv3-only-by-default.patch
-Patch2018: set-ozone-platform-hint-auto-by-default.patch
-Patch2019: show-full-urls-by-default.patch
-Patch2020: disable-password-manager-prompt-by-default.patch
-Patch2021: enable-network-service-sandbox-by-default.patch
-Patch2022: disable-sync-by-default.patch
-Patch2023: disable-infobar-for-builds-without-api-key.patch
-Patch2024: disable-printing-by-default.patch
-Patch2025: enable-visited-link-database-partitioning.patch
-Patch2026: disable-tpcd-bypasses.patch
-Patch2027: disable-gen-ai-features-and-logging-by-default.patch
-Patch2028: disable-secondary-browser-features-by-default.patch
-Patch2029: remove-unused-preferences.patch
-Patch2030: add-cross-origin-referrer-clearing-feature.patch
-Patch2031: expose-flags.patch
-Patch2032: hide-profile-icon-feature.patch
-Patch2033: add-feature-to-show-puny-code.patch
+%{lua:
+	local patches = rpm.glob('hardened-chromium-*.patch')
+	local count = 2000
+	for p in ipairs(patches) do
+		print(string.format(string.format("Patch%u: hardened-chromium-%u.patch\n", count, count)))
+		count = count + 1
+	end
+	macros['_hardeningPatchCount'] = count
+	patches = rpm.glob('vanadium-*.patch')
+	count = 3000
+	for p in ipairs(patches) do
+		print(string.format(string.format("Patch%u: vanadium-%u.patch\n", count, count)))
+		count = count + 1
+	end
+	macros['_vanadiumPatchCount'] = count
+}
+
+#Patch2000: disable-various-content-settings-by-default.patch
+#Patch2001: block-external-extensions.patch
+#Patch2002: disable-autofill-by-default.patch
+#Patch2003: disable-background-mode-by-default.patch
+#Patch2004: set-browser-defaults.patch
+#Patch2005: disable-disk-cache.patch
+#Patch2006: disable-metrics-reporting.patch
+#Patch2007: disable-promotions-by-default.patch
+#Patch2008: disable-remote-access-by-default.patch
+#Patch2009: disable-search-suggest-by-default.patch
+#Patch2010: enable-audio-service-sandbox.patch
+#Patch2011: restrict-default-supported-http-auth-schemes.patch
+#Patch2012: disable-variations.patch
+#Patch2013: set-default-always-open-pdf-externally.patch
+#Patch2014: set-default-extension-content-verification-enforce-strict.patch
+#Patch2015: set-default-extension-install-verification-enforce-strict.patch
+#Patch2016: set-default-secure-dns-mode-automatic.patch
+#Patch2017: set-mv3-only-by-default.patch
+#Patch2018: set-ozone-platform-hint-auto-by-default.patch
+#Patch2019: show-full-urls-by-default.patch
+#Patch2020: disable-password-manager-prompt-by-default.patch
+#Patch2021: enable-network-service-sandbox-by-default.patch
+#Patch2022: disable-sync-by-default.patch
+#Patch2023: disable-infobar-for-builds-without-api-key.patch
+#Patch2024: disable-printing-by-default.patch
+#Patch2025: enable-visited-link-database-partitioning.patch
+#Patch2026: disable-tpcd-bypasses.patch
+#Patch2027: disable-gen-ai-features-and-logging-by-default.patch
+#Patch2028: disable-secondary-browser-features-by-default.patch
+#Patch2029: remove-unused-preferences.patch
+#Patch2030: add-cross-origin-referrer-clearing-feature.patch
+#Patch2031: expose-flags.patch
+#Patch2032: hide-profile-icon-feature.patch
+#Patch2033: add-feature-to-show-puny-code.patch
 
 # Vanadium patches
 
-Patch3000: 0011-Checkout-PGO-profiles.patch
-Patch3001: 0012-disable-checkout_nacl.patch
-Patch3002: 0014-disable-seed-based-field-trials.patch
-Patch3004: 0017-disable-navigation-error-correction-by-default.patch
-Patch3006: 0019-disable-network-prediction-by-default.patch
-Patch3007: 0021-disable-hyperlink-auditing-by-default.patch
-Patch3008: 0022-disable-showing-popular-sites-by-default.patch
-Patch3009: 0023-disable-article-suggestions-feature-by-default.patch
-Patch3010: 0024-disable-content-feed-suggestions-by-default.patch
-Patch3011: 0025-disable-sensors-access-by-default.patch
-Patch3012: 0026-block-playing-protected-media-by-default.patch
-Patch3013: 0027-disable-third-party-cookies-by-default.patch
-Patch3014: 0028-disable-background-sync-by-default.patch
-Patch3015: 0029-disable-payment-support-by-default.patch
-Patch3016: 0030-disable-media-router-media-remoting-by-default.patch
-Patch3017: 0031-disable-media-router-by-default.patch
-Patch3019: 0033-disable-browser-sign-in-feature-by-default.patch
-Patch3021: 0035-disable-safe-browsing-reporting-opt-in-by-default.patch
-Patch3022: 0036-disable-unused-safe-browsing-option-by-default.patch
-Patch3023: 0037-disable-media-DRM-preprovisioning-by-default.patch
-Patch3024: 0038-disable-autofill-server-communication-by-default.patch
-Patch3025: 0039-disable-component-updater-pings-by-default.patch
-Patch3027: 0041-disable-trivial-subdomain-hiding.patch
-Patch3029: 0044-disable-GaiaAuthFetcher-code-due-to-upstream-bug.patch
-Patch3030: 0046-Disable-newer-privacy-sandbox-features-by-default.patch
-Patch3031: 0048-Disable-top-toolbar-button-Translate-option-by-defau.patch
-Patch3032: 0049-always-use-local-new-tab-page.patch
-Patch3033: 0050-mark-non-secure-origins-as-dangerous.patch
-Patch3035: 0052-stub-out-the-battery-status-API.patch
-Patch3036: 0055-disable-trials-of-privacy-aware-analytics-advertisin.patch
-Patch3037: 0057-disable-appending-variations-header.patch
-Patch3038: 0058-Disable-detailed-language-settings-by-default.patch
-Patch3039: 0059-disable-fetching-optimization-guides-by-default.patch
-Patch3041: 0063-require-HTTPS-for-component-updates.patch
-Patch3042: 0069-enable-prefetch-privacy-changes-by-default.patch
-Patch3043: 0070-enable-split-cache-by-default.patch
-Patch3044: 0071-enable-partitioning-connections-by-default.patch
-Patch3045: 0074-Enable-strict-origin-isolation-by-default.patch
-Patch3046: 0075-Enable-reduce-accept-language-header-by-default.patch
-Patch3048: 0077-use-Google-Chrome-branding-for-client-hints.patch
-Patch3049: 0115-Derive-high-entropy-client-hints-with-reduced-user-a.patch
-Patch3050: 0122-Use-local-list-of-supported-languages-for-Language-s.patch
-Patch3051: 0165-Enable-content-settings-partitioning-by-default.patch
-Patch3052: 0170-Revert-M122-content-make-disable-jit-actually-disabl.patch
-Patch3053: 0084-temporary-Always-partition-third-party-storage.patch
-Patch3054: 0183-Isolate-sandboxed-iframes-per-site-by-default.patch
+#Patch3000: 0011-Checkout-PGO-profiles.patch
+#Patch3001: 0012-disable-checkout_nacl.patch
+#Patch3002: 0014-disable-seed-based-field-trials.patch
+#Patch3004: 0017-disable-navigation-error-correction-by-default.patch
+#Patch3006: 0019-disable-network-prediction-by-default.patch
+#Patch3007: 0021-disable-hyperlink-auditing-by-default.patch
+#Patch3008: 0022-disable-showing-popular-sites-by-default.patch
+#Patch3009: 0023-disable-article-suggestions-feature-by-default.patch
+#Patch3010: 0024-disable-content-feed-suggestions-by-default.patch
+#Patch3011: 0025-disable-sensors-access-by-default.patch
+#Patch3012: 0026-block-playing-protected-media-by-default.patch
+#Patch3013: 0027-disable-third-party-cookies-by-default.patch
+#Patch3014: 0028-disable-background-sync-by-default.patch
+#Patch3015: 0029-disable-payment-support-by-default.patch
+#Patch3016: 0030-disable-media-router-media-remoting-by-default.patch
+#Patch3017: 0031-disable-media-router-by-default.patch
+#Patch3019: 0033-disable-browser-sign-in-feature-by-default.patch
+#Patch3021: 0035-disable-safe-browsing-reporting-opt-in-by-default.patch
+#Patch3022: 0036-disable-unused-safe-browsing-option-by-default.patch
+#Patch3023: 0037-disable-media-DRM-preprovisioning-by-default.patch
+#Patch3024: 0038-disable-autofill-server-communication-by-default.patch
+#Patch3025: 0039-disable-component-updater-pings-by-default.patch
+#Patch3027: 0041-disable-trivial-subdomain-hiding.patch
+#Patch3029: 0044-disable-GaiaAuthFetcher-code-due-to-upstream-bug.patch
+#Patch3030: 0046-Disable-newer-privacy-sandbox-features-by-default.patch
+#Patch3031: 0048-Disable-top-toolbar-button-Translate-option-by-defau.patch
+#Patch3032: 0049-always-use-local-new-tab-page.patch
+#Patch3033: 0050-mark-non-secure-origins-as-dangerous.patch
+#Patch3035: 0052-stub-out-the-battery-status-API.patch
+#Patch3036: 0055-disable-trials-of-privacy-aware-analytics-advertisin.patch
+#Patch3037: 0057-disable-appending-variations-header.patch
+#Patch3038: 0058-Disable-detailed-language-settings-by-default.patch
+#Patch3039: 0059-disable-fetching-optimization-guides-by-default.patch
+#Patch3041: 0063-require-HTTPS-for-component-updates.patch
+#Patch3042: 0069-enable-prefetch-privacy-changes-by-default.patch
+#Patch3043: 0070-enable-split-cache-by-default.patch
+#Patch3044: 0071-enable-partitioning-connections-by-default.patch
+#Patch3045: 0074-Enable-strict-origin-isolation-by-default.patch
+#Patch3046: 0075-Enable-reduce-accept-language-header-by-default.patch
+#Patch3048: 0077-use-Google-Chrome-branding-for-client-hints.patch
+#Patch3049: 0115-Derive-high-entropy-client-hints-with-reduced-user-a.patch
+#Patch3050: 0122-Use-local-list-of-supported-languages-for-Language-s.patch
+#Patch3051: 0165-Enable-content-settings-partitioning-by-default.patch
+#Patch3052: 0170-Revert-M122-content-make-disable-jit-actually-disabl.patch
+#Patch3053: 0084-temporary-Always-partition-third-party-storage.patch
+#Patch3054: 0183-Isolate-sandboxed-iframes-per-site-by-default.patch
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
 # http://build.chromium.org/buildbot/official/
 # For Chromium Fedora use chromium-latest.py --stable --ffmpegclean --ffmpegarm
@@ -1068,8 +1085,8 @@ Qt6 UI for chromium.
 
 %patch -P358 -p1 -b .rust-clang_lib
 
-%autopatch -p1 -m 2000 -M 2033
-%autopatch -p1 -m 3000 -M 3054
+%autopatch -p1 -m 2000 -M %{_hardeningPatchCount}
+%autopatch -p1 -m 3000 -M %{_vanadiumPatchCount}
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
 find -type f \( -iname "*.py" \) -exec sed -i '1s=^#! */usr/bin/\(python\|env python\)[23]\?=#!%{chromium_pybin}=' {} +
