@@ -371,17 +371,23 @@ Patch358: chromium-127-rust-clanglib.patch
 
 # hardening patches
 %{lua:
-	local patches = rpm.glob('hardened-chromium-*.patch')
+	if posix.getenv("HOME") == "/builddir" then
+		hpatches = rpm.glob('/builddir/build/SOURCES/hardened-chromium-*.patch')
+		vpatches = rpm.glob('/builddir/build/SOURCES/vanadium-*.patch')
+	else
+		hpatches = rpm.glob('hardened-chromium-*.patch')
+		vpatches = rpm.glob('vanadium-*.patch')
+	end
+	
 	local count = 2000
-	for p in ipairs(patches) do
+	for p in ipairs(hpatches) do
 		print("Patch"..count..": hardened-chromium-"..count..".patch\n")
 		count = count + 1
 	end
 	rpm.define("_hardeningPatchCount "..count-1)
 	
-	patches = rpm.glob('vanadium-*.patch')
 	count = 3000
-	for p in ipairs(patches) do
+	for p in ipairs(vpatches) do
 		print("Patch"..count..": vanadium-"..count..".patch\n")
 		count = count + 1
 	end
@@ -1002,8 +1008,9 @@ Qt6 UI for chromium.
 
 %patch -P358 -p1 -b .rust-clang_lib
 
-%autopatch -p1 -m 2000 -M %{lua: print(macros['_hardeningPatchCount'])}
-%autopatch -p1 -m 3000 -M %{lua: print(macros['_vanadiumPatchCount'])}
+%autopatch -p1 -m 2000 -M %{_hardeningPatchCount}
+%autopatch -p1 -m 3000 -M %{_vanadiumPatchCount}
+
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
 find -type f \( -iname "*.py" \) -exec sed -i '1s=^#! */usr/bin/\(python\|env python\)[23]\?=#!%{chromium_pybin}=' {} +
