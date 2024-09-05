@@ -1,7 +1,7 @@
-Index: chromium-127.0.6533.72/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.cc
+Index: chromium-127.0.6533.88/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.cc
 ===================================================================
---- chromium-127.0.6533.72.orig/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.cc
-+++ chromium-127.0.6533.72/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.cc
+--- chromium-127.0.6533.88.orig/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.cc
++++ chromium-127.0.6533.88/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.cc
 @@ -492,6 +492,9 @@ uint8_t ComputeSystemPagesPerSlotSpanPre
         partition_page_count <= kMaxPartitionPagesPerRegularSlotSpan;
         partition_page_count++) {

@@ -296,7 +296,7 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 127.0.6533.99
+Version: 128.0.6613.119
 Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
@@ -305,17 +305,8 @@ License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND G
 # Use /etc/chromium for initial_prefs
 Patch1: chromium-115-initial_prefs-etc-path.patch
 
-# Do not mangle zlib
-Patch5: chromium-77.0.3865.75-no-zlib-mangle.patch
-
-# Do not use unrar code, it is non-free
-Patch6: chromium-122-norar.patch
-
 # Try to load widevine from other places
 Patch8: chromium-117-widevine-other-locations.patch
-
-# Tell bootstrap.py to always use the version of Python we specify
-Patch11: chromium-93.0.4577.63-py3-bootstrap.patch
 
 # debian patches
 # disable font-test 
@@ -398,7 +389,7 @@ Patch358: chromium-127-rust-clanglib.patch
 
 # PowerPC64 LE support
 # Timothy Pearson's patchset
-# https://gitlab.solidsilicon.io/public-development/open-source/chromium/openpower-patches/-/tree/chromium-126/patches/ppc64le
+# https://gitlab.solidsilicon.io/public-development/open-source/chromium/openpower-patches/-/tree/chromium-128/patches/ppc64le
 Patch359: add-ppc64-architecture-string.patch
 Patch360: 0001-linux-seccomp-bpf-ppc64-glibc-workaround-in-SIGSYS-h.patch
 Patch361: 0001-sandbox-Enable-seccomp_bpf-for-ppc64.patch
@@ -424,20 +415,21 @@ Patch379: 0001-third_party-lss-Don-t-look-for-mmap2-on-ppc64.patch
 Patch380: 0001-third_party-pffft-Include-altivec.h-on-ppc64-with-SI.patch
 Patch381: 0002-Add-PPC64-generated-files-for-boringssl.patch
 Patch382: 0002-third_party-lss-kernel-structs.patch
+Patch383: 0001-swiftshader-fix-build.patch
+Patch384: Rtc_base-system-arch.h-PPC.patch
 
-Patch383: Rtc_base-system-arch.h-PPC.patch
+Patch385: 0002-Include-cstddef-to-fix-build.patch
+Patch386: 0004-third_party-crashpad-port-curl-transport-ppc64.patch
 
-Patch384: 0002-Include-cstddef-to-fix-build.patch
-Patch385: 0004-third_party-crashpad-port-curl-transport-ppc64.patch
+Patch387: HACK-third_party-libvpx-use-generic-gnu.patch
+Patch388: HACK-debian-clang-disable-skia-musttail.patch
+Patch389: HACK-debian-clang-disable-base-musttail.patch
 
-Patch386: HACK-third_party-libvpx-use-generic-gnu.patch
-Patch387: HACK-debian-clang-disable-skia-musttail.patch
+Patch390: 0001-Add-ppc64-target-to-libaom.patch
+Patch391: 0001-Add-pregenerated-config-for-libaom-on-ppc64.patch
 
-Patch388: 0001-Add-ppc64-target-to-libaom.patch
-Patch389: 0001-Add-pregenerated-config-for-libaom-on-ppc64.patch
-
-Patch390: 0002-third_party-libvpx-Remove-bad-ppc64-config.patch
-Patch391: 0003-third_party-libvpx-Add-ppc64-generated-config.patch
+Patch392: 0002-third_party-libvpx-Remove-bad-ppc64-config.patch
+Patch393: 0003-third_party-libvpx-Add-ppc64-generated-config.patch
 # Enabling VSX causes artifacts to appear in VP9 videos
 Patch394: 0004-third_party-libvpx-work-around-ambiguous-vsx.patch
 
@@ -454,11 +446,11 @@ Patch402: fix-breakpad-compile.patch
 Patch403: fix-partition-alloc-compile.patch
 Patch404: fix-study-crash.patch
 Patch405: memory-allocator-dcheck-assert-fix.patch
-Patch406: 0002-Add-ppc64-trap-instructions.patch
+Patch406: fix-different-data-layouts.patch
+Patch407: 0002-Add-ppc64-trap-instructions.patch
 
-Patch407: fix-ppc64-linux-syscalls-headers.patch
-Patch408: use-sysconf-page-size-on-ppc64.patch
-Patch409: partition-alloc-4k-detect.patch
+Patch408: fix-ppc64-linux-syscalls-headers.patch
+Patch409: use-sysconf-page-size-on-ppc64.patch
 
 Patch410: dawn-fix-typos.patch
 Patch411: dawn-fix-ppc64le-detection.patch
@@ -471,12 +463,6 @@ Patch413: fix-unknown-warning-option-messages.diff
 Patch414: fix-swiftshader-compile.patch
 
 # upstream patches
-Patch501: chromium-127-ninja-1.21.1-deps-part0.patch
-Patch502: chromium-127-ninja-1.21.1-deps-part1.patch
-Patch503: chromium-127-ninja-1.21.1-deps-part2.patch
-Patch504: chromium-127-ninja-1.21.1-deps-part3.patch
-Patch505: chromium-127-crabbyavif.patch
-Patch506: chromium-127-allow-enabling-vulkan-on-ozone-wayland.patch
 
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
 # http://build.chromium.org/buildbot/official/
@@ -1057,10 +1043,7 @@ Qt6 UI for chromium.
 
 ### Chromium Fedora Patches ###
 %patch -P1 -p1 -b .etc
-%patch -P5 -p1 -b .nozlibmangle
-%patch -P6 -p1 -b .nounrar
 %patch -P8 -p1 -b .widevine-other-locations
-%patch -P11 -p1 -b .py3
 
 %patch -P20 -p1 -b .disable-font-test
 %patch -P21 -p1 -b .screen-ai-service
@@ -1162,20 +1145,21 @@ Qt6 UI for chromium.
 %patch -P380 -p1 -b .0001-third_party-pffft-Include-altivec.h-on-ppc64-with-SI
 %patch -P381 -p1 -b .002-Add-PPC64-generated-files-for-boringssl
 %patch -P382 -p1 -b .0002-third_party-lss-kernel-structs
+%patch -P383 -p1 -b .0001-swiftshader-fix-build
+%patch -P384 -p1 -b .Rtc_base-system-arch.h-PPC
 
-%patch -P383 -p1 -b .Rtc_base-system-arch.h-PPC
+%patch -P385 -p1 -b .0002-Include-cstddef-to-fix-build
+%patch -P386 -p1 -b .0004-third_party-crashpad-port-curl-transport-ppc64
 
-%patch -P384 -p1 -b .0002-Include-cstddef-to-fix-build
-%patch -P385 -p1 -b .0004-third_party-crashpad-port-curl-transport-ppc64
+%patch -P387 -p1 -b .HACK-third_party-libvpx-use-generic-gnu
+%patch -P388 -p1 -b .HACK-debian-clang-disable-skia-musttail
+%patch -P389 -p1 -b .HACK-debian-clang-disable-base-musttail
 
-%patch -P386 -p1 -b .HACK-third_party-libvpx-use-generic-gnu
-%patch -P387 -p1 -b .HACK-debian-clang-disable-skia-musttail
+%patch -P390 -p1 -b .0001-Add-ppc64-target-to-libaom
+%patch -P391 -p1 -b .0001-Add-pregenerated-config-for-libaom-on-ppc64
 
-%patch -P388 -p1 -b .0001-Add-ppc64-target-to-libaom
-%patch -P389 -p1 -b .0001-Add-pregenerated-config-for-libaom-on-ppc64
-
-%patch -P390 -p1 -b .0002-third_party-libvpx-Remove-bad-ppc64-config
-%patch -P391 -p1 -b .0003-third_party-libvpx-Add-ppc64-generated-config
+%patch -P392 -p1 -b .0002-third_party-libvpx-Remove-bad-ppc64-config
+%patch -P393 -p1 -b .0003-third_party-libvpx-Add-ppc64-generated-config
 %patch -P394 -p1 -b .0004-third_party-libvpx-work-around-ambiguous-vsx
 
 %patch -P395 -p1 -b .skia-vsx-instructions
@@ -1190,11 +1174,11 @@ Qt6 UI for chromium.
 %patch -P403 -p1 -b .fix-partition-alloc-compile
 %patch -P404 -p1 -b .fix-study-crash
 %patch -P405 -p1 -b .memory-allocator-dcheck-assert-fix
-%patch -P406 -p1 -b .0002-Add-ppc64-trap-instructions
+%patch -P406 -p1 -b .fix-different-data-layouts
+%patch -P407 -p1 -b .0002-Add-ppc64-trap-instructions
 
-%patch -P407 -p1 -b .fix-ppc64-linux-syscalls-headers
-%patch -P408 -p1 -b .use-sysconf-page-size-on-ppc64
-#%%patch -P409 -p1 -b .partition-alloc-4k-detect
+%patch -P408 -p1 -b .fix-ppc64-linux-syscalls-headers
+%patch -P409 -p1 -b .use-sysconf-page-size-on-ppc64
 
 %patch -P410 -p1 -b .dawn-fix-typos
 %patch -P411 -p1 -b .dawn-fix-ppc64le-detection
@@ -1204,15 +1188,6 @@ Qt6 UI for chromium.
 %patch -P413 -p1 -b .fix-unknown-warning-option-messages
 %patch -P414 -p1 -b .fix-swiftshader-compile
 %endif
-
-%if 0%{?fedora} > 39
-%patch -P501 -p1 -b .ninja-1.21.1-deps
-%patch -P502 -p1 -b .ninja-1.21.1-deps
-%patch -P503 -p1 -b .ninja-1.21.1-deps
-%patch -P504 -p1 -b .ninja-1.21.1-deps
-%endif
-%patch -P505 -p1 -b .crabbyavif
-%patch -P506 -p1 -b .allow-enabling-vulkan-on-ozone-wayland
 
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
@@ -1430,6 +1405,8 @@ CHROMIUM_CORE_GN_DEFINES+=' build_dawn_tests=false enable_perfetto_unittests=fal
 CHROMIUM_CORE_GN_DEFINES+=' disable_fieldtrial_testing_config=true'
 CHROMIUM_CORE_GN_DEFINES+=' symbol_level=%{debug_level} blink_symbol_level=%{debug_level}'
 CHROMIUM_CORE_GN_DEFINES+=' angle_has_histograms=false'
+# drop unrar
+CHROMIUM_CORE_GN_DEFINES+=' safe_browsing_use_unrar=false'
 export CHROMIUM_CORE_GN_DEFINES
 
 # browser gn defines
@@ -2033,6 +2010,11 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Thu Sep 05 2024 Than Ngo <than@redhat.com> - 128.0.6613.119-1
+- update to 128.0.6613.119
+  * High CVE-2024-8362: Use after free in WebAudio
+  * High CVE-2024-7970: Out of bounds write in V8
+
 * Wed Aug 07 2024 Than Ngo <than@redhat.com> - 127.0.6533.99-1
 - update to 127.0.6533.99
   * Critical CVE-2024-7532: Out of bounds memory access in ANGLE
