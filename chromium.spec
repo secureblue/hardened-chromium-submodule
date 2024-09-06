@@ -402,8 +402,8 @@ Patch358: chromium-127-rust-clanglib.patch
 	end
         rpm.define("_vanadiumPatchCount "..count-1)
 
-	os.execute(”echo 'Autopatch H: "..macros['_hardeningPatchCount'].."'")
-        os.execute(”echo 'Autopatch V: "..macros['_vanadiumPatchCount'].."'")
+	os.execute("echo 'Autopatch H: "..macros['_hardeningPatchCount'].."'")
+        os.execute("echo 'Autopatch V: "..macros['_vanadiumPatchCount'].."'")
 }
 
 # Use chromium-latest.py to generate clean tarball from released build tarballs, found here:
