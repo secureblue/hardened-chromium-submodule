@@ -415,7 +415,10 @@ Patch379: 0001-third_party-lss-Don-t-look-for-mmap2-on-ppc64.patch
 Patch380: 0001-third_party-pffft-Include-altivec.h-on-ppc64-with-SI.patch
 Patch381: 0002-Add-PPC64-generated-files-for-boringssl.patch
 Patch382: 0002-third_party-lss-kernel-structs.patch
+
+# error: undefined symbol: llvm::MCAsmInfoXCOFF::MCAsmInfoXCOFF()
 Patch383: 0001-swiftshader-fix-build.patch
+
 Patch384: Rtc_base-system-arch.h-PPC.patch
 
 Patch385: 0002-Include-cstddef-to-fix-build.patch
@@ -458,9 +461,6 @@ Patch412: add-ppc64-architecture-to-extensions.diff
 
 # Suppress harmless compiler warning messages that appear on ppc64 due to arch-specific warning flags being passed
 Patch413: fix-unknown-warning-option-messages.diff
-
-# error: undefined symbol: llvm::MCAsmInfoXCOFF::MCAsmInfoXCOFF()
-Patch414: fix-swiftshader-compile.patch
 
 # upstream patches
 
@@ -1137,7 +1137,6 @@ Qt6 UI for chromium.
 %patch -P373 -p1 -b .0007-sandbox-linux-add-ppc64-stat
 %patch -P374 -p1 -b .Sandbox-linux-services-credentials.cc-PPC
 %patch -P375 -p1 -b .0008-sandbox-fix-ppc64le-glibc234
-
 %patch -P376 -p1 -b .0001-third_party-angle-Include-missing-header-cstddef-in-
 %patch -P377 -p1 -b .0001-Add-PPC64-support-for-boringssl
 %patch -P378 -p1 -b .0001-third_party-libvpx-Properly-generate-gni-on-ppc64
@@ -1147,23 +1146,17 @@ Qt6 UI for chromium.
 %patch -P382 -p1 -b .0002-third_party-lss-kernel-structs
 %patch -P383 -p1 -b .0001-swiftshader-fix-build
 %patch -P384 -p1 -b .Rtc_base-system-arch.h-PPC
-
 %patch -P385 -p1 -b .0002-Include-cstddef-to-fix-build
 %patch -P386 -p1 -b .0004-third_party-crashpad-port-curl-transport-ppc64
-
 %patch -P387 -p1 -b .HACK-third_party-libvpx-use-generic-gnu
 %patch -P388 -p1 -b .HACK-debian-clang-disable-skia-musttail
 %patch -P389 -p1 -b .HACK-debian-clang-disable-base-musttail
-
 %patch -P390 -p1 -b .0001-Add-ppc64-target-to-libaom
 %patch -P391 -p1 -b .0001-Add-pregenerated-config-for-libaom-on-ppc64
-
 %patch -P392 -p1 -b .0002-third_party-libvpx-Remove-bad-ppc64-config
 %patch -P393 -p1 -b .0003-third_party-libvpx-Add-ppc64-generated-config
 %patch -P394 -p1 -b .0004-third_party-libvpx-work-around-ambiguous-vsx
-
 %patch -P395 -p1 -b .skia-vsx-instructions
-
 %patch -P396 -p1 -b .0001-Implement-support-for-ppc64-on-Linux
 %patch -P397 -p1 -b .0001-Implement-support-for-PPC64-on-Linux
 %patch -P398 -p1 -b .0001-Force-baseline-POWER8-AltiVec-VSX-CPU-features-when-
@@ -1176,17 +1169,12 @@ Qt6 UI for chromium.
 %patch -P405 -p1 -b .memory-allocator-dcheck-assert-fix
 %patch -P406 -p1 -b .fix-different-data-layouts
 %patch -P407 -p1 -b .0002-Add-ppc64-trap-instructions
-
 %patch -P408 -p1 -b .fix-ppc64-linux-syscalls-headers
 %patch -P409 -p1 -b .use-sysconf-page-size-on-ppc64
-
 %patch -P410 -p1 -b .dawn-fix-typos
 %patch -P411 -p1 -b .dawn-fix-ppc64le-detection
-
 %patch -P412 -p1 -b .add-ppc64-architecture-to-extensions
-
 %patch -P413 -p1 -b .fix-unknown-warning-option-messages
-%patch -P414 -p1 -b .fix-swiftshader-compile
 %endif
 
 # Change shebang in all relevant files in this directory and all subdirectories
@@ -1285,6 +1273,10 @@ CXXFLAGS="$CFLAGS"
 # override system build flags
 CFLAGS="$FLAGS"
 CXXFLAGS="$FLAGS"
+%endif
+
+%ifarch ppc64le
+CXXFLAGS+=' -faltivec-src-compat=mixed -Wno-deprecated-altivec-src-compat'
 %endif
 
 # reduce the size of relocations
