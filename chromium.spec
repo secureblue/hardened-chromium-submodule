@@ -230,12 +230,10 @@
 %global bundlehighway 1
 %endif
 
-# enable bundleminizip for Fedora > 39 due to switch to minizip-ng
-# which breaks the build
-%global bundleminizip 0
-%if 0%{?fedora} > 39
+# workaround for build error
+# disable bundleminizip for Fedora > 39 due to switch to minizip-ng
+# disable bundleminizip for epel and Fedora39 due to old minizip version
 %global bundleminizip 1
-%endif
 
 %if 0%{?fedora} || 0%{?rhel} >= 9
 %global bundlezstd 0
@@ -313,12 +311,6 @@ Patch8: chromium-117-widevine-other-locations.patch
 Patch20: chromium-disable-font-tests.patch
 # don't download binary blob
 Patch21: chromium-123-screen-ai-service.patch
-
-# https://gitweb.gentoo.org/repo/gentoo.git/tree/www-client/chromium/files/chromium-unbundle-zlib.patch
-Patch52: chromium-81.0.4044.92-unbundle-zlib.patch
-
-# Fix headers to look for system paths when we are using system minizip
-Patch61: chromium-119-system-minizip-header-fix.patch
 
 # Fix issue where closure_compiler thinks java is only allowed in android builds
 # https://bugs.chromium.org/p/chromium/issues/detail?id=1192875
@@ -1047,11 +1039,6 @@ Qt6 UI for chromium.
 
 %patch -P20 -p1 -b .disable-font-test
 %patch -P21 -p1 -b .screen-ai-service
-
-%if ! %{bundleminizip}
-%patch -P52 -p1 -b .unbundle-zlib
-%patch -P61 -p1 -b .system-minizip
-%endif
 
 %patch -P65 -p1 -b .java-only-allowed
 %patch -P69 -p1 -b .update-rjsmin-to-1.2.0
