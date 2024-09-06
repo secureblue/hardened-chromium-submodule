@@ -244,15 +244,17 @@
 %global bundlelibdrm 0
 %global bundleffmpegfree 0
 %global bundlefreetype 0
-%global bundlelibopenjpeg2 0
 %global bundlelibtiff 0
 %global bundlelibxml 0
 %if 0%{?rhel} == 9
+# old version, need to update openjpeg to 2.5.x
+%global bundlelibopenjpeg2 1
 %global bundlecrc32c 1
 %global bundleharfbuzz 1
 %global bundlebrotli 1
 %global bundlelibwebp 1
 %else
+%global bundlelibopenjpeg2 0
 %global bundlecrc32c 0
 %global bundleharfbuzz 0
 %global bundlebrotli 0 
