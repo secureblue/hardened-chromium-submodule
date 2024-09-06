@@ -354,8 +354,6 @@ Patch150: chromium-124-qt6.patch
 # it is not supported in old glibc < 2.30, error: fatal error: 'sys/ifunc.h' file not found
 Patch305: chromium-124-el8-arm64-memory_tagging.patch
 Patch306: chromium-127-el8-ifunc-header.patch
-# 64kpage support on aarch64 (el8)
-Patch308: chromium-124-el8-support-64kpage.patch
 
 # enable fstack-protector-strong
 Patch312: chromium-123-fstack-protector-strong.patch
@@ -1081,7 +1079,6 @@ Qt6 UI for chromium.
 %ifarch aarch64
 %patch -P305 -p1 -b .el8-memory_tagging
 %patch -P306 -p1 -b .el8-ifunc-header
-%patch -P308 -p1 -b .el8-support-64kpage.patch
 %endif
 %endif
 
