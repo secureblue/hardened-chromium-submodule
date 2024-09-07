@@ -372,13 +372,10 @@ Patch358: chromium-127-rust-clanglib.patch
 # hardening patches
 %{lua:
         rpm.execute("pwd")
-        os.execute("echo $HOME")
+        os.execute("echo 'Current home: $HOME'")
 	if posix.getenv("HOME") == "/builddir" then
 		hpatches = rpm.glob('/builddir/build/SOURCES/hardened-chromium-*.patch')
 		vpatches = rpm.glob('/builddir/build/SOURCES/vanadium-*.patch')
-	elseif posix.getenv("LOCALBUILD") == "true" then
-		hpatches = rpm.glob('hardened-chromium-*.patch')
-		vpatches = rpm.glob('vanadium-*.patch')
         else
 	        hpatches = rpm.glob(macros['_sourcedir']..'/hardened-chromium-*.patch')
 		vpatches = rpm.glob(macros['_sourcedir']..'/vanadium-*.patch')
