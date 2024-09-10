@@ -489,10 +489,6 @@ Source14: https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-%{esbuild_ve
 Source15: https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-%{esbuild_version}.tgz
 %endif
 
-# bindgen for epel8
-Source16: https://than.fedorapeople.org/epel8/bindgen-cli-aarch64.tar.xz
-Source17: https://than.fedorapeople.org/epel8/bindgen-cli-x86_64.tar.xz
-
 # esbuild binary from fedora
 %if 0%{?fedora}
 BuildRequires: golang-github-evanw-esbuild
@@ -519,12 +515,7 @@ BuildRequires: binutils
 %endif
 
 BuildRequires: rustc
-%if 0%{?rhel} == 8
-# need to build bindgen on el8
-BuildRequires: cargo
-%else
 BuildRequires: bindgen-cli
-%endif
 
 %if ! %{bundlezstd}
 BuildRequires: libzstd-devel
@@ -1166,20 +1157,6 @@ Qt6 UI for chromium.
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
 find -type f \( -iname "*.py" \) -exec sed -i '1s=^#! */usr/bin/\(python\|env python\)[23]\?=#!%{chromium_pybin}=' {} +
-
-# workaround for missing bindgen on el8
-%if 0%{?rhel} == 8
-%ifarch aarch64
-tar -Jxf %{SOURCE16}
-%endif
-%ifarch x86_64
-tar -Jxf %{SOURCE17}
-%endif
-mkdir -p usr/%{_lib}
-pushd usr/%{_lib}
-ln -fs %{_libdir}/libclang* .
-popd 
-%endif
 
 # Add correct path for nodejs binary
 %if ! %{system_nodejs}
