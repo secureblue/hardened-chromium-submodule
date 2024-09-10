@@ -293,7 +293,7 @@
 %endif
 
 Name:	hardened-chromium%{chromium_channel}
-Version: 128.0.6613.119
+Version: 128.0.6613.137
 Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
