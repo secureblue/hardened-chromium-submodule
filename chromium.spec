@@ -1280,11 +1280,7 @@ export RUSTC_BOOTSTRAP=1
 # set rustc version
 rustc_version="$(rustc --version)"
 # set rust bindgen root
-%if 0%{?rhel} == 8
-rust_bindgen_root="$PWD%{_prefix}"
-%else
 rust_bindgen_root="%{_prefix}"
-%endif
 
 # set clang version
 clang_version="$(clang --version | sed -n 's/clang version //p' | cut -d. -f1)"
