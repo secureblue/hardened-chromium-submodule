@@ -296,7 +296,7 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 128.0.6613.119
+Version: 128.0.6613.137
 Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
@@ -1965,6 +1965,13 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Wed Sep 11 2024 Than Ngo <than@redhat.com> - 128.0.6613.137-1
+- update to 128.0.6613.137
+  * High CVE-2024-8636: Heap buffer overflow in Skia
+  * High CVE-2024-8637: Use after free in Media Router
+  * High CVE-2024-8638: Type Confusion in V8
+  * High CVE-2024-8639: Use after free in Autofill
+
 * Thu Sep 05 2024 Than Ngo <than@redhat.com> - 128.0.6613.119-1
 - update to 128.0.6613.119
   * High CVE-2024-8362: Use after free in WebAudio
