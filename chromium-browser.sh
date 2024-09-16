@@ -35,17 +35,10 @@ export GNOME_DISABLE_CRASH_DIALOG=SET_BY_GOOGLE_CHROME
 [[ -f /etc/chromium/chromium.conf ]] && . /etc/chromium/chromium.conf
 CHROMIUM_FLAGS=${CHROMIUM_USER_FLAGS:-$CHROMIUM_FLAGS}
 
-CHROMIUM_DISTRO_FLAGS=" --enable-plugins \
-                        --enable-extensions \
-                        --enable-user-scripts \
-                        --enable-printing \
-                        --enable-sync \
-                        --auto-ssl-client-auth @@EXTRA_FLAGS@@"
-
 # Sanitize std{in,out,err} because they'll be shared with untrusted child
 # processes (http://crbug.com/376567).
 exec < /dev/null
 exec > >(exec cat)
 exec 2> >(exec cat >&2)
 
-exec -a "$0" "$HERE/@@CHROMIUM_BROWSER_CHANNEL@@" $CHROMIUM_FLAGS $CHROMIUM_DISTRO_FLAGS "$@"
+exec -a "$0" "$HERE/@@CHROMIUM_BROWSER_CHANNEL@@" $CHROMIUM_FLAGS "$@"
