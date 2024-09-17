@@ -1,0 +1,12 @@
+diff -up chromium-129.0.6668.42/build/rust/cargo_crate.gni.me chromium-129.0.6668.42/build/rust/cargo_crate.gni
+--- chromium-129.0.6668.42/build/rust/cargo_crate.gni.me	2024-09-16 14:19:49.407900780 +0200
++++ chromium-129.0.6668.42/build/rust/cargo_crate.gni	2024-09-16 14:21:33.411392581 +0200
+@@ -429,7 +429,7 @@ template("cargo_crate") {
+           rust_abi_target,
+         ]
+       }
+-      if (current_cpu == "arm64" || current_cpu == "x64") {
++      if (current_cpu == "arm64" || current_cpu == "x64" || current_cpu == "ppc64") {
+         args += [
+           "--pointer-width",
+           "64",

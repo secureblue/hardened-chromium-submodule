@@ -1,0 +1,13 @@
+diff -up chromium-128.0.6613.137/third_party/inspector_protocol/code_generator.py.me chromium-128.0.6613.137/third_party/inspector_protocol/code_generator.py
+--- chromium-128.0.6613.137/third_party/inspector_protocol/code_generator.py.me	2024-09-16 12:47:47.541825252 +0200
++++ chromium-128.0.6613.137/third_party/inspector_protocol/code_generator.py	2024-09-16 12:48:39.210990291 +0200
+@@ -147,8 +147,7 @@ def dash_to_camelcase(word):
+ 
+ def to_snake_case(name):
+   name = re.sub(r"([A-Z]{2,})([A-Z][a-z])", r"\1_\2", name)
+-  return re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", name, sys.maxsize).lower()
+-
++  return re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", name, count=sys.maxsize).lower()
+ 
+ def to_method_case(config, name):
+   if config.use_title_case_methods:

@@ -296,7 +296,7 @@
 %endif
 
 Name:	chromium%{chromium_channel}
-Version: 128.0.6613.137
+Version: 129.0.6668.58
 Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
@@ -333,6 +333,9 @@ Patch90: chromium-121-system-libxml.patch
 # patch for using system opus
 Patch91: chromium-108-system-opus.patch
 
+# python-3,13, Deprecationwarning: 'count' is passed as positionaö argument
+Patch100: chromium-128.0.6613.137-python-3.13-warning.patch
+
 # system ffmpeg
 # need for old ffmpeg 5.x on epel9
 Patch129: chromium-125-ffmpeg-5.x-reordered_opaque.patch
@@ -345,6 +348,8 @@ Patch132: chromium-118-sigtrap_system_ffmpeg.patch
 Patch133: chromium-121-system-old-ffmpeg.patch
 # disable FFmpegAllowLists by default to allow external ffmpeg
 patch134: chromium-125-disable-FFmpegAllowLists.patch
+# revert, it causes build error: use of undeclared identifier 'AVFMT_FLAG_NOH264PARSE'
+Patch135: chromium-129-disable-H.264-video-parser-during-demuxing.patch
 
 # file conflict with old kernel on el8/el9
 Patch141: chromium-118-dma_buf_export_sync_file-conflict.patch
@@ -372,9 +377,6 @@ Patch353: chromium-127-aarch64-duplicate-case-value.patch
 
 # remove flag split-threshold-for-reg-with-hint, it's not supported in clang <= 17
 Patch354: chromium-126-split-threshold-for-reg-with-hint.patch
-
-# use system libstdc++
-Patch355: chromium-126-system-libstdc++.patch
 
 # set clang_lib path
 Patch358: chromium-127-rust-clanglib.patch
@@ -447,12 +449,12 @@ Patch407: 0002-Add-ppc64-trap-instructions.patch
 Patch408: fix-ppc64-linux-syscalls-headers.patch
 Patch409: use-sysconf-page-size-on-ppc64.patch
 
-Patch410: dawn-fix-typos.patch
 Patch411: dawn-fix-ppc64le-detection.patch
 Patch412: add-ppc64-architecture-to-extensions.diff
 
 # Suppress harmless compiler warning messages that appear on ppc64 due to arch-specific warning flags being passed
 Patch413: fix-unknown-warning-option-messages.diff
+Patch414: cargo-add-ppc64.diff
 
 # upstream patches
 
@@ -636,6 +638,10 @@ BuildRequires: libappstream-glib
 %if %{bootstrap}
 # gn needs these
 BuildRequires: libstdc++-static
+%endif
+
+%if ! %{use_custom_libcxx}
+BuildRequires: libcxx-devel
 %endif
 
 # Fedora tries to use system libs whenever it can.
@@ -1049,6 +1055,10 @@ Qt6 UI for chromium.
 %patch -P91 -p1 -b .system-opus
 %endif
 
+%if 0%{?fedora}
+%patch -P100 -p1 -b .python-3.13-warning
+%endif
+
 %if ! %{bundleffmpegfree}
 %if 0%{?rhel} == 9
 %patch -P129 -p1 -R -b .ffmpeg-5.x-reordered_opaque
@@ -1058,6 +1068,7 @@ Qt6 UI for chromium.
 %patch -P132 -p1 -b .sigtrap_system_ffmpeg
 %patch -P133 -p1 -b .system-old-ffmpeg
 %patch -P134 -p1 -b .disable-FFmpegAllowLists
+%patch -P135 -p1 -b .disable-H.264-video-parser-during-demuxing
 %endif
 
 %if 0%{?rhel} == 8 || 0%{?rhel} == 9
@@ -1091,9 +1102,6 @@ Qt6 UI for chromium.
 %patch -P354 -p1 -b .split-threshold-for-reg-with-hint
 %endif
 
-%if ! %{use_custom_libcxx}
-%patch -P355 -p1 -b .system-libstdc++
-%endif
 %patch -P358 -p1 -b .rust-clang_lib
 
 %ifarch ppc64le
@@ -1148,10 +1156,10 @@ Qt6 UI for chromium.
 %patch -P407 -p1 -b .0002-Add-ppc64-trap-instructions
 %patch -P408 -p1 -b .fix-ppc64-linux-syscalls-headers
 %patch -P409 -p1 -b .use-sysconf-page-size-on-ppc64
-%patch -P410 -p1 -b .dawn-fix-typos
 %patch -P411 -p1 -b .dawn-fix-ppc64le-detection
 %patch -P412 -p1 -b .add-ppc64-architecture-to-extensions
 %patch -P413 -p1 -b .fix-unknown-warning-option-messages
+%patch -P414 -p1 -b .rust-add-ppc64-case
 %endif
 
 # Change shebang in all relevant files in this directory and all subdirectories
@@ -1236,6 +1244,11 @@ CXXFLAGS="$CFLAGS"
 # override system build flags
 CFLAGS="$FLAGS"
 CXXFLAGS="$FLAGS"
+%endif
+
+%if ! %{use_custom_libcxx}
+CXXFLAGS="$FLAGS -stdlib=libc++"
+LDFLAGS="$LDFLAGS -stdlib=libc++"
 %endif
 
 %ifarch ppc64le
@@ -1961,6 +1974,15 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Tue Sep 17 2024 Than Ngo <than@redhat.com> - 129.0.6668.58-1
+- update to 129.0.6668.58
+  * High CVE-2024-8904: Type Confusion in V8
+  * Medium CVE-2024-8905: Inappropriate implementation in V8
+  * Medium CVE-2024-8906: Incorrect security UI in Downloads
+  * Medium CVE-2024-8907: Insufficient data validation in Omnibox
+  * Low CVE-2024-8908: Inappropriate implementation in Autofill
+  * Low CVE-2024-8909: Inappropriate implementation in UI
+
 * Wed Sep 11 2024 Than Ngo <than@redhat.com> - 128.0.6613.137-1
 - update to 128.0.6613.137
   * High CVE-2024-8636: Heap buffer overflow in Skia
