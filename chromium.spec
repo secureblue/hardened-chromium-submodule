@@ -972,10 +972,6 @@ Qt6 UI for chromium.
 %patch -P91 -p1 -b .system-opus
 %endif
 
-%if 0%{?fedora}
-%patch -P100 -p1 -b .python-3.13-warning
-%endif
-
 %if ! %{bundleffmpegfree}
 %patch -P131 -p1 -b .prop-codecs
 %patch -P132 -p1 -b .sigtrap_system_ffmpeg
