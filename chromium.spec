@@ -563,10 +563,6 @@ BuildRequires: libappstream-glib
 BuildRequires: libstdc++-static
 %endif
 
-%if ! %{use_custom_libcxx}
-BuildRequires: libcxx-devel
-%endif
-
 # Fedora tries to use system libs whenever it can.
 BuildRequires:	bzip2-devel
 BuildRequires:	dbus-glib-devel
