@@ -1080,11 +1080,6 @@ CFLAGS="$FLAGS"
 CXXFLAGS="$FLAGS"
 %endif
 
-%if ! %{use_custom_libcxx}
-CXXFLAGS="$FLAGS -stdlib=libc++"
-LDFLAGS="$LDFLAGS -stdlib=libc++"
-%endif
-
 %ifarch ppc64le
 CXXFLAGS+=' -faltivec-src-compat=mixed -Wno-deprecated-altivec-src-compat'
 %endif
