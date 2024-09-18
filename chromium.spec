@@ -227,12 +227,10 @@
 %global bundlehighway 1
 %endif
 
-# enable bundleminizip for Fedora > 39 due to switch to minizip-ng
-# which breaks the build
-%global bundleminizip 0
-%if 0%{?fedora} > 39
+# workaround for build error
+# disable bundleminizip for Fedora > 39 due to switch to minizip-ng
+# disable bundleminizip for epel and Fedora39 due to old minizip version
 %global bundleminizip 1
-%endif
 
 %if 0%{?fedora} || 0%{?rhel} >= 9
 %global bundlezstd 0
@@ -243,15 +241,17 @@
 %global bundlelibdrm 0
 %global bundleffmpegfree 0
 %global bundlefreetype 0
-%global bundlelibopenjpeg2 0
 %global bundlelibtiff 0
 %global bundlelibxml 0
 %if 0%{?rhel} == 9
+# old version, need to update openjpeg to 2.5.x
+%global bundlelibopenjpeg2 1
 %global bundlecrc32c 1
 %global bundleharfbuzz 1
 %global bundlebrotli 1
 %global bundlelibwebp 1
 %else
+%global bundlelibopenjpeg2 0
 %global bundlecrc32c 0
 %global bundleharfbuzz 0
 %global bundlebrotli 0 
@@ -293,8 +293,8 @@
 %endif
 
 Name:	hardened-chromium%{chromium_channel}
-Version: 128.0.6613.137
-Release: 3%{?dist}
+Version: 129.0.6668.58
+Release: 1%{?dist}
 Summary: A WebKit (Blink) powered web browser that Google doesn't want you to use
 Url: http://www.chromium.org/Home
 License: BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND IJG AND MIT AND GPL-2.0-or-later AND ISC AND OpenSSL AND (MPL-1.1 OR GPL-2.0-only OR LGPL-2.0-only)
@@ -305,26 +305,11 @@ Patch0: chromium-70.0.3538.67-sandbox-pie.patch
 # Use /etc/chromium for initial_prefs
 Patch1: chromium-115-initial_prefs-etc-path.patch
 
-# Do not mangle zlib
-Patch5: chromium-77.0.3865.75-no-zlib-mangle.patch
-
-# Do not use unrar code, it is non-free
-Patch6: chromium-122-norar.patch
-
-# Tell bootstrap.py to always use the version of Python we specify
-Patch11: chromium-93.0.4577.63-py3-bootstrap.patch
-
 # debian patches
 # disable font-test 
 Patch20: chromium-disable-font-tests.patch
 # don't download binary blob
 Patch21: chromium-123-screen-ai-service.patch
-
-# https://gitweb.gentoo.org/repo/gentoo.git/tree/www-client/chromium/files/chromium-unbundle-zlib.patch
-Patch52: chromium-81.0.4044.92-unbundle-zlib.patch
-
-# Fix headers to look for system paths when we are using system minizip
-Patch61: chromium-119-system-minizip-header-fix.patch
 
 # Fix issue where closure_compiler thinks java is only allowed in android builds
 # https://bugs.chromium.org/p/chromium/issues/detail?id=1192875
@@ -455,12 +440,7 @@ BuildRequires: binutils
 %endif
 
 BuildRequires: rustc
-%if 0%{?rhel} == 8
-# need to build bindgen on el8
-BuildRequires: cargo
-%else
 BuildRequires: bindgen-cli
-%endif
 
 %if ! %{bundlezstd}
 BuildRequires: libzstd-devel
@@ -581,6 +561,10 @@ BuildRequires: libappstream-glib
 %if %{bootstrap}
 # gn needs these
 BuildRequires: libstdc++-static
+%endif
+
+%if ! %{use_custom_libcxx}
+BuildRequires: libcxx-devel
 %endif
 
 # Fedora tries to use system libs whenever it can.
@@ -972,17 +956,9 @@ Qt6 UI for chromium.
 ### Chromium Fedora Patches ###
 %patch -P0 -p1 -b .sandboxpie
 %patch -P1 -p1 -b .etc
-%patch -P5 -p1 -b .nozlibmangle
-%patch -P6 -p1 -b .nounrar
-%patch -P11 -p1 -b .py3
 
 %patch -P20 -p1 -b .disable-font-test
 %patch -P21 -p1 -b .screen-ai-service
-
-%if ! %{bundleminizip}
-%patch -P52 -p1 -b .unbundle-zlib
-%patch -P61 -p1 -b .system-minizip
-%endif
 
 %patch -P65 -p1 -b .java-only-allowed
 %patch -P69 -p1 -b .update-rjsmin-to-1.2.0
@@ -1027,20 +1003,6 @@ Qt6 UI for chromium.
 # Change shebang in all relevant files in this directory and all subdirectories
 # See `man find` for how the `-exec command {} +` syntax works
 find -type f \( -iname "*.py" \) -exec sed -i '1s=^#! */usr/bin/\(python\|env python\)[23]\?=#!%{chromium_pybin}=' {} +
-
-# workaround for missing bindgen on el8
-%if 0%{?rhel} == 8
-%ifarch aarch64
-tar -Jxf %{SOURCE16}
-%endif
-%ifarch x86_64
-tar -Jxf %{SOURCE17}
-%endif
-mkdir -p usr/%{_lib}
-pushd usr/%{_lib}
-ln -fs %{_libdir}/libclang* .
-popd 
-%endif
 
 # Add correct path for nodejs binary
 %if ! %{system_nodejs}
@@ -1122,6 +1084,15 @@ CFLAGS="$FLAGS"
 CXXFLAGS="$FLAGS"
 %endif
 
+%if ! %{use_custom_libcxx}
+CXXFLAGS="$FLAGS -stdlib=libc++"
+LDFLAGS="$LDFLAGS -stdlib=libc++"
+%endif
+
+%ifarch ppc64le
+CXXFLAGS+=' -faltivec-src-compat=mixed -Wno-deprecated-altivec-src-compat'
+%endif
+
 # reduce the size of relocations
 %if 0%{?fedora} || 0%{?rhel} > 9
 LDFLAGS="$LDFLAGS -Wl,-z,pack-relative-relocs"
@@ -1160,11 +1131,7 @@ export RUSTC_BOOTSTRAP=1
 # set rustc version
 rustc_version="$(rustc --version)"
 # set rust bindgen root
-%if 0%{?rhel} == 8
-rust_bindgen_root="$PWD%{_prefix}"
-%else
 rust_bindgen_root="%{_prefix}"
-%endif
 
 # set clang version
 clang_version="$(clang --version | sed -n 's/clang version //p' | cut -d. -f1)"
@@ -1240,6 +1207,8 @@ CHROMIUM_CORE_GN_DEFINES+=' build_dawn_tests=false enable_perfetto_unittests=fal
 CHROMIUM_CORE_GN_DEFINES+=' disable_fieldtrial_testing_config=true'
 CHROMIUM_CORE_GN_DEFINES+=' symbol_level=%{debug_level} blink_symbol_level=%{debug_level}'
 CHROMIUM_CORE_GN_DEFINES+=' angle_has_histograms=false'
+# drop unrar
+CHROMIUM_CORE_GN_DEFINES+=' safe_browsing_use_unrar=false'
 export CHROMIUM_CORE_GN_DEFINES
 
 # browser gn defines
@@ -1835,6 +1804,45 @@ getent group chrome-remote-desktop >/dev/null || groupadd -r chrome-remote-deskt
 %endif
 
 %changelog
+* Tue Sep 17 2024 Than Ngo <than@redhat.com> - 129.0.6668.58-1
+- update to 129.0.6668.58
+  * High CVE-2024-8904: Type Confusion in V8
+  * Medium CVE-2024-8905: Inappropriate implementation in V8
+  * Medium CVE-2024-8906: Incorrect security UI in Downloads
+  * Medium CVE-2024-8907: Insufficient data validation in Omnibox
+  * Low CVE-2024-8908: Inappropriate implementation in Autofill
+  * Low CVE-2024-8909: Inappropriate implementation in UI
+
+* Wed Sep 11 2024 Than Ngo <than@redhat.com> - 128.0.6613.137-1
+- update to 128.0.6613.137
+  * High CVE-2024-8636: Heap buffer overflow in Skia
+  * High CVE-2024-8637: Use after free in Media Router
+  * High CVE-2024-8638: Type Confusion in V8
+  * High CVE-2024-8639: Use after free in Autofill
+
+* Thu Sep 05 2024 Than Ngo <than@redhat.com> - 128.0.6613.119-1
+- update to 128.0.6613.119
+  * High CVE-2024-8362: Use after free in WebAudio
+  * High CVE-2024-7970: Out of bounds write in V8
+
+* Wed Aug 07 2024 Than Ngo <than@redhat.com> - 127.0.6533.99-1
+- update to 127.0.6533.99
+  * Critical CVE-2024-7532: Out of bounds memory access in ANGLE
+  * High CVE-2024-7533: Use after free in Sharing
+  * High CVE-2024-7550: Type Confusion in V8
+  * High CVE-2024-7534: Heap buffer overflow in Layout
+  * High CVE-2024-7535: Inappropriate implementation in V8
+  * High CVE-2024-7536: Use after free in WebAudio
+
+* Tue Aug 06 2024 Than Ngo <than@redhat.com> - 127.0.6533.88-3
+- fix rhbz#2294773 - Allow enabling vulkan on ozone wayland for AMD vaapi
+- add ppc64le patch to fix runtime assertion trap on ppc64el systems
+- refresh ppc64le patch to work around broken 64k allocator code on arm64
+
+* Thu Aug 01 2024 Than Ngo <than@redhat.com> - 127.0.6533.88-2
+- remove old patch that seems to be the cause of a crash
+  when the user set user.max_user_namespaces to 0
+
 * Wed Jul 31 2024 Than Ngo <than@redhat.com> - 127.0.6533.88-1
 - update to 127.0.6533.88
 
