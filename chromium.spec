@@ -976,6 +976,7 @@ Qt6 UI for chromium.
 %patch -P132 -p1 -b .sigtrap_system_ffmpeg
 %patch -P133 -p1 -b .system-old-ffmpeg
 %patch -P134 -p1 -b .disable-FFmpegAllowLists
+%patch -P135 -p1 -b .disable-H.264-video-parser-during-demuxing
 %endif
 
 %if 0%{?rhel} > 9 || 0%{?fedora} > 39
