@@ -335,6 +335,9 @@ Patch132: chromium-118-sigtrap_system_ffmpeg.patch
 Patch133: chromium-121-system-old-ffmpeg.patch
 # disable FFmpegAllowLists by default to allow external ffmpeg
 Patch134: chromium-125-disable-FFmpegAllowLists.patch
+# revert, it causes build error: use of undeclared identifier 'AVFMT_FLAG_NOH264PARSE'            
+Patch135: chromium-129-disable-H.264-video-parser-during-demuxing.patch            
+
 
 # add correct path for Qt6Gui header and libs
 Patch150: chromium-124-qt6.patch
