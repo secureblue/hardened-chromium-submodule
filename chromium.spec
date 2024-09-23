@@ -23,13 +23,6 @@
 %global __provides_exclude_from ^(%{chromium_path}/.*\\.so|%{chromium_path}/.*\\.so.*)$
 %global __requires_exclude ^(%{chromium_path}/.*\\.so|%{chromium_path}/.*\\.so.*)$
 
-# enable|disable control flow integrity support
-%global cfi 1
-
-%global api_key %nil
-%global default_client_id %nil
-%global default_client_secret %nil
-%global chromoting_client_id %nil
 
 Name:	hardened-chromium%{chromium_channel}
 Version: 129.0.6668.58
@@ -299,13 +292,6 @@ Chromium is an open-source web browser, powered by WebKit (Blink).
 
 %package common
 Summary: Files needed for both the headless_shell and full Chromium
-
-# -common doesn't have chrome-remote-desktop bits
-# but we need to clean it up if it gets disabled again
-# NOTE: Check obsoletes version to be sure it matches
-Provides: chrome-remote-desktop = %{version}-%{release}
-Obsoletes: chrome-remote-desktop <= 81.0.4044.138
-
 %description common
 %{summary}.
 
@@ -406,64 +392,59 @@ rust_bindgen_root="%{_prefix}"
 clang_version="$(clang --version | sed -n 's/clang version //p' | cut -d. -f1)"
 clang_base_path="$(clang --version | grep InstalledDir | cut -d' ' -f2 | sed 's#/bin##')"
 
-CHROMIUM_CORE_GN_DEFINES=""
-CHROMIUM_CORE_GN_DEFINES+=' custom_toolchain="//build/toolchain/linux/unbundle:default"'
-CHROMIUM_CORE_GN_DEFINES+=' host_toolchain="//build/toolchain/linux/unbundle:default"'
-CHROMIUM_CORE_GN_DEFINES+=' is_debug=false dcheck_always_on=false dcheck_is_configurable=false'
-CHROMIUM_CORE_GN_DEFINES+=' enable_nacl=false'
-CHROMIUM_CORE_GN_DEFINES+=' system_libdir="%{_lib}"'
-CHROMIUM_CORE_GN_DEFINES+=' is_official_build=true'
+CHROMIUM_GN_DEFINES=""
+CHROMIUM_GN_DEFINES+=' custom_toolchain="//build/toolchain/linux/unbundle:default"'
+CHROMIUM_GN_DEFINES+=' host_toolchain="//build/toolchain/linux/unbundle:default"'
+CHROMIUM_GN_DEFINES+=' is_debug=false dcheck_always_on=false dcheck_is_configurable=false'
+CHROMIUM_GN_DEFINES+=' enable_nacl=false'
+CHROMIUM_GN_DEFINES+=' system_libdir="%{_lib}"'
+CHROMIUM_GN_DEFINES+=' is_official_build=true'
 sed -i 's|OFFICIAL_BUILD|GOOGLE_CHROME_BUILD|g' tools/generate_shim_headers/generate_shim_headers.py
-CHROMIUM_CORE_GN_DEFINES+=' chrome_pgo_phase=0'
-CHROMIUM_CORE_GN_DEFINES+=' is_cfi=true use_thin_lto=true'
-CHROMIUM_CORE_GN_DEFINES+=' enable_reporting=false'
-CHROMIUM_CORE_GN_DEFINES+=' enable_remoting=false'
-CHROMIUM_CORE_GN_DEFINES+=' is_clang=true'
-CHROMIUM_CORE_GN_DEFINES+=" clang_base_path=\"$clang_base_path\""
-CHROMIUM_CORE_GN_DEFINES+=" clang_version=\"$clang_version\""
-CHROMIUM_CORE_GN_DEFINES+=' clang_use_chrome_plugins=false'
-CHROMIUM_CORE_GN_DEFINES+=' use_lld=true'
-CHROMIUM_CORE_GN_DEFINES+=' rust_sysroot_absolute="%{_prefix}"'
-CHROMIUM_CORE_GN_DEFINES+=" rust_bindgen_root=\"$rust_bindgen_root\""
-CHROMIUM_CORE_GN_DEFINES+=" rustc_version=\"$rustc_version\""
-CHROMIUM_CORE_GN_DEFINES+=' use_sysroot=false'
-CHROMIUM_CORE_GN_DEFINES+=' icu_use_data_file=true'
-CHROMIUM_CORE_GN_DEFINES+=' target_os="linux"'
-CHROMIUM_CORE_GN_DEFINES+=' current_os="linux"'
-CHROMIUM_CORE_GN_DEFINES+=' treat_warnings_as_errors=false'
-CHROMIUM_CORE_GN_DEFINES+=' enable_iterator_debugging=false'
-CHROMIUM_CORE_GN_DEFINES+=' enable_vr=false'
-CHROMIUM_CORE_GN_DEFINES+=' enable_arcore=false'
-CHROMIUM_CORE_GN_DEFINES+=' enable_openxr=false'
-CHROMIUM_CORE_GN_DEFINES+=' enable_cardboard=false'
-CHROMIUM_CORE_GN_DEFINES+=' build_dawn_tests=false enable_perfetto_unittests=false'
-CHROMIUM_CORE_GN_DEFINES+=' disable_fieldtrial_testing_config=true'
-CHROMIUM_CORE_GN_DEFINES+=' symbol_level=%{debug_level} blink_symbol_level=%{debug_level}'
-CHROMIUM_CORE_GN_DEFINES+=' angle_has_histograms=false'
-CHROMIUM_CORE_GN_DEFINES+=' safe_browsing_use_unrar=false'
-export CHROMIUM_CORE_GN_DEFINES
-
-# browser gn defines
-CHROMIUM_BROWSER_GN_DEFINES=""
-CHROMIUM_BROWSER_GN_DEFINES+=' ffmpeg_branding="Chrome" proprietary_codecs=true is_component_ffmpeg=true enable_ffmpeg_video_decoders=true media_use_ffmpeg=true'
-CHROMIUM_BROWSER_GN_DEFINES+=' media_use_openh264=true'
-CHROMIUM_BROWSER_GN_DEFINES+=' rtc_use_h264=true'
-CHROMIUM_BROWSER_GN_DEFINES+=' use_kerberos=true'
-CHROMIUM_BROWSER_GN_DEFINES+=' use_qt=true moc_qt5_path="%{_libdir}/qt5/bin/"'
-CHROMIUM_BROWSER_GN_DEFINES+=' use_qt6=true moc_qt6_path="%{_libdir}/qt6/libexec/"'
-CHROMIUM_BROWSER_GN_DEFINES+=' use_gio=true use_pulseaudio=true'
-CHROMIUM_BROWSER_GN_DEFINES+=' enable_hangout_services_extension=false'
-CHROMIUM_BROWSER_GN_DEFINES+=' enable_widevine=false'
-CHROMIUM_BROWSER_GN_DEFINES+=' use_vaapi=true'
-CHROMIUM_BROWSER_GN_DEFINES+=' rtc_use_pipewire=true rtc_link_pipewire=true'
-CHROMIUM_BROWSER_GN_DEFINES+=' use_system_libjpeg=true'
-CHROMIUM_BROWSER_GN_DEFINES+=' use_system_libpng=true'
-CHROMIUM_BROWSER_GN_DEFINES+=' use_system_libopenjpeg2=true'
-CHROMIUM_BROWSER_GN_DEFINES+=' use_system_lcms2=true'
-CHROMIUM_BROWSER_GN_DEFINES+=' use_system_libtiff=true'
-CHROMIUM_BROWSER_GN_DEFINES+=' use_system_libffi=true'
-
-export CHROMIUM_BROWSER_GN_DEFINES
+CHROMIUM_GN_DEFINES+=' chrome_pgo_phase=0'
+CHROMIUM_GN_DEFINES+=' is_cfi=true use_thin_lto=true'
+CHROMIUM_GN_DEFINES+=' enable_reporting=false'
+CHROMIUM_GN_DEFINES+=' enable_remoting=false'
+CHROMIUM_GN_DEFINES+=' is_clang=true'
+CHROMIUM_GN_DEFINES+=" clang_base_path=\"$clang_base_path\""
+CHROMIUM_GN_DEFINES+=" clang_version=\"$clang_version\""
+CHROMIUM_GN_DEFINES+=' clang_use_chrome_plugins=false'
+CHROMIUM_GN_DEFINES+=' use_lld=true'
+CHROMIUM_GN_DEFINES+=' rust_sysroot_absolute="%{_prefix}"'
+CHROMIUM_GN_DEFINES+=" rust_bindgen_root=\"$rust_bindgen_root\""
+CHROMIUM_GN_DEFINES+=" rustc_version=\"$rustc_version\""
+CHROMIUM_GN_DEFINES+=' use_sysroot=false'
+CHROMIUM_GN_DEFINES+=' icu_use_data_file=true'
+CHROMIUM_GN_DEFINES+=' target_os="linux"'
+CHROMIUM_GN_DEFINES+=' current_os="linux"'
+CHROMIUM_GN_DEFINES+=' treat_warnings_as_errors=false'
+CHROMIUM_GN_DEFINES+=' enable_iterator_debugging=false'
+CHROMIUM_GN_DEFINES+=' enable_vr=false'
+CHROMIUM_GN_DEFINES+=' enable_arcore=false'
+CHROMIUM_GN_DEFINES+=' enable_openxr=false'
+CHROMIUM_GN_DEFINES+=' enable_cardboard=false'
+CHROMIUM_GN_DEFINES+=' build_dawn_tests=false enable_perfetto_unittests=false'
+CHROMIUM_GN_DEFINES+=' disable_fieldtrial_testing_config=true'
+CHROMIUM_GN_DEFINES+=' symbol_level=%{debug_level} blink_symbol_level=%{debug_level}'
+CHROMIUM_GN_DEFINES+=' angle_has_histograms=false'
+CHROMIUM_GN_DEFINES+=' safe_browsing_use_unrar=false'
+CHROMIUM_GN_DEFINES+=' ffmpeg_branding="Chrome" proprietary_codecs=true is_component_ffmpeg=true enable_ffmpeg_video_decoders=true media_use_ffmpeg=true'
+CHROMIUM_GN_DEFINES+=' media_use_openh264=true'
+CHROMIUM_GN_DEFINES+=' rtc_use_h264=true'
+CHROMIUM_GN_DEFINES+=' use_kerberos=true'
+CHROMIUM_GN_DEFINES+=' use_qt=true moc_qt5_path="%{_libdir}/qt5/bin/"'
+CHROMIUM_GN_DEFINES+=' use_qt6=true moc_qt6_path="%{_libdir}/qt6/libexec/"'
+CHROMIUM_GN_DEFINES+=' use_gio=true use_pulseaudio=true'
+CHROMIUM_GN_DEFINES+=' enable_hangout_services_extension=false'
+CHROMIUM_GN_DEFINES+=' enable_widevine=false'
+CHROMIUM_GN_DEFINES+=' use_vaapi=true'
+CHROMIUM_GN_DEFINES+=' rtc_use_pipewire=true rtc_link_pipewire=true'
+CHROMIUM_GN_DEFINES+=' use_system_libjpeg=true'
+CHROMIUM_GN_DEFINES+=' use_system_libpng=true'
+CHROMIUM_GN_DEFINES+=' use_system_libopenjpeg2=true'
+CHROMIUM_GN_DEFINES+=' use_system_lcms2=true'
+CHROMIUM_GN_DEFINES+=' use_system_libtiff=true'
+CHROMIUM_GN_DEFINES+=' use_system_libffi=true'
+export CHROMIUM_GN_DEFINES
 
 # use system libraries
 system_libs=()
@@ -501,7 +482,7 @@ fi
 
 mkdir -p %{chromebuilddir} && cp -a %{_bindir}/gn %{chromebuilddir}/
 
-%{chromebuilddir}/gn --script-executable=%{chromium_pybin} gen --args="$CHROMIUM_CORE_GN_DEFINES $CHROMIUM_BROWSER_GN_DEFINES" %{chromebuilddir}
+%{chromebuilddir}/gn --script-executable=%{chromium_pybin} gen --args="$CHROMIUM_GN_DEFINES" %{chromebuilddir}
 
 %build_target %{chromebuilddir} chrome
 %build_target %{chromebuilddir} chrome_sandbox
