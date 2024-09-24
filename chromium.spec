@@ -116,14 +116,8 @@ Source1: README.fedora
 Source2: chromium.conf
 Source3: chromium-browser.sh
 Source4: %{chromium_browser_channel}.desktop
-# Also, only used if you want to reproduce the clean tarball.
 Source5: clean_ffmpeg.sh
 Source6: chromium-latest.py
-Source7: get_free_ffmpeg_source_files.py
-# Get the names of all tests (gtests) for Linux
-# Usage: get_linux_tests_name.py chromium-%%{version} --spec
-Source8: get_linux_tests_names.py
-# GNOME stuff
 Source9: chromium-browser.xml
 Source11: master_preferences
 
